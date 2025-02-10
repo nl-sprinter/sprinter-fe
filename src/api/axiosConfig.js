@@ -47,25 +47,18 @@ axiosInstance.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const refreshToken = localStorage.getItem('refreshToken');
-                if (!refreshToken) {
-                    throw new Error('Refresh token not found');
-                }
+                const refreshResponse = await axiosInstance.post('/auth/refresh', {}, {withCredentials: true});
 
-                // refreshToken으로 새로운 accessToken 요청
-                const response = await axios.post('http://localhost:8080/api/v1/auth/refresh', {
-                    refreshToken
-                });
-                
-                const { accessToken } = response.data;
-                localStorage.setItem('accessToken', accessToken); // 새로운 accessToken을 저장
-                
-                originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                // 새로운 accessToken을 localStorage에 저장
+                const newAccessToken = refreshResponse.data.accessToken;
+                localStorage.setItem('accessToken', newAccessToken); // 새로운 accessToken을 저장
+
+                // 기존 요청을 newAccessToken으로 다시 실행
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return axiosInstance(originalRequest);
             } catch (refreshError) {
                 // refreshToken도 만료되었을 경우 로그아웃 처리
                 localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
                 window.location.href = '/login';
                 return Promise.reject(refreshError);
             }
