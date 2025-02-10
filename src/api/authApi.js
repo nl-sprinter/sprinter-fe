@@ -1,29 +1,44 @@
-import axios from './axiosConfig';
+import axiosInstance from './axiosConfig';
 
-export const authApi = {
-    signup: async (email, password, nickname) => {
-        console.log(`received email=${email}, password=${password}, nickname=${nickname}`)
-        try {
-            const response = await axios.post('/auth', {
-                email,
-                password,
-                nickname
-            });
-            return response.data;
-        } catch (error) {
-            throw error.response?.data || error.message;
-        }
-    },
-    
-    login: async (email, password) => {
-        try {
-            const response = await axios.post('/login', {
-                email,
-                password
-            });
-            return response;
-        } catch (error) {
-            throw error.response?.data || error.message;
-        }
+export const login = async (email, password) => {
+    try {
+        const response = await axiosInstance.post('/auth/login', {
+            email,
+            password
+        });
+        const { accessToken, refreshToken } = response.data;
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const signup = async (email, password, nickname) => {
+    try {
+        const response = await axiosInstance.post('/auth/signup', {
+            email,
+            password,
+            nickname
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const logout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    window.location.href = '/login';
+};
+
+export const checkAuth = async () => {
+    try {
+        const response = await axiosInstance.get('/auth/check');
+        return response.data;
+    } catch (error) {
+        throw error;
     }
 };

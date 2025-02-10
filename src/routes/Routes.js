@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PrivateRoute from '../components/auth/PrivateRoute';
+import PublicRoute from '../components/auth/PublicRoute';
 import NotFoundPage from '../components/pages/NotFoundPage';
 
 // 로그인 전 페이지
@@ -23,9 +24,21 @@ const AppRoutes = () => {
         <BrowserRouter>
             <Routes>
                 // 로그인 전 페이지
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignUpPage />} />
+                <Route path="/" element={
+                    <PublicRoute>
+                        <LandingPage />
+                    </PublicRoute>
+                } />
+                <Route path="/login" element={
+                    <PublicRoute>
+                        <LoginPage />
+                    </PublicRoute>
+                } />
+                <Route path="/signup" element={
+                    <PublicRoute>
+                        <SignUpPage />
+                    </PublicRoute>
+                } />
                 
 
                 // 프로젝트 외부 페이지

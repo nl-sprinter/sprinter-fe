@@ -3,7 +3,7 @@ import Layout from '../common/Layout';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { authApi } from '../../api/authApi';
+import { signup } from '../../api/authApi';
 
 const StyledTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -109,7 +109,7 @@ const SignUpPage = () => {
         if (!validateForm()) return;
 
         try {
-            const response = await authApi.signup(
+            const response = await signup(
                 formData.email,
                 formData.password,
                 formData.nickname

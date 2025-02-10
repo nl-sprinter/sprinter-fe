@@ -1,10 +1,10 @@
 import { Box, Button, TextField, Typography, Divider } from '@mui/material';
 import Layout from '../common/Layout';
 import { styled } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useState } from 'react';
-import { authApi } from '../../api/authApi';
+import { login } from '../../api/authApi';
 
 const StyledTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
@@ -83,8 +83,9 @@ const LoginPage = () => {
         e.preventDefault();
         
         try {
-            const response = await authApi.login(formData.email, formData.password);
+            const response = await login(formData.email, formData.password);
             if (response.status === 200) {
+                console.log(`LoginPage:로그인 성공`)
                 navigate('/home');
             }
         } catch (error) {
