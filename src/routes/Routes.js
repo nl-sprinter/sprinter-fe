@@ -12,6 +12,7 @@ import AccountPage from '../components/pages/AccountPage';
 // 프로젝트 외부 페이지
 import HomePage from '../components/pages/HomePage';
 import StartingFormPage from '../components/pages/StartingFormPage';
+import BacklogConfirmPage from '../components/pages/BacklogConfirmPage';
 
 // 프로젝트 내부 페이지
 import OverviewPage from '../components/pages/OverviewPage';
@@ -24,7 +25,7 @@ const AppRoutes = () => {
     return (
         <BrowserRouter>
             <Routes>
-                // 로그인 전 페이지
+                //// 로그인 전 페이지
                 <Route path="/" element={
                     <PublicRoute>
                         <LandingPage/>
@@ -42,6 +43,8 @@ const AppRoutes = () => {
                 }/>
 
 
+                //// 로그인 후 페이지
+
                 // 프로젝트 외부 페이지
                 <Route path="/home" element={
                     <PrivateRoute>
@@ -51,6 +54,11 @@ const AppRoutes = () => {
                 <Route path="/startingform" element={
                     <PrivateRoute>
                         <StartingFormPage/>
+                    </PrivateRoute>
+                }/>
+                <Route path="/backlogconfirm" element={
+                    <PrivateRoute>
+                        <BacklogConfirmPage/>
                     </PrivateRoute>
                 }/>
                 <Route path="/account" element={
