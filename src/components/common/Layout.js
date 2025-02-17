@@ -1,42 +1,26 @@
-import {Box} from '@mui/material';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
 const Layout = ({children, showSidebar = false, showFunctions = false}) => {
     return (
-        <Box sx={{ 
-            height: '100vh',
-            display: 'flex', 
-            flexDirection: 'column',
-            overflow: 'hidden'
-        }}>
+        <div className="h-screen flex flex-col overflow-hidden">
             <Header showSidebar={showSidebar} showFunctions={showFunctions}/>
-            <Box sx={{ 
-                display: 'flex', 
-                flex: 1, 
-                mt: '64px',
-                overflow: 'hidden',
-                position: 'relative'
-            }}>
+            <div className="flex flex-1 mt-16 overflow-hidden relative">
                 {showSidebar && <Sidebar/>}
-                <Box 
-                    component="main"
-                    sx={{
-                        flex: 1,
-                        width: showSidebar ? `calc(100% - 240px)` : '100%',
-                        ml: showSidebar ? '240px' : 0,
-                        p: 3,
-                        overflow: 'auto',
-                        position: 'absolute',
-                        top: 0,
-                        right: 0,
-                        bottom: 0
-                    }}
+                <main 
+                    className={`
+                        flex-1 
+                        ${showSidebar ? 'w-[calc(100%-240px)] ml-60' : 'w-full'} 
+                        p-6 
+                        overflow-auto 
+                        absolute 
+                        inset-0
+                    `}
                 >
                     {children}
-                </Box>
-            </Box>
-        </Box>
+                </main>
+            </div>
+        </div>
     );
 };
 

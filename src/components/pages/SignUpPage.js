@@ -1,66 +1,7 @@
-import { Box, Button, TextField, Typography } from '@mui/material';
 import Layout from '../common/Layout';
-import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { signup } from '../../api/authApi';
-
-const StyledTextField = styled(TextField)({
-    '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-            borderColor: '#e0e0e0',
-        },
-        '&:hover fieldset': {
-            borderColor: '#666666',
-        },
-        '&.Mui-focused fieldset': {
-            borderColor: '#4CAF50',
-            borderWidth: 1,
-        },
-    },
-    '& .MuiInputLabel-root': {
-        color: '#666666',
-        '&.Mui-focused': {
-            color: '#4CAF50',
-        },
-    },
-    '& .MuiInputBase-input': {
-        color: '#333333',
-    }
-});
-
-const SignUpContainer = styled(Box)({
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'linear-gradient(180deg, #FFFFFF 10%, #3F5F8F 100%)',
-    overflow: 'hidden'
-});
-
-const SignUpBox = styled(Box)({
-    width: '100%',
-    maxWidth: '400px',
-    padding: '40px',
-    borderRadius: '12px',
-    backgroundColor: 'white',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    margin: '0 20px'
-});
-
-const ValidationMessage = styled(Typography)({
-    color: '#ff0000',
-    fontSize: '0.75rem',
-    marginTop: '4px'
-});
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -105,7 +46,6 @@ const SignUpPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
         if (!validateForm()) return;
 
         try {
@@ -114,8 +54,8 @@ const SignUpPage = () => {
                 formData.password,
                 formData.nickname
             );
-            alert('회원가입이 완료되었습니다!');  // 성공 메시지
-            navigate('/');  // LandingPage로 이동
+            alert('회원가입이 완료되었습니다!');
+            navigate('/');
         } catch (error) {
             setErrors({ submit: error.message || '회원가입에 실패했습니다' });
         }
@@ -131,86 +71,82 @@ const SignUpPage = () => {
 
     return (
         <Layout>
-            <SignUpContainer>
-                <SignUpBox component="form" onSubmit={handleSubmit}>
-                    <Typography variant="h4" component="h1" textAlign="center" mb={3}>
+            <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-blue-900 overflow-hidden">
+                <form onSubmit={handleSubmit} className="w-full max-w-[400px] p-10 bg-white rounded-xl shadow-md flex flex-col gap-5 mx-5">
+                    <h1 className="text-2xl font-bold text-center mb-6">
                         회원가입
-                    </Typography>
+                    </h1>
                     
-                    <StyledTextField
-                        label="이메일"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        error={!!errors.email}
-                        helperText={errors.email}
-                        variant="outlined"
-                        fullWidth
-                        type="email"
-                    />
+                    <div>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="이메일"
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500
+                                ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                    </div>
                     
-                    <StyledTextField
-                        label="닉네임"
-                        name="nickname"
-                        value={formData.nickname}
-                        onChange={handleChange}
-                        error={!!errors.nickname}
-                        helperText={errors.nickname}
-                        variant="outlined"
-                        fullWidth
-                    />
+                    <div>
+                        <input
+                            type="text"
+                            name="nickname"
+                            value={formData.nickname}
+                            onChange={handleChange}
+                            placeholder="닉네임"
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500
+                                ${errors.nickname ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        {errors.nickname && <p className="text-red-500 text-sm mt-1">{errors.nickname}</p>}
+                    </div>
                     
-                    <StyledTextField
-                        label="비밀번호"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        error={!!errors.password}
-                        helperText={errors.password}
-                        variant="outlined"
-                        fullWidth
-                        type="password"
-                    />
+                    <div>
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="비밀번호"
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500
+                                ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                    </div>
                     
-                    <StyledTextField
-                        label="비밀번호 확인"
-                        name="passwordConfirm"
-                        value={formData.passwordConfirm}
-                        onChange={handleChange}
-                        error={!!errors.passwordConfirm}
-                        helperText={errors.passwordConfirm}
-                        variant="outlined"
-                        fullWidth
-                        type="password"
-                    />
+                    <div>
+                        <input
+                            type="password"
+                            name="passwordConfirm"
+                            value={formData.passwordConfirm}
+                            onChange={handleChange}
+                            placeholder="비밀번호 확인"
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500
+                                ${errors.passwordConfirm ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        {errors.passwordConfirm && <p className="text-red-500 text-sm mt-1">{errors.passwordConfirm}</p>}
+                    </div>
                     
-                    {errors.submit && (
-                        <ValidationMessage>
-                            {errors.submit}
-                        </ValidationMessage>
-                    )}
+                    {errors.submit && <p className="text-red-500 text-sm">{errors.submit}</p>}
                     
-                    <Button
+                    <button
                         type="submit"
-                        variant="contained"
-                        fullWidth
-                        sx={{
-                            bgcolor: '#4CAF50',
-                            '&:hover': { bgcolor: '#45a049' }
-                        }}
+                        className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
                     >
                         회원가입
-                    </Button>
-
-                    <Button
-                        variant="text"
+                    </button>
+                    
+                    <button
+                        type="button"
                         onClick={() => navigate('/')}
-                        sx={{ color: '#666666' }}
+                        className="text-gray-600 hover:text-gray-800"
                     >
                         뒤로 가기
-                    </Button>
-                </SignUpBox>
-            </SignUpContainer>
+                    </button>
+                </form>
+            </div>
         </Layout>
     );
 };

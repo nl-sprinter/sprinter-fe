@@ -1,24 +1,5 @@
-import { Box, Typography, Modal, List, ListItem } from '@mui/material';
-import { styled } from '@mui/material/styles';
-
-const SearchBox = styled(Box)({
-    position: 'absolute',
-    top: '64px',
-    right: '240px',
-    width: '400px',
-    backgroundColor: 'white',
-    border: '1px solid #e0e0e0',
-    borderRadius: '0 0 4px 4px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-});
-
-const SearchItem = styled(ListItem)({
-    padding: '12px 20px',
-    cursor: 'pointer',
-    '&:hover': {
-        backgroundColor: '#f5f5f5'
-    }
-});
+import Modal from 'react-modal';
+import { FiX } from 'react-icons/fi';
 
 const SearchModal = ({ open, onClose, anchorEl }) => {
     const recentSearches = [
@@ -28,34 +9,41 @@ const SearchModal = ({ open, onClose, anchorEl }) => {
     ];
 
     const searchRect = anchorEl?.getBoundingClientRect();
-    const modalTop = searchRect ? searchRect.bottom : 64;
-    const modalLeft = searchRect ? searchRect.left : 'auto';
+    
+    const customStyles = {
+        overlay: {
+            backgroundColor: 'transparent',
+            zIndex: 50
+        },
+        content: {
+            position: 'absolute',
+            top: searchRect ? `${searchRect.bottom}px` : '64px',
+            left: searchRect ? `${searchRect.left}px` : 'auto',
+            right: 'auto',
+            bottom: 'auto',
+            width: searchRect?.width || '400px',
+            padding: '0',
+            border: '0px solid',
+            borderTop: 'none',
+            borderRadius: '0 0 0.375rem 0.375rem',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+        }
+    };
 
     return (
         <Modal
-            open={open}
-            onClose={onClose}
-            sx={{
-                '& .MuiBackdrop-root': {
-                    backgroundColor: 'transparent'
-                }
-            }}
+            isOpen={open}
+            onRequestClose={onClose}
+            style={customStyles}
+            contentLabel="Search Modal"
         >
-            <SearchBox
-                sx={{
-                    top: modalTop,
-                    left: modalLeft,
-                    width: searchRect?.width || 400
-                }}
-            >
-                <List>
-                    {recentSearches.map((search, index) => (
-                        <SearchItem key={index}>
-                            <Typography>{search}</Typography>
-                        </SearchItem>
-                    ))}
-                </List>
-            </SearchBox>
+            <ul className="list-none">
+                {recentSearches.map((search, index) => (
+                    <li key={index} className="p-3 cursor-pointer hover:bg-gray-100">
+                        <span>{search}</span>
+                    </li>
+                ))}
+            </ul>
         </Modal>
     );
 };

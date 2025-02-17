@@ -1,52 +1,17 @@
-import {AppBar, Toolbar, Typography, IconButton, InputBase, Box} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import ChatBubbleRoundedIcon from '@mui/icons-material/ChatBubbleRounded';
-import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
-import { styled } from '@mui/material/styles';
+import { FiSearch, FiMenu, FiMessageSquare, FiUser } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import TodoModal from './TodoModal';
 import ChatModal from './ChatModal';
 import SearchModal from './SearchModal';
-
-
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: '24px',
-    backgroundColor: '#f5f5f5',
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    maxWidth: '400px',
-    display: 'flex',
-    alignItems: 'center'
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    right: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#666666'
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    width: '100%',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 5, 1, 2),
-    },
-}));
+import UserModal from './UserModal';
 
 const Header = ({ showSidebar = false, showFunctions = false }) => {
     const navigate = useNavigate();
     const [todoModalOpen, setTodoModalOpen] = useState(false);
     const [chatModalOpen, setChatModalOpen] = useState(false);
     const [searchModalOpen, setSearchModalOpen] = useState(false);
+    const [userModalOpen, setUserModalOpen] = useState(false);
     const searchRef = useRef(null);
     
     const handleLogoClick = () => {
@@ -54,61 +19,50 @@ const Header = ({ showSidebar = false, showFunctions = false }) => {
     };
 
     return (
-        <AppBar 
-            position="fixed" 
-            elevation={0}
-            sx={{
-                width: showSidebar ? { xs: '100%', sm: `calc(100% - ${240}px)` } : '100%',
-                ml: showSidebar ? { xs: 0, sm: `${240}px` } : 0,
-                zIndex: (theme) => theme.zIndex.drawer - 1,
-                bgcolor: 'white'
-            }}
-        >
-            <Toolbar sx={{ justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1, justifyContent: 'flex-end' }}>
+        <header className={`fixed top-0 ${showSidebar ? 'sm:ml-60 sm:w-[calc(100%-240px)]' : 'w-full'} bg-white z-40`}>
+            <div className="flex justify-between items-center px-4 h-16">
+                <div className="flex items-center gap-8 flex-grow justify-end">
                     {showFunctions && (
                         <>
-                            <Search ref={searchRef}>
-                                <StyledInputBase 
-                                    placeholder="검색" 
+                            <div ref={searchRef} className="relative flex items-center max-w-[400px] w-full bg-gray-100 rounded-3xl">
+                                <input
+                                    type="text"
+                                    placeholder="검색"
+                                    className="w-full px-4 py-2 bg-transparent outline-none"
                                     onClick={() => setSearchModalOpen(true)}
                                 />
-                                <SearchIconWrapper>
-                                    <SearchIcon />
-                                </SearchIconWrapper>
-                            </Search>
-                            <IconButton 
-                                sx={{ color: '#666666' }}
+                                <div className="absolute right-0 h-full flex items-center justify-center px-4 text-gray-600">
+                                    <FiSearch className="text-xl" />
+                                </div>
+                            </div>
+                            <button 
+                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-full"
                                 onClick={() => setTodoModalOpen(true)}
                             >
-                                <MenuRoundedIcon />
-                            </IconButton>
-                            <IconButton 
-                                sx={{ color: '#666666' }}
+                                <FiMenu className="text-xl" />
+                            </button>
+                            <button 
+                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-full"
                                 onClick={() => setChatModalOpen(true)}
                             >
-                                <ChatBubbleRoundedIcon />
-                            </IconButton>
-                            <IconButton 
-                                sx={{ color: '#666666' }}
-                                onClick={() => navigate('/account')}
+                                <FiMessageSquare className="text-xl" />
+                            </button>
+                            <button 
+                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-full"
+                                onClick={() => setUserModalOpen(true)}
                             >
-                                <PersonRoundedIcon />
-                            </IconButton>
+                                <FiUser className="text-xl" />
+                            </button>
                         </>
                     )}
-                    <Box 
-                        component="img"
+                    <img 
                         src="/images/label.png"
                         alt="Label"
-                        sx={{ 
-                            height: 24,
-                            cursor: 'pointer'
-                        }}
+                        className="h-6 cursor-pointer"
                         onClick={handleLogoClick}
                     />
-                </Box>
-            </Toolbar>
+                </div>
+            </div>
             <TodoModal 
                 open={todoModalOpen} 
                 onClose={() => setTodoModalOpen(false)} 
@@ -122,7 +76,11 @@ const Header = ({ showSidebar = false, showFunctions = false }) => {
                 onClose={() => setSearchModalOpen(false)}
                 anchorEl={searchRef.current}
             />
-        </AppBar>
+            <UserModal
+                open={userModalOpen}
+                onClose={() => setUserModalOpen(false)}
+            />
+        </header>
     );
 };
 

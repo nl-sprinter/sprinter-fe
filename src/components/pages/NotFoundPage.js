@@ -1,4 +1,3 @@
-import { Box, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../common/Layout';
 
@@ -7,34 +6,20 @@ const NotFoundPage = () => {
 
     return (
         <Layout>
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    minHeight: '100%',          // 상단바로 인한 스크롤바 제거
-                    textAlign: 'center',        // 상단바로 인한 스크롤바 제거
-                    py: 4                       // 상단바로 인한 스크롤바 제거
-                }}
-            >
-                <Typography variant="h1" sx={{ mb: 2, color: '#666666' }}>
+            <div className="flex flex-col items-center justify-center min-h-full text-center py-8">
+                <h1 className="text-6xl mb-4 text-gray-600">
                     404
-                </Typography>
-                <Typography variant="h4" sx={{ mb: 4, color: '#666666' }}>
+                </h1>
+                <h2 className="text-2xl mb-8 text-gray-600">
                     페이지를 찾을 수 없습니다
-                </Typography>
-                <Button
-                    variant="contained"
+                </h2>
+                <button
                     onClick={() => navigate('/')}
-                    sx={{
-                        bgcolor: '#4CAF50',
-                        '&:hover': { bgcolor: '#45a049' }
-                    }}
+                    className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                 >
                     홈으로 돌아가기
-                </Button>
-            </Box>
+                </button>
+            </div>
         </Layout>
     );
 };

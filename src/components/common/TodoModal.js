@@ -1,37 +1,25 @@
-import { Box, Typography, Modal, List, ListItem } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import Modal from 'react-modal';
+import { FiX } from 'react-icons/fi';
 
-const TodoBox = styled(Box)({
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    width: '300px',
-    height: '100%',
-    backgroundColor: 'white',
-    borderLeft: '1px solid #e0e0e0',
-    padding: '20px'
-});
-
-const TodoItem = styled(ListItem)({
-    display: 'flex',
-    alignItems: 'center',
-    padding: '12px',
-    borderBottom: '1px solid #f5f5f5',
-    '&:last-child': {
-        borderBottom: 'none'
+const customStyles = {
+    overlay: {
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        zIndex: 50
+    },
+    content: {
+        top: '0',
+        right: '0',
+        bottom: '0',
+        left: 'auto',
+        width: '300px',
+        margin: '0',
+        padding: '20px',
+        border: '0px solid',
+        borderRadius: '0',
+        transform: 'none',
+        position: 'fixed'
     }
-});
-
-const ProjectIndicator = styled(Box)({
-    width: '32px',
-    height: '32px',
-    borderRadius: '4px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white',
-    marginLeft: '12px'
-});
+};
 
 const TodoModal = ({ open, onClose }) => {
     const todos = [
@@ -42,36 +30,36 @@ const TodoModal = ({ open, onClose }) => {
 
     return (
         <Modal
-            open={open}
-            onClose={onClose}
-            sx={{
-                '& .MuiBackdrop-root': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)'
-                }
-            }}
+            isOpen={open}
+            onRequestClose={onClose}
+            style={customStyles}
+            contentLabel="Todo Modal"
         >
-            <TodoBox>
-                <Typography variant="h6" sx={{ mb: 3 }}>
-                    Todo List
-                </Typography>
-                <List>
-                    {todos.map((todo, index) => (
-                        <TodoItem key={index}>
-                            <Box sx={{ flexGrow: 1 }}>
-                                <Typography variant="body2" color="#666666">
-                                    {todo.project}
-                                </Typography>
-                                <Typography>
-                                    {todo.task} {todo.status}
-                                </Typography>
-                            </Box>
-                            <ProjectIndicator sx={{ bgcolor: todo.color }}>
-                                P
-                            </ProjectIndicator>
-                        </TodoItem>
-                    ))}
-                </List>
-            </TodoBox>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold">Todo List</h2>
+                <button 
+                    onClick={onClose}
+                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                    <FiX className="text-xl text-gray-600" />
+                </button>
+            </div>
+            <ul>
+                {todos.map((todo, index) => (
+                    <li key={index} className="flex items-center py-3 border-b border-gray-100 last:border-b-0">
+                        <div className="flex-grow">
+                            <p className="text-sm text-gray-600">{todo.project}</p>
+                            <p>{todo.task} {todo.status}</p>
+                        </div>
+                        <div 
+                            className="w-8 h-8 rounded bg-green-500 text-white flex items-center justify-center ml-3"
+                            style={{ backgroundColor: todo.color }}
+                        >
+                            P
+                        </div>
+                    </li>
+                ))}
+            </ul>
         </Modal>
     );
 };

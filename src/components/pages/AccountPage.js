@@ -1,147 +1,107 @@
-import { Box, Button, TextField, Typography } from '@mui/material';
 import Layout from '../common/Layout';
-import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-
-const AccountContainer = styled(Box)({
-    width: '100%',
-    maxWidth: '600px',
-    margin: '0 auto',
-    padding: '40px 20px',
-});
-
-const StyledTextField = styled(TextField)({
-    '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-            borderColor: '#e0e0e0',
-        },
-        '&:hover fieldset': {
-            borderColor: '#666666',
-        },
-        '&.Mui-focused fieldset': {
-            borderColor: '#4CAF50',
-            borderWidth: 1,
-        },
-    },
-    '& .MuiInputLabel-root': {
-        color: '#666666',
-        '&.Mui-focused': {
-            color: '#4CAF50',
-        },
-    },
-    '& .MuiInputBase-input': {
-        color: '#333333',
-    },
-    '&.Mui-disabled .MuiInputBase-input': {
-        color: '#666666',
-        '-webkit-text-fill-color': '#666666',
-    }
-});
-
-const ButtonGroup = styled(Box)({
-    display: 'flex',
-    gap: '1rem',
-    justifyContent: 'flex-end',
-    marginTop: '2rem'
-});
-
-const ValidationMessage = styled(Typography)({
-    color: '#ff0000',
-    fontSize: '0.75rem',
-    marginTop: '4px'
-});
+import { useState } from 'react';
 
 const AccountPage = () => {
     const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        newPasswordConfirm: ''
+    });
+    const [errors, setErrors] = useState({});
     
     return (
         <Layout>
-            <AccountContainer>
-                <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
+            <div className="max-w-2xl mx-auto px-4 py-8">
+                <h1 className="text-2xl font-bold mb-8">
                     계정 정보 수정
-                </Typography>
+                </h1>
                 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                    <Box>
-                        <Typography sx={{ mb: 1 }}>이메일</Typography>
-                        <StyledTextField
-                            fullWidth
+                <div className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            이메일
+                        </label>
+                        <input
+                            type="email"
                             disabled
                             value="kraftenty@gmail.com"
+                            className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600"
                         />
-                    </Box>
+                    </div>
                     
-                    <Box>
-                        <Typography sx={{ mb: 1 }}>닉네임</Typography>
-                        <StyledTextField
-                            fullWidth
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            닉네임
+                        </label>
+                        <input
+                            type="text"
                             disabled
                             value="enty"
+                            className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600"
                         />
-                    </Box>
+                    </div>
                     
-                    <Box>
-                        <Typography sx={{ mb: 1 }}>현재 비밀번호</Typography>
-                        <StyledTextField
-                            fullWidth
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            현재 비밀번호
+                        </label>
+                        <input
                             type="password"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                         />
-                        <ValidationMessage>Validation Message</ValidationMessage>
-                    </Box>
+                        {errors.currentPassword && (
+                            <p className="text-red-500 text-sm mt-1">{errors.currentPassword}</p>
+                        )}
+                    </div>
                     
-                    <Box>
-                        <Typography sx={{ mb: 1 }}>새 비밀번호</Typography>
-                        <StyledTextField
-                            fullWidth
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            새 비밀번호
+                        </label>
+                        <input
                             type="password"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                         />
-                        <ValidationMessage>Validation Message</ValidationMessage>
-                    </Box>
+                        {errors.newPassword && (
+                            <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
+                        )}
+                    </div>
                     
-                    <Box>
-                        <Typography sx={{ mb: 1 }}>새 비밀번호 확인</Typography>
-                        <StyledTextField
-                            fullWidth
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            새 비밀번호 확인
+                        </label>
+                        <input
                             type="password"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                         />
-                        <ValidationMessage>Validation Message</ValidationMessage>
-                    </Box>
-                </Box>
+                        {errors.newPasswordConfirm && (
+                            <p className="text-red-500 text-sm mt-1">{errors.newPasswordConfirm}</p>
+                        )}
+                    </div>
+                </div>
                 
-                <ButtonGroup>
-                    <Button 
-                        variant="contained" 
-                        sx={{ 
-                            bgcolor: '#e0e0e0',
-                            color: '#666666',
-                            '&:hover': { bgcolor: '#d0d0d0' }
-                        }}
+                <div className="flex justify-end gap-4 mt-8">
+                    <button 
                         onClick={() => navigate(-1)}
+                        className="px-4 py-2 bg-gray-200 text-gray-600 rounded hover:bg-gray-300 transition-colors"
                     >
                         뒤로가기
-                    </Button>
-                    <Button 
-                        variant="contained"
-                        sx={{
-                            bgcolor: '#009688',
-                            color: 'white',
-                            '&:hover': { bgcolor: '#00897b' }
-                        }}
+                    </button>
+                    <button 
+                        className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors"
                     >
                         수정
-                    </Button>
-                    <Button 
-                        variant="contained"
-                        sx={{
-                            bgcolor: '#AA0000',
-                            color: 'white',
-                            '&:hover': { bgcolor: '#990000' }
-                        }}
+                    </button>
+                    <button 
+                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                     >
                         회원 탈퇴
-                    </Button>
-                </ButtonGroup>
-            </AccountContainer>
+                    </button>
+                </div>
+            </div>
         </Layout>
     );
 };

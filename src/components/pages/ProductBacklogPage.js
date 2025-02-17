@@ -1,75 +1,42 @@
-import { Box, Typography, Paper, List, ListItem, Divider } from '@mui/material';
 import Layout from '../common/Layout';
-import { styled } from '@mui/material/styles';
-
-const BacklogContainer = styled(Paper)({
-    margin: '24px',
-    backgroundColor: '#f5f5f5',
-    borderRadius: '8px',
-    overflow: 'hidden'
-});
-
-const BacklogList = styled(List)({
-    padding: '20px',
-    '&::-webkit-scrollbar': {
-        width: '8px'
-    },
-    '&::-webkit-scrollbar-track': {
-        background: '#f1f1f1',
-        borderRadius: '4px'
-    },
-    '&::-webkit-scrollbar-thumb': {
-        background: '#888',
-        borderRadius: '4px',
-        '&:hover': {
-            background: '#666'
-        }
-    }
-});
-
-const BacklogItem = styled(ListItem)({
-    backgroundColor: '#ffffff',
-    borderRadius: '4px',
-    marginBottom: '12px',
-    padding: '16px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    '&:hover': {
-        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-        transform: 'translateY(-2px)',
-        transition: 'all 0.2s ease'
-    }
-});
+import { useState } from 'react';
 
 const ProductBacklogPage = () => {
     const backlogs = [
         { sprint: 'sprint1', title: 'aaaa' },
         { sprint: 'sprint1', title: 'bbbb' },
         { sprint: 'sprint2', title: 'bcbcb' },
-        // ... 더 많은 백로그 아이템들
     ];
 
     return (
         <Layout showFunctions showSidebar>
-            <Box sx={{ p: 4 }}>
-                <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+            <div className="p-8">
+                <h1 className="text-2xl font-bold mb-4">
                     Product Backlog
-                </Typography>
+                </h1>
                 
-                <BacklogContainer>
-                    <BacklogList>
+                <div className="bg-white rounded-lg shadow-sm">
+                    <div className="divide-y divide-gray-200">
                         {backlogs.map((backlog, index) => (
-                            <Box key={index}>
-                                <BacklogItem>
-                                    <Typography variant="h6">
+                            <div key={index} className="p-4 hover:bg-gray-50 cursor-pointer">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-medium">
                                         {backlog.sprint} - {backlog.title}
-                                    </Typography>
-                                </BacklogItem>
-                                
-                            </Box>
+                                    </h2>
+                                    <div className="flex gap-2">
+                                        <button className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded">
+                                            수정
+                                        </button>
+                                        <button className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">
+                                            삭제
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
-                    </BacklogList>
-                </BacklogContainer>
-            </Box>
+                    </div>
+                </div>
+            </div>
         </Layout>
     );
 };

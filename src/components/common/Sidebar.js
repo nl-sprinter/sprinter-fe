@@ -1,63 +1,6 @@
-import { Drawer, List, ListItem, ListItemText, Box, IconButton, Collapse, Typography } from '@mui/material';
 import { NavLink } from 'react-router-dom';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { styled } from '@mui/material/styles';
+import { FiArrowDown, FiArrowUp } from 'react-icons/fi';
 import { useState } from 'react';
-
-const DRAWER_WIDTH = 240;
-
-const ProjectSquare = styled(Box)({
-    width: 32,
-    height: 32,
-    backgroundColor: '#4CAF50',
-    borderRadius: 8,
-    marginRight: 12
-});
-
-const StyledNavLink = styled(NavLink)({
-    textDecoration: 'none',
-    color: 'inherit',
-    width: '100%',
-    display: 'block',
-    '&:hover .MuiListItem-root': {
-        backgroundColor: '#e0e0e0',
-        borderRadius: 8,
-    },
-    '& .MuiListItem-root': {
-        borderRadius: 8,
-        margin: '2px 8px',
-        padding: '8px 16px',
-        width: 'auto',
-    },
-    '&.active .MuiListItem-root': {
-        backgroundColor: '#f0f0f0',
-    },
-});
-
-const ProjectHeader = styled(Box)({
-    display: 'flex',
-    alignItems: 'center',
-    padding: '16px',
-    marginBottom: 8,
-    width: '100%',
-    boxSizing: 'border-box'
-});
-
-const ProjectDropdown = styled(Box)({
-    backgroundColor: '#f5f5f5',
-    borderRadius: '8px',
-    margin: '0 16px',
-    overflow: 'hidden'
-});
-
-const ProjectItem = styled(ListItem)({
-    padding: '12px 16px',
-    cursor: 'pointer',
-    '&:hover': {
-        backgroundColor: '#e0e0e0'
-    }
-});
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -75,54 +18,54 @@ const Sidebar = () => {
     ];
 
     return (
-        <Drawer
-            variant="permanent"
-            sx={{
-                width: DRAWER_WIDTH,
-                flexShrink: 0,
-                '& .MuiDrawer-paper': {
-                    width: DRAWER_WIDTH,
-                    boxSizing: 'border-box',
-                    bgcolor: '#dddddd',
-                    border: 'none'
-                },
-            }}
-        >
-            <ProjectHeader>
-                <ProjectSquare />
-                <Box sx={{ flexGrow: 1 }}>Proj1</Box>
-                <IconButton 
-                    size="small"
+        <div className="fixed left-0 top-0 h-full w-60 bg-gray-100 border-r border-gray-200">
+            <div className="flex items-center p-4 w-full">
+                <div className="w-8 h-8 bg-green-500 rounded-lg mr-3"></div>
+                <div className="flex-grow">Proj1</div>
+                <button 
+                    className="p-1 hover:bg-gray-200 rounded-full transition-colors"
                     onClick={() => setIsOpen(!isOpen)}
                 >
-                    {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                </IconButton>
-            </ProjectHeader>
+                    {isOpen ? <FiArrowUp /> : <FiArrowDown />}
+                </button>
+            </div>
             
-            <Collapse in={isOpen}>
-                <ProjectDropdown>
+            <div className={`transition-all duration-200 ${isOpen ? 'h-auto mb-2' : 'h-0'} overflow-hidden`}>
+                <div className="mx-4 bg-white rounded-lg overflow-hidden shadow-sm">
                     {projects.map((project) => (
-                        <ProjectItem key={project.name}>
-                            <ProjectSquare sx={{ bgcolor: project.color, width: 24, height: 24 }} />
-                            <Typography sx={{ ml: 1 }}>{project.name}</Typography>
-                        </ProjectItem>
+                        <div 
+                            key={project.name} 
+                            className="flex items-center p-3 cursor-pointer hover:bg-gray-50"
+                        >
+                            <div 
+                                className="w-6 h-6 rounded mr-2"
+                                style={{ backgroundColor: project.color }}
+                            ></div>
+                            <span>{project.name}</span>
+                        </div>
                     ))}
-                </ProjectDropdown>
-            </Collapse>
+                </div>
+            </div>
 
-            <List>
+            <nav className="px-2">
                 {menuItems.map((item) => (
-                    <StyledNavLink 
-                        key={item.path} 
+                    <NavLink 
+                        key={item.path}
                         to={item.path}
+                        className={({ isActive }) => `
+                            block px-3 py-2 my-1
+                            rounded-lg
+                            transition-colors
+                            ${isActive 
+                                ? 'bg-gray-200 text-gray-900' 
+                                : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'}
+                        `}
                     >
-                        <ListItem>
-                            <ListItemText primary={item.text} />
-                        </ListItem>
-                    </StyledNavLink>
+                        {item.text}
+                    </NavLink>
                 ))}
-            </List>
-        </Drawer>
+            </nav>
+        </div>
     );
 };
 
