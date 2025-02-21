@@ -20,7 +20,7 @@ const HomePage = () => {
                         <div className="w-16 h-16 bg-gray-300 rounded-lg flex items-center justify-center mb-4">
                             <FiPlus className="text-4xl text-gray-600" />
                         </div>
-                        <span className="text-gray-600">Add Project</span>
+                        <span className="text-gray-600">새 프로젝트</span>
                     </div>
                     
                     <div 

@@ -96,6 +96,7 @@ const AppRoutes = () => {
                     </PrivateRoute>
                 }/>
 
+
                 // 404 페이지 - 항상 마지막에 위치해야 함
                 <Route path="*" element={<NotFoundPage/>}/>
             </Routes>

@@ -1,15 +1,23 @@
 import Layout from '../common/Layout';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { sendStartingForm } from '../../api/startingFormApi';
+import useApiCall from '../../hooks/useApiCall';
 
 const StartingFormPage = () => {
     const navigate = useNavigate();
+    const { callApi } = useApiCall();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        const formData = new FormData(event.target);
-        const data = Object.fromEntries(formData.entries());
-        console.log(JSON.stringify(data));
-        navigate('/backlogconfirm');
+        try {
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            const response = await callApi(sendStartingForm, data);
+            navigate('/backlogconfirm', { state: { backlogData: response } });
+        } catch (error) {
+            // 에러는 useApiCall에서 처리되므로 여기서는 추가 처리가 필요없음
+        }
     };
 
     return (
@@ -33,30 +41,78 @@ const StartingFormPage = () => {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            프로젝트 설명
+                            프로젝트 목표
                         </label>
                         <textarea
-                            name="description"
+                            name="projectGoal"
                             rows={4}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
-                            placeholder="프로젝트에 대해 설명해주세요"
+                            placeholder="프로젝트 목표를 설명해주세요"
                         />
                     </div>
-                    <div className="flex justify-between pt-4">
-                        <button
-                            type="button"
-                            onClick={() => navigate('/home')}
-                            className="px-6 py-2 border border-green-500 text-green-500 rounded hover:border-green-600 hover:text-green-600"
-                        >
-                            취소
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                        >
-                            다음
-                        </button>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            프로젝트 예상 진행 기간
+                        </label>
+                        <input
+                            type="text"
+                            name="estimatedDuration"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                            placeholder="예상 진행 기간을 입력하세요"
+                        />
                     </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            스프린트 주기
+                        </label>
+                        <input
+                            type="text"
+                            name="sprintCycle"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                            placeholder="스프린트 주기를 입력하세요"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            팀원 몇 명인지
+                        </label>
+                        <input
+                            type="text"
+                            name="teamMembers"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                            placeholder="팀원 수를 입력하세요"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            프로젝트에서의 핵심 요구사항
+                        </label>
+                        <textarea
+                            name="essentialFeatures"
+                            rows={4}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                            placeholder="핵심 요구사항을 설명해주세요"
+                        />
+                    </div>
+                </div>
+                
+                <div className="flex justify-between pt-4">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/home')}
+                        className="px-6 py-2 border border-green-500 text-green-500 rounded hover:border-green-600 hover:text-green-600"
+                    >
+                        취소
+                    </button>
+                    <button
+                        type="submit"
+                        className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    >
+                        다음
+                    </button>
                 </div>
             </form>
         </Layout>
