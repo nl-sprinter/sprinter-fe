@@ -1,14 +1,17 @@
 import AppRoutes from './routes/Routes';
-import { LoadingProvider } from './contexts/LoadingContext';
-import { ErrorProvider } from './contexts/ErrorContext';
+import { LoadingModal } from './components/common/LoadingModal';
+import { ErrorModal } from './components/common/ErrorModal';
+import AxiosSetup from './api/AxiosSetup';
 
 function App() {
   return (
-    <ErrorProvider>
-      <LoadingProvider>
-        <AppRoutes/>
-      </LoadingProvider>
-    </ErrorProvider>
+    <ErrorModal>
+      <LoadingModal>
+        <AxiosSetup>
+          <AppRoutes />
+        </AxiosSetup>
+      </LoadingModal>
+    </ErrorModal>
   );
 }
 

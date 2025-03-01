@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Modal from 'react-modal';
 import { IoMdAdd, IoMdClose } from "react-icons/io";
+import { FiEdit2 } from "react-icons/fi";
 import { createProject } from '../../api/projectApi';
-import useApiCall from '../../hooks/useApiCall';
 
 const BacklogConfirmPage = () => {
     const navigate = useNavigate();
@@ -19,7 +19,8 @@ const BacklogConfirmPage = () => {
     const [isAddingBacklog, setIsAddingBacklog] = useState(false);
     const [targetSprintNumber, setTargetSprintNumber] = useState(null);
     const [sprintDuration, setSprintDuration] = useState(backlogData?.sprint.sprint_duration || 7);
-    const { callApi } = useApiCall();
+    const [isEditingProjectName, setIsEditingProjectName] = useState(false);
+    const [projectName, setProjectName] = useState(backlogData?.project.project_name || '');
 
     if (!backlogData) {
         return <div>데이터가 없습니다.</div>;
@@ -37,10 +38,11 @@ const BacklogConfirmPage = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            await callApi(createProject, backlogData);
-            navigate('/home');
+            await createProject(backlogData);
+        navigate('/home');
         } catch (error) {
-            // 에러는 useApiCall에서 처리됨
+            // 에러는 axiosConfig의 인터셉터에서 처리됨
+            console.error('Error creating project:', error);
         }
     };
 
@@ -204,15 +206,62 @@ const BacklogConfirmPage = () => {
         }
     };
 
+    const handleProjectNameEdit = () => {
+        setIsEditingProjectName(true);
+    };
+
+    const handleProjectNameSave = (e) => {
+        if (e.key === 'Enter' || e.type === 'blur') {
+            setIsEditingProjectName(false);
+            if (projectName.trim()) {
+                setBacklogData({
+                    ...backlogData,
+                    project: {
+                        ...backlogData.project,
+                        project_name: projectName.trim()
+                    }
+                });
+            } else {
+                setProjectName(backlogData.project.project_name);
+            }
+        } else if (e.key === 'Escape') {
+            setIsEditingProjectName(false);
+            setProjectName(backlogData.project.project_name);
+        }
+    };
+
     return (
         <Layout>
             <DragDropContext onDragEnd={handleDragEnd}>
                 <form onSubmit={handleSubmit} className="px-[10%] py-8 overflow-y-auto">
                     <div className="flex flex-col items-center mb-8">
                         <div className="mb-4">
-                            <h1 className="text-3xl font-bold text-center">
-                                {backlogData.project.project_name}
-                            </h1>
+                            <div className="flex items-center justify-center gap-2">
+                                {isEditingProjectName ? (
+                                    <input
+                                        type="text"
+                                        value={projectName}
+                                        onChange={(e) => setProjectName(e.target.value)}
+                                        onKeyDown={(e) => handleProjectNameSave(e)}
+                                        onBlur={handleProjectNameSave}
+                                        autoFocus
+                                        className="text-3xl font-bold text-center bg-transparent border-b-2 border-green-500 outline-none"
+                                    />
+                                ) : (
+                                    <>
+                                        <h1 className="text-3xl font-bold text-center">
+                                            {backlogData.project.project_name}
+                                        </h1>
+                                        <button
+                                            type="button"
+                                            onClick={handleProjectNameEdit}
+                                            className="text-gray-400 hover:text-gray-600"
+                                        >
+                                            <FiEdit2 size={20} />
+                                        </button>
+                                    </>
+                                )}
+                            </div>
                             <p className="text-gray-600 text-center">
                                 AI가 추천하는 백로그입니다
                             </p>
@@ -427,7 +476,7 @@ const BacklogConfirmPage = () => {
                                 취소
                             </button>
                             <button
-                                type="submit"
+                        type="submit"
                                 className={`w-[120px] px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600`}
                             >
                                 만들기

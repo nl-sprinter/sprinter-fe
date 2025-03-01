@@ -3,12 +3,12 @@ import { IoMdClose } from "react-icons/io";
 
 const ErrorContext = createContext();
 
-export const ErrorProvider = ({ children }) => {
+export const ErrorModal = ({ children }) => {
     const [error, setError] = useState(null);
 
     const showError = (message) => {
         setError(message);
-        setTimeout(() => setError(null), 5000); // 5초 후 자동으로 사라짐
+        setTimeout(() => setError(null), 5000);
     };
 
     return (
@@ -41,7 +41,7 @@ export const ErrorProvider = ({ children }) => {
 export const useError = () => {
     const context = useContext(ErrorContext);
     if (!context) {
-        throw new Error('useError must be used within an ErrorProvider');
+        throw new Error('useError must be used within an ErrorModal component');
     }
     return context;
 }; 

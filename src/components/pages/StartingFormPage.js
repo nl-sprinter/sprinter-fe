@@ -1,22 +1,18 @@
 import Layout from '../common/Layout';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { sendStartingForm } from '../../api/startingFormApi';
-import useApiCall from '../../hooks/useApiCall';
 
 const StartingFormPage = () => {
     const navigate = useNavigate();
-    const { callApi } = useApiCall();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
-            const response = await callApi(sendStartingForm, data);
+            const response = await sendStartingForm(data);
             navigate('/backlogconfirm', { state: { backlogData: response } });
         } catch (error) {
-            // 에러는 useApiCall에서 처리되므로 여기서는 추가 처리가 필요없음
         }
     };
 

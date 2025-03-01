@@ -3,62 +3,38 @@ import Layout from '../common/Layout';
 import { FiPlus } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { getUserProjects, getUserNickname } from '../../api/userApi';
-import useApiCall from '../../hooks/useApiCall';
 
 const HomePage = () => {
     const navigate = useNavigate();
     const [projects, setProjects] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [nickname, setNickname] = useState('');
-    const { callApi } = useApiCall();
 
     useEffect(() => {
         let isMounted = true;
 
-        const fetchProjects = async () => {
+        const fetchData = async () => {
             try {
-                const data = await callApi(getUserProjects);
-                const nickname = await callApi(getUserNickname);
+                const [projectsData, nicknameData] = await Promise.all([
+                    getUserProjects(),
+                    getUserNickname()
+                ]);
+                
                 if (isMounted) {
-                    setProjects(data);
-                    setNickname(nickname);
-                    setLoading(false);
+                    setProjects(projectsData);
+                    setNickname(nicknameData);
                 }
-            } catch (err) {
-                if (isMounted) {
-                    setError('프로젝트를 불러오는데 실패했습니다.');
-                    setLoading(false);
-                }
+            } catch (error) {
+                // 에러는 axiosConfig의 인터셉터에서 처리됨
+                console.error('Error fetching data:', error);
             }
         };
 
-        fetchProjects();
+        fetchData();
 
         return () => {
             isMounted = false;
         };
     }, []);
-
-    if (loading) {
-        return (
-            <Layout showFunctions>
-                <div className="p-8 flex justify-center items-center">
-                    <div className="text-gray-600">로딩 중...</div>
-                </div>
-            </Layout>
-        );
-    }
-
-    if (error) {
-        return (
-            <Layout showFunctions>
-                <div className="p-8 flex justify-center items-center">
-                    <div className="text-red-500">{error}</div>
-                </div>
-            </Layout>
-        );
-    }
 
     return (
         <Layout showFunctions>
@@ -79,7 +55,6 @@ const HomePage = () => {
                     </div>
                     
                     {projects.map((project, index) => (
-                        console.log(project),
                         <div 
                             key={index}
                             className="w-64 h-64 bg-green-500 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-green-600 transition-colors"
