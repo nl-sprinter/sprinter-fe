@@ -58,6 +58,7 @@ const LoginPage = () => {
                             onChange={handleChange}
                             placeholder="이메일"
                             required
+                            autoComplete="username"
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                         />
                     </div>
@@ -70,6 +71,7 @@ const LoginPage = () => {
                             onChange={handleChange}
                             placeholder="비밀번호"
                             required
+                            autoComplete="current-password"
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                         />
                     </div>

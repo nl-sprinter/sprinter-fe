@@ -12,7 +12,16 @@ const HomePage = () => {
     const [projects, setProjects] = useState([]);
     const { fetchProjects } = useUserProjectStore();
     const { setProjectId } = useProjectNavigationStore();
-    const { user } = useUserStore();
+    const { user, fetchUserInfo } = useUserStore();
+
+    useEffect(() => {
+        if (!user) {
+            console.log('Homepage - user가 없습니다. fetchUserInfo 호출');
+            fetchUserInfo();
+        } else {
+            console.log('Homepage - user가 있습니다. fetchUserInfo 호출 안함');
+        }
+    }, [user, fetchUserInfo]);
 
     useEffect(() => {
         let isMounted = true;
