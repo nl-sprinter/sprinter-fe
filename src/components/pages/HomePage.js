@@ -2,26 +2,27 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../common/Layout';
 import { FiPlus } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-import { getUserProjects, getUserNickname } from '../../api/userApi';
+import { getUserProjects } from '../../api/userProjectApi';
+import { useUserProjectStore } from '../../store/useUserProjectStore';
+import { useUserStore } from '../../store/useUserStore';
+import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
 
 const HomePage = () => {
     const navigate = useNavigate();
     const [projects, setProjects] = useState([]);
-    const [nickname, setNickname] = useState('');
+    const { fetchProjects } = useUserProjectStore();
+    const { setProjectId } = useProjectNavigationStore();
+    const { user } = useUserStore();
 
     useEffect(() => {
         let isMounted = true;
 
         const fetchData = async () => {
             try {
-                const [projectsData, nicknameData] = await Promise.all([
-                    getUserProjects(),
-                    getUserNickname()
-                ]);
+                const projectsData = await getUserProjects();
                 
                 if (isMounted) {
                     setProjects(projectsData);
-                    setNickname(nicknameData);
                 }
             } catch (error) {
                 // 에러는 axiosConfig의 인터셉터에서 처리됨
@@ -36,11 +37,18 @@ const HomePage = () => {
         };
     }, []);
 
+    const handleProjectClick = async (project) => {
+        // 프로젝트 진입 시 store 초기화 및 현재 프로젝트 설정
+        await fetchProjects();
+        setProjectId(project.projectId);
+        navigate(`/project/${project.projectId}`);
+    };
+
     return (
         <Layout showFunctions>
             <div className="p-8">
                 <h1 className="text-2xl font-bold mb-8">
-                    안녕하세요, {nickname}님!
+                    안녕하세요, {user?.nickname}님!
                 </h1>
                 
                 <div className="flex flex-wrap gap-4">
@@ -54,11 +62,11 @@ const HomePage = () => {
                         <span className="text-gray-600">새 프로젝트</span>
                     </div>
                     
-                    {projects.map((project, index) => (
+                    {projects.map((project) => (
                         <div 
-                            key={index}
+                            key={project.projectId}
                             className="w-64 h-64 bg-green-500 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-green-600 transition-colors"
-                            onClick={() => navigate('/overview')}
+                            onClick={() => handleProjectClick(project)}
                         >
                             <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center mb-4">
                                 <span className="text-4xl text-green-500">
@@ -67,7 +75,7 @@ const HomePage = () => {
                             </div>
                             <span className="text-white">{project.projectName}</span>
                             <span className="text-white text-sm mt-2 opacity-75">
-                                {new Date(project.createdAt).toLocaleDateString()}
+                                ID: {project.projectId}
                             </span>
                         </div>
                     ))}

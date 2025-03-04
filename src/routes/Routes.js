@@ -69,26 +69,11 @@ const AppRoutes = () => {
                 }/>
 
                 // 프로젝트 내부 페이지
-                <Route path="/overview" element={
-                    <PrivateRoute>
-                        <OverviewPage showSidebar/>
-                    </PrivateRoute>
-                }/>
-                <Route path="/productbacklog" element={
-                    <PrivateRoute>
-                        <ProductBacklogPage showSidebar/>
-                    </PrivateRoute>
-                }/>
-                <Route path="/sprint" element={
-                    <PrivateRoute>
-                        <SprintPage showSidebar/>
-                    </PrivateRoute>
-                }/>
-                <Route path="/calendar" element={
-                    <PrivateRoute>
-                        <CalendarPage showSidebar/>
-                    </PrivateRoute>
-                }/>
+                <Route path="/project/:projectId" element={<PrivateRoute><OverviewPage showSidebar/></PrivateRoute>}/>
+                <Route path="/project/:projectId/overview" element={<PrivateRoute><OverviewPage showSidebar/></PrivateRoute>}/>
+                <Route path="/project/:projectId/productbacklog" element={<PrivateRoute><ProductBacklogPage showSidebar/></PrivateRoute>}/>
+                <Route path="/project/:projectId/sprint" element={<PrivateRoute><SprintPage showSidebar/></PrivateRoute>}/>
+                <Route path="/project/:projectId/calendar" element={<PrivateRoute><CalendarPage showSidebar/></PrivateRoute>}/>
 
                 // 로그아웃
                 <Route path="/logout" element={

@@ -1,4 +1,4 @@
-import axiosInstance from './axiosConfig';
+import axiosInstance from './axiosInstance';
 
 export const createProject = async (data) => {
     const requestBody = {
@@ -20,4 +20,4 @@ export const createProject = async (data) => {
 
     const response = await axiosInstance.post('/project/create', requestBody);
     return response.data;
-}; 
+};

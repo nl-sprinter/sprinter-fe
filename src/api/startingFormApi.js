@@ -1,4 +1,4 @@
-import axiosInstance from './axiosConfig';
+import axiosInstance from './axiosInstance';
 
 export const sendStartingForm = async (formData) => {
     const response = await axiosInstance.post('/startingform/gptData', {

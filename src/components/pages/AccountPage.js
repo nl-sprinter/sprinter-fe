@@ -1,9 +1,11 @@
 import Layout from '../common/Layout';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useUserStore } from '../../store/useUserStore';
 
 const AccountPage = () => {
     const navigate = useNavigate();
+    const { user } = useUserStore();
     const [formData, setFormData] = useState({
         currentPassword: '',
         newPassword: '',
@@ -26,7 +28,7 @@ const AccountPage = () => {
                         <input
                             type="email"
                             disabled
-                            value="kraftenty@gmail.com"
+                            value={user?.email}
                             className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600"
                         />
                     </div>
@@ -38,7 +40,7 @@ const AccountPage = () => {
                         <input
                             type="text"
                             disabled
-                            value="enty"
+                            value={user?.nickname}
                             className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600"
                         />
                     </div>

@@ -1,5 +1,4 @@
 import Modal from 'react-modal';
-import { FiX } from 'react-icons/fi';
 
 const SearchModal = ({ open, onClose, anchorEl }) => {
     const recentSearches = [

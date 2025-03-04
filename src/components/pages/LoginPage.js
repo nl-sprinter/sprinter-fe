@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { useState } from 'react';
 import { login } from '../../api/authApi';
+import { useUserStore } from '../../store/useUserStore';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -11,6 +12,7 @@ const LoginPage = () => {
         password: ''
     });
     const [error, setError] = useState('');
+    const { fetchUserInfo } = useUserStore();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -26,7 +28,7 @@ const LoginPage = () => {
         try {
             const response = await login(formData.email, formData.password);
             if (response.status === 200) {
-                console.log(`LoginPage:로그인 성공`)
+                await fetchUserInfo();
                 navigate('/home');
             }
         } catch (error) {

@@ -1,5 +1,6 @@
 import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
+import { useUserStore } from '../../store/useUserStore';
 
 const customStyles = {
     overlay: {
@@ -23,6 +24,7 @@ const customStyles = {
 
 const UserModal = ({ open, onClose }) => {
     const navigate = useNavigate();
+    const { user } = useUserStore();
 
     const handleClick = (path) => {
         onClose();
@@ -38,7 +40,7 @@ const UserModal = ({ open, onClose }) => {
         >
             <div className="space-y-4">
                 <div className="pb-2 border-b border-gray-200">
-                    <span className="text-sm font-medium text-gray-900">aa</span>
+                    <span className="text-sm font-medium text-gray-900">{user?.nickname}</span>
                 </div>
                 <div className="space-y-2">
                     <button 
