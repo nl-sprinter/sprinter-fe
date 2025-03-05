@@ -32,3 +32,27 @@ body {
 .animate-slide-up {
     animation: slide-up 0.3s ease-out;
 }
+
+/* Modal Portal Styling */
+.modal-portal {
+    position: relative;
+    z-index: 9999;
+}
+
+.modal-portal .ReactModal__Overlay {
+    opacity: 0;
+    transition: opacity 200ms ease-in-out;
+}
+
+.modal-portal .ReactModal__Overlay--after-open {
+    opacity: 1;
+}
+
+.modal-portal .ReactModal__Overlay--before-close {
+    opacity: 0;
+}
+
+/* Ensure sidebar stays visible when modal is open */
+.ReactModal__Body--open .sidebar {
+    z-index: 1;
+}

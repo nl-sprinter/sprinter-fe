@@ -7,6 +7,7 @@ import Modal from 'react-modal';
 import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { FiEdit2 } from "react-icons/fi";
 import { createProject } from '../../api/projectApi';
+import WeightIndicator from '../common/WeightIndicator';
 
 const BacklogConfirmPage = () => {
     const navigate = useNavigate();
@@ -41,7 +42,6 @@ const BacklogConfirmPage = () => {
             await createProject(backlogData);
         navigate('/home');
         } catch (error) {
-            // 에러는 axiosConfig의 인터셉터에서 처리됨
             console.error('Error creating project:', error);
         }
     };
@@ -345,11 +345,7 @@ const BacklogConfirmPage = () => {
                                                                     {backlog.title}
                                                                 </span>
                                                                 <div className="flex items-center gap-3">
-                                                                    <div className="w-24 h-4 bg-gray-200 rounded-full overflow-hidden">
-                                                                        <div 
-                                                                            className={`h-full ${getWeightColor(backlog.weight)} ${getWeightBarWidth(backlog.weight)}`}
-                                                                        />
-                                                                    </div>
+                                                                    <WeightIndicator weight={backlog.weight} size="small" />
                                                                     <button
                                                                         type="button"
                                                                         onClick={(e) => {
@@ -417,7 +413,11 @@ const BacklogConfirmPage = () => {
                                             }`}
                                         >
                                             <div className="flex flex-col items-center gap-1">
-                                                <div className={`w-full h-2 rounded-full ${getWeightColor(weight)}`} />
+                                                <WeightIndicator 
+                                                    weight={weight} 
+                                                    showLabel={false} 
+                                                    size="small" 
+                                                />
                                                 <span className="text-sm">
                                                     {weight === 1 ? '1. 낮음' : weight === 2 ? '2. 보통' : '3. 높음'}
                                                 </span>

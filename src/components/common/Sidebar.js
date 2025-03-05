@@ -1,5 +1,5 @@
-import { NavLink, useNavigate, useParams } from 'react-router-dom';
-import { FiArrowDown, FiArrowUp } from 'react-icons/fi';
+import { NavLink, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { FiArrowDown, FiArrowUp, FiChevronDown, FiChevronRight } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useUserProjectStore } from '../../store/useUserProjectStore';
 import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
@@ -7,10 +7,16 @@ import { useProjectNavigationStore } from '../../store/useProjectNavigationStore
 const Sidebar = () => {
     const navigate = useNavigate();
     const { projectId } = useParams();
+    const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
+    const [isSprintOpen, setIsSprintOpen] = useState(false);
     
     const { projects, fetchProjects } = useUserProjectStore();
-    const { projectId: currentProjectId, setProjectId } = useProjectNavigationStore();
+    const { 
+        projectId: currentProjectId, 
+        setProjectId,
+        sprints 
+    } = useProjectNavigationStore();
 
     // 현재 선택된 프로젝트 찾기
     const currentProject = projects.find(p => p.projectId === currentProjectId);
@@ -26,12 +32,19 @@ const Sidebar = () => {
         fetchProjectsList();
     }, [projects.length, fetchProjects]);
 
-    // 최초 마운트 시에만 URL에 있는 projectId를 가져와서 그걸로 초기화
+    // 최초 마운트 시에만 URL의 projectId로 초기화
     useEffect(() => {
         if (projectId && !currentProjectId) {
             setProjectId(parseInt(projectId));
         }
     }, []); // 최초 마운트 시에만 실행
+
+    // URL이 /sprint를 포함할 때 드롭다운 메뉴 열기
+    useEffect(() => {
+        if (location.pathname.includes('/sprint')) {
+            setIsSprintOpen(true);
+        }
+    }, [location.pathname]);
 
     const handleProjectClick = (project) => {
         setProjectId(project.projectId);
@@ -39,11 +52,23 @@ const Sidebar = () => {
         navigate(`/project/${project.projectId}`);
     };
 
+    const handleSprintClick = () => {
+        const isCurrentlyInSprint = location.pathname.includes('/sprint');
+        const targetPath = `/project/${projectId}/sprint`;
+        
+        // 현재 Sprint 페이지가 아닐 때만 네비게이션 실행
+        if (!isCurrentlyInSprint) {
+            navigate(targetPath);
+        }
+        
+        setIsSprintOpen(!isSprintOpen);
+    };
+
     const menuItems = [
-        { text: 'Overview', path: 'overview' },
-        { text: 'Product Backlog', path: 'productbacklog' },
-        { text: 'Sprint', path: 'sprint' },
-        { text: 'Calendar', path: 'calendar' }
+        { text: 'Overview', path: 'overview', type: 'link' },
+        { text: 'Product Backlog', path: 'productbacklog', type: 'link' },
+        { text: 'Sprint', type: 'dropdown' },
+        { text: 'Calendar', path: 'calendar', type: 'link' }
     ];
 
     return (
@@ -86,20 +111,55 @@ const Sidebar = () => {
 
             <nav className="px-2">
                 {menuItems.map((item) => (
-                    <NavLink 
-                        key={item.path}
-                        to={`/project/${projectId}/${item.path}`}
-                        className={({ isActive }) => `
-                            block px-3 py-2 my-1
-                            rounded-lg
-                            transition-colors
-                            ${isActive 
-                                ? 'bg-gray-200 text-gray-900' 
-                                : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'}
-                        `}
-                    >
-                        {item.text}
-                    </NavLink>
+                    item.type === 'link' ? (
+                        <NavLink 
+                            key={item.path}
+                            to={`/project/${projectId}/${item.path}`}
+                            className={({ isActive }) => `
+                                block px-3 py-2 my-1
+                                rounded-lg
+                                transition-colors
+                                ${isActive 
+                                    ? 'bg-gray-200 text-gray-900' 
+                                    : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'}
+                            `}
+                        >
+                            {item.text}
+                        </NavLink>
+                    ) : (
+                        <div key={item.text} className="relative">
+                            <button
+                                onClick={handleSprintClick}
+                                className={`w-full flex items-center justify-between px-3 py-2 my-1 rounded-lg transition-colors ${
+                                    location.pathname.includes('/sprint')
+                                        ? 'bg-gray-200 text-gray-900'
+                                        : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+                                }`}
+                            >
+                                <span>Sprint</span>
+                                {isSprintOpen ? <FiChevronDown className="ml-2" /> : <FiChevronRight className="ml-2" />}
+                            </button>
+                            
+                            <div className={`overflow-hidden transition-all duration-200 ${isSprintOpen ? 'max-h-96' : 'max-h-0'}`}>
+                                {sprints.map((sprint) => (
+                                    <NavLink
+                                        key={sprint.sprintId}
+                                        to={`/project/${projectId}/sprint/${sprint.sprintId}`}
+                                        className={({ isActive }) => `
+                                            block pl-6 pr-3 py-2
+                                            text-sm
+                                            transition-colors
+                                            ${isActive
+                                                ? 'bg-gray-200 text-gray-900'
+                                                : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'}
+                                        `}
+                                    >
+                                        {sprint.sprintName}
+                                    </NavLink>
+                                ))}
+                            </div>
+                        </div>
+                    )
                 ))}
             </nav>
         </div>
