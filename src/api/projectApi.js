@@ -87,6 +87,15 @@ export const getProductBacklog = async (projectId) => {
         },
         {
             backlogId: 3,
+            backlogName: '1-3설계',
+            sprintId: 1,
+            sprintName: '설계하기',
+            sprintOrder: 1,
+            weight: 1,
+            isFinished: false
+        },
+        {
+            backlogId: 4,
             backlogName: '2-1구현',
             sprintId: 2,
             sprintName: '구현하기',
@@ -95,7 +104,7 @@ export const getProductBacklog = async (projectId) => {
             isFinished: false
         },
         {
-            backlogId: 4,
+            backlogId: 5,
             backlogName: '2-2구현',
             sprintId: 2,
             sprintName: '구현하기',
@@ -104,7 +113,7 @@ export const getProductBacklog = async (projectId) => {
             isFinished: false
         },
         {
-            backlogId: 5,
+            backlogId: 6,
             backlogName: '3-1테스트',
             sprintId: 3,
             sprintName: '테스트하기',
@@ -113,14 +122,68 @@ export const getProductBacklog = async (projectId) => {
             isFinished: false
         },
         {
-            backlogId: 6,
+            backlogId: 7,
             backlogName: '3-2테스트',
             sprintId: 3,
             sprintName: '테스트하기',
             sprintOrder: 3,
             weight: 2,
             isFinished: false
-        }
+        },
+        {
+            backlogId: 8,
+            backlogName: '3-3테스트',
+            sprintId: 3,
+            sprintName: '테스트하기',
+            sprintOrder: 3,
+            weight: 1,
+            isFinished: false
+        },
+        {
+            backlogId: 9,
+            backlogName: '3-4테스트',
+            sprintId: 3,
+            sprintName: '테스트하기',
+            sprintOrder: 3,
+            weight: 1,
+            isFinished: false
+        },
+        {
+            backlogId: 10,
+            backlogName: '3-5테스트',
+            sprintId: 3,
+            sprintName: '테스트하기',
+            sprintOrder: 3,
+            weight: 1,
+            isFinished: false
+        },
+        {
+            backlogId: 11,
+            backlogName: '3-6테스트',
+            sprintId: 3,
+            sprintName: '테스트하기',
+            sprintOrder: 3,
+            weight: 1,
+            isFinished: false
+        },
+        {
+            backlogId: 12,
+            backlogName: '3-7테스트',
+            sprintId: 3,
+            sprintName: '테스트하기',
+            sprintOrder: 3,
+            weight: 1,
+            isFinished: false
+        },
+        {
+            backlogId: 13,
+            backlogName: '3-8테스트',
+            sprintId: 3,
+            sprintName: '테스트하기',
+            sprintOrder: 3,
+            weight: 1,
+            isFinished: false
+        },
     ];
     // return response.data;
     return dummyData;

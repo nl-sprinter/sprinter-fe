@@ -1,6 +1,6 @@
 import Modal from 'react-modal';
 import { IoMdClose } from "react-icons/io";
-import WeightIndicator from './WeightIndicator';
+import WeightIndicator from '../WeightIndicator';
 
 const BacklogModal = ({ isOpen, onClose, backlog }) => {
     if (!backlog) return null;

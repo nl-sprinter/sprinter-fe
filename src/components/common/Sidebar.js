@@ -9,14 +9,17 @@ const Sidebar = () => {
     const { projectId } = useParams();
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
-    const [isSprintOpen, setIsSprintOpen] = useState(false);
     
     const { projects, fetchProjects } = useUserProjectStore();
     const { 
         projectId: currentProjectId, 
         setProjectId,
-        sprints 
+        sprints,
+        isSprintOpen,
+        setIsSprintOpen 
     } = useProjectNavigationStore();
+
+    console.log(`isSprintOpen: ${isSprintOpen}`); // TODO
 
     // 현재 선택된 프로젝트 찾기
     const currentProject = projects.find(p => p.projectId === currentProjectId);
@@ -28,7 +31,7 @@ const Sidebar = () => {
                 await fetchProjects();
             }
         };
-        
+
         fetchProjectsList();
     }, [projects.length, fetchProjects]);
 
@@ -39,29 +42,18 @@ const Sidebar = () => {
         }
     }, []); // 최초 마운트 시에만 실행
 
-    // URL이 /sprint를 포함할 때 드롭다운 메뉴 열기
+    // URL이 /sprint로 끝날 때 드롭다운 메뉴 열기
     useEffect(() => {
-        if (location.pathname.includes('/sprint')) {
+        if (location.pathname.endsWith('/sprint')) {
+            console.log(`[DEBUG] URL이 /sprint로 끝날 때 드롭다운 메뉴 열기, isSprintOpen = ${isSprintOpen}`)
             setIsSprintOpen(true);
         }
-    }, [location.pathname]);
+    }, [location.pathname]); // isSprintOpen 의존성 제거
 
     const handleProjectClick = (project) => {
         setProjectId(project.projectId);
         setIsOpen(false);
         navigate(`/project/${project.projectId}`);
-    };
-
-    const handleSprintClick = () => {
-        const isCurrentlyInSprint = location.pathname.includes('/sprint');
-        const targetPath = `/project/${projectId}/sprint`;
-        
-        // 현재 Sprint 페이지가 아닐 때만 네비게이션 실행
-        if (!isCurrentlyInSprint) {
-            navigate(targetPath);
-        }
-        
-        setIsSprintOpen(!isSprintOpen);
     };
 
     const menuItems = [
@@ -128,19 +120,32 @@ const Sidebar = () => {
                         </NavLink>
                     ) : (
                         <div key={item.text} className="relative">
-                            <button
-                                onClick={handleSprintClick}
-                                className={`w-full flex items-center justify-between px-3 py-2 my-1 rounded-lg transition-colors ${
-                                    location.pathname.includes('/sprint')
-                                        ? 'bg-gray-200 text-gray-900'
-                                        : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
-                                }`}
-                            >
-                                <span>Sprint</span>
-                                {isSprintOpen ? <FiChevronDown className="ml-2" /> : <FiChevronRight className="ml-2" />}
-                            </button>
+                            <div className="flex items-center">
+                                <button
+                                    onClick={() => {
+                                        navigate(`/project/${projectId}/sprint`);
+                                    }}
+                                    className={`flex-1 flex items-center px-3 py-2 my-1 rounded-lg transition-colors ${
+                                        location.pathname.includes('/sprint')
+                                            ? 'bg-gray-200 text-gray-900'
+                                            : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
+                                    }`}
+                                >
+                                    Sprint
+                                </button>
+                                <button
+                                    onClick={() => setIsSprintOpen(!isSprintOpen)}
+                                    className={`p-2 rounded-lg transition-colors ${
+                                        location.pathname.includes('/sprint')
+                                            ? 'text-gray-900'
+                                            : 'text-gray-600'
+                                    }`}
+                                >
+                                    {isSprintOpen ? <FiChevronDown className="ml-2" /> : <FiChevronRight className="ml-2" />}
+                                </button>
+                            </div>
                             
-                            <div className={`overflow-hidden transition-all duration-200 ${isSprintOpen ? 'max-h-96' : 'max-h-0'}`}>
+                            <div className={isSprintOpen ? 'block' : 'hidden'}>
                                 {sprints.map((sprint) => (
                                     <NavLink
                                         key={sprint.sprintId}
@@ -150,9 +155,12 @@ const Sidebar = () => {
                                             text-sm
                                             transition-colors
                                             ${isActive
-                                                ? 'bg-gray-200 text-gray-900'
-                                                : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'}
+                                                ? 'font-bold text-gray-900'
+                                                : 'text-gray-600 hover:text-gray-900'}
                                         `}
+                                        onClick={(e) => {
+                                            e.stopPropagation();  // 이벤트 버블링 방지
+                                        }}
                                     >
                                         {sprint.sprintName}
                                     </NavLink>

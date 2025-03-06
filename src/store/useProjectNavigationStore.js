@@ -9,6 +9,7 @@ export const useProjectNavigationStore = create((set) => ({
     sprintId: null,
     backlogId: null,
     sprints: [],
+    isSprintOpen: false,
 
     setProjectId: async (projectId) => {
         console.log(`projectId가 ${projectId}로 변경되었습니다.`);
@@ -41,10 +42,15 @@ export const useProjectNavigationStore = create((set) => ({
         taskId
     }),
 
+    setIsSprintOpen: (isOpen) => set({
+        isSprintOpen: isOpen
+    }),
+
     reset: () => set({
         projectId: null,
         sprintId: null,
         backlogId: null,
-        sprints: []
+        sprints: [],
+        isSprintOpen: false
     })
 }));

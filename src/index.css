@@ -41,7 +41,7 @@ body {
 
 .modal-portal .ReactModal__Overlay {
     opacity: 0;
-    transition: opacity 200ms ease-in-out;
+    /* transition: opacity 200ms ease-in-out; 부드럽게 열리는 애니메이션*/ 
 }
 
 .modal-portal .ReactModal__Overlay--after-open {

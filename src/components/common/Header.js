@@ -1,10 +1,10 @@
 import { FiSearch, FiMenu, FiMessageSquare, FiUser } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
-import TodoModal from './TodoModal';
-import ChatModal from './ChatModal';
-import SearchModal from './SearchModal';
-import UserModal from './UserModal';
+import TodoModal from './modal/TodoModal';
+import ChatModal from './modal/ChatModal';
+import SearchModal from './modal/SearchModal';
+import UserModal from './modal/UserModal';
 
 const Header = ({ showSidebar = false, showFunctions = false }) => {
     const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
-import { useUserStore } from '../../store/useUserStore';
+import { useUserStore } from '../../../store/useUserStore';
 
 const customStyles = {
     overlay: {
