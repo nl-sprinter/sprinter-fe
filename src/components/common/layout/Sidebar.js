@@ -1,8 +1,8 @@
 import { NavLink, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FiArrowDown, FiArrowUp, FiChevronDown, FiChevronRight } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-import { useUserProjectStore } from '../../store/useUserProjectStore';
-import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
+import { useUserProjectStore } from '../../../store/useUserProjectStore';
+import { useProjectNavigationStore } from '../../../store/useProjectNavigationStore';
 
 const Sidebar = () => {
     const navigate = useNavigate();

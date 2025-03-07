@@ -1,5 +1,31 @@
-import Layout from '../common/Layout';
+import Layout from '../common/layout/Layout';
 import { useState } from 'react';
+import PageTitle from '../common/PageTitle';
+import CardBox from '../common/layout/CardBox';
+import W3H2Card from '../common/card/W3H2Card';
+import { IoMdAdd } from 'react-icons/io';
+
+const ScheduleItem = ({ title, date, type }) => {
+    return (
+        <div className="flex items-center justify-between p-2 rounded-lg transition-all duration-300
+            border border-gray-200 relative overflow-hidden
+            border-l-4 border-l-green-500 hover:bg-green-50"
+        >
+            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-green-50/80 to-transparent" />
+            <div className="flex flex-col gap-1 relative flex-1">
+                <span className="text-sm">{title}</span>
+                <span className="text-xs text-gray-500">{date}</span>
+            </div>
+            <span className={`px-2 py-1 rounded text-xs relative ${
+                type === 'sprint' 
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-blue-100 text-blue-700'
+            }`}>
+                {type === 'sprint' ? '스프린트' : '미팅'}
+            </span>
+        </div>
+    );
+};
 
 const CalendarPage = () => {
     const [currentDate] = useState(new Date());
@@ -47,15 +73,16 @@ const CalendarPage = () => {
         for (let day = 1; day <= daysInMonth; day++) {
             const date = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const dayEvents = events.filter(event => event.date === date);
+            const isToday = new Date().getDate() === day && new Date().getMonth() === currentDate.getMonth();
 
             days.push(
-                <div key={day} className="p-2 min-h-[100px] border border-gray-100">
-                    <span className="text-sm text-gray-600">{day}</span>
+                <div key={day} className={`p-2 min-h-[80px] border-t border-l border-gray-100 ${isToday ? 'bg-green-50/30' : ''}`}>
+                    <span className={`text-sm ${isToday ? 'text-green-600 font-medium' : 'text-gray-600'}`}>{day}</span>
                     <div className="mt-1 space-y-1">
                         {dayEvents.map((event, index) => (
                             <div 
                                 key={index}
-                                className={`text-xs p-1 rounded ${
+                                className={`text-xs p-1.5 rounded-md ${
                                     event.type === 'sprint' 
                                         ? 'bg-green-100 text-green-800' 
                                         : 'bg-blue-100 text-blue-800'
@@ -74,32 +101,48 @@ const CalendarPage = () => {
 
     return (
         <Layout showFunctions showSidebar>
-            <div className="p-8">
-                <div className="mb-8">
-                    <h1 className="text-2xl font-bold mb-2">캘린더</h1>
-                    <p className="text-gray-600">프로젝트의 주요 일정을 확인할 수 있습니다.</p>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-semibold">
-                            {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
-                        </h2>
-                        <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                            일정 추가
-                        </button>
-                    </div>
-
-                    <div className="grid grid-cols-7 gap-px bg-gray-200">
-                        {['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                            <div key={day} className="bg-gray-50 p-2 text-center font-medium">
-                                {day}
+            <PageTitle 
+                title="캘린더" 
+                description="프로젝트의 주요 일정을 확인할 수 있습니다."
+                rightContent={
+                    <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-1">
+                        <IoMdAdd size={20} />
+                        일정 추가
+                    </button>
+                }
+            />
+            
+            <CardBox>
+                <W3H2Card 
+                    title={`${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`}
+                >
+                    <div className="flex h-full gap-6">
+                        <div className="flex-1">
+                            <div className="grid grid-cols-7 border-r border-b border-gray-100">
+                                {['일', '월', '화', '수', '목', '금', '토'].map(day => (
+                                    <div key={day} className="p-2 text-center font-medium text-gray-600 bg-gray-50/50 border-t border-l border-gray-100">
+                                        {day}
+                                    </div>
+                                ))}
+                                {renderCalendar()}
                             </div>
-                        ))}
-                        {renderCalendar()}
+                        </div>
+                        <div className="w-80">
+                            <h3 className="text-lg font-medium mb-4">My Schedule</h3>
+                            <div className="space-y-2">
+                                {events.map((event, index) => (
+                                    <ScheduleItem
+                                        key={index}
+                                        title={event.title}
+                                        date={event.date}
+                                        type={event.type}
+                                    />
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </W3H2Card>
+            </CardBox>
         </Layout>
     );
 };

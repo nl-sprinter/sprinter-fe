@@ -1,15 +1,16 @@
-import Layout from '../common/Layout';
+import Layout from '../common/layout/Layout';
 import {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {getProductBacklog} from '../../api/projectApi';
 import {PieChart} from 'react-minimal-pie-chart';
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts';
 import {IoMdAdd} from 'react-icons/io';
-import WeightIndicator from '../common/WeightIndicator';
-import BasicInfoCard from '../common/BasicInfoCard';
-import LongInfoCard from '../common/LongInfoCard';
-import CardBox from "../common/CardBox";
+import W2H1Card from '../common/card/W2H1Card';
+import CardBox from "../common/layout/CardBox";
 import PageTitle from "../common/PageTitle";
+import DailyScrumItem from "../common/item/DailyScrumItem";
+import BacklogItem from "../common/item/BacklogItem";
+import W1H1Card from "../common/card/W1H1Card";
 
 const SprintEachPage = () => {
     const {projectId, sprintId} = useParams();
@@ -53,7 +54,7 @@ const SprintEachPage = () => {
         <Layout showFunctions showSidebar>
             <PageTitle title="스프린트 상세" />
             <CardBox>
-                <LongInfoCard title="Sprint 현황">
+                <W2H1Card title="Sprint 현황">
                     <div className="flex h-full">
                         <div className="w-1/3 flex items-center justify-center">
                             <div className="w-24 h-24">
@@ -81,9 +82,9 @@ const SprintEachPage = () => {
                             </BarChart>
                         </div>
                     </div>
-                </LongInfoCard>
+                </W2H1Card>
 
-                <BasicInfoCard
+                <W1H1Card
                     title="Sprint Backlog"
                     headerRight={
                         <button className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors">
@@ -93,27 +94,18 @@ const SprintEachPage = () => {
                 >
                     <div className="space-y-3">
                         {backlogs.map((backlog) => (
-                            <div
-                                key={backlog.backlogId}
-                                className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg border border-gray-100 transition-colors"
-                            >
-                                <span className="flex-1 text-sm">{backlog.backlogName}</span>
-                                <div className="flex items-center gap-3">
-                                    <WeightIndicator weight={backlog.weight} showLabel={false} size="small"/>
-                                    <span className={`px-2 py-1 rounded text-sm ${
-                                        backlog.isFinished
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-blue-100 text-blue-800'
-                                    }`}>
-                                            {backlog.isFinished ? '완료' : '진행중'}
-                                        </span>
-                                </div>
-                            </div>
+                            <BacklogItem
+                                backlogId={backlog.id}
+                                sprintOrder={backlog.sprintOrder}
+                                backlogName={backlog.backlogName}
+                                weight={backlog.weight}
+                                isFinished={backlog.isFinished}
+                                />
                         ))}
                     </div>
-                </BasicInfoCard>
+                </W1H1Card>
 
-                <BasicInfoCard
+                <W1H1Card
                     title="Daily Scrum"
                     headerRight={
                         <button className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors">
@@ -123,18 +115,14 @@ const SprintEachPage = () => {
                 >
                     <div className="space-y-3">
                         {dailyScrums.map((scrum) => (
-                            <div
-                                key={scrum.id}
-                                className="p-2 hover:bg-gray-50 rounded-lg border border-gray-100 transition-colors"
-                            >
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-xs text-gray-500">{scrum.date}</span>
-                                </div>
-                                <p className="text-sm text-gray-700">{scrum.content}</p>
-                            </div>
+                            <DailyScrumItem
+                                id={scrum.id}
+                                date={scrum.date}
+                                content={scrum.content}
+                            />
                         ))}
                     </div>
-                </BasicInfoCard>
+                </W1H1Card>
             </CardBox>
         </Layout>
     );

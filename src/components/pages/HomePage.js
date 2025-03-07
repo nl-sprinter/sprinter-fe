@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import Layout from '../common/Layout';
+import Layout from '../common/layout/Layout';
 import { FiPlus } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { getUserProjects } from '../../api/userProjectApi';

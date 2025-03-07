@@ -1,8 +1,8 @@
 import React from 'react';
 
-const BasicInfoCard = ({ title, children, headerRight, className = '' }) => {
+const W3H2Card = ({ title, children, headerRight, className = '' }) => {
     return (
-        <div className={`bg-white rounded-lg shadow-sm h-[300px] flex flex-col ${className}`}>
+        <div className={`col-span-3 row-span-2 bg-white rounded-lg shadow-lg flex flex-col ${className}`}>
             <div className="flex justify-between items-center py-2.5 px-4 border-b border-gray-100">
                 <h2 className="text-base font-semibold text-gray-900">{title}</h2>
                 {headerRight}
@@ -14,4 +14,4 @@ const BasicInfoCard = ({ title, children, headerRight, className = '' }) => {
     );
 };
 
-export default BasicInfoCard; 
+export default W3H2Card;

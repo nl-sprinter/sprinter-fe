@@ -1,13 +1,13 @@
-import Layout from '../common/Layout';
+import Layout from '../common/layout/Layout';
 import {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {getProductBacklog} from '../../api/projectApi';
-import WeightIndicator from '../common/WeightIndicator';
 import {useUserStore} from '../../store/useUserStore';
 import {PieChart} from 'react-minimal-pie-chart';
-import BasicInfoCard from '../common/BasicInfoCard';
-import CardBox from "../common/CardBox";
+import CardBox from "../common/layout/CardBox";
 import PageTitle from "../common/PageTitle";
+import BacklogItem from "../common/item/BacklogItem";
+import W1H1Card from "../common/card/W1H1Card";
 
 const SprintPage = () => {
     const {projectId} = useParams();
@@ -29,28 +29,27 @@ const SprintPage = () => {
 
     return (
         <Layout showFunctions showSidebar>
-            <PageTitle title="스프린트 현황" />
+            <PageTitle title="스프린트 현황"/>
             <CardBox>
-                <BasicInfoCard title="나의 Backlog">
+                <W1H1Card title="나의 Backlog">
                     <div className="space-y-3">
                         {backlogs.map((backlog) => (
-                            <div
-                                key={backlog.backlogId}
-                                className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg border border-gray-100 transition-colors"
-                            >
-                                <span className="text-xs text-gray-500">Sprint {backlog.sprintOrder}</span>
-                                <span className="flex-1 mx-3 text-sm">{backlog.backlogName}</span>
-                                <WeightIndicator weight={backlog.weight} showLabel={false} size="small"/>
-                            </div>
+                            <BacklogItem
+                                backlogId={backlog.backlogId}
+                                sprintOrder={backlog.sprintOrder}
+                                backlogName={backlog.backlogName}
+                                weight={backlog.weight}
+                                isFinished={backlog.isFinished}
+                            />
                         ))}
                     </div>
-                </BasicInfoCard>
+                </W1H1Card>
 
-                <BasicInfoCard title="Daily Scrum"/>
+                <W1H1Card title="Daily Scrum"/>
 
-                <BasicInfoCard title="추가 예정"/>
+                <W1H1Card title="추가 예정"/>
 
-                <BasicInfoCard title="나의 달성 현황">
+                <W1H1Card title="나의 달성 현황">
                     <div className="flex items-center justify-center h-full">
                         <div className="w-28 h-28">
                             <PieChart
@@ -65,7 +64,7 @@ const SprintPage = () => {
                             />
                         </div>
                     </div>
-                </BasicInfoCard>
+                </W1H1Card>
             </CardBox>
         </Layout>
     );

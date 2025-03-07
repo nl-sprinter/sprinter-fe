@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLoading } from '../components/common/LoadingModal';
+import { useLoading } from '../components/common/modal/LoadingModal';
 import { useError } from '../components/common/modal/ErrorModal';
 import { setLoadingHandler, setErrorHandler } from './axiosInstance';
 

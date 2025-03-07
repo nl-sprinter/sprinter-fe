@@ -1,4 +1,4 @@
-import Layout from '../common/Layout';
+import Layout from '../common/layout/Layout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import { useState } from 'react';

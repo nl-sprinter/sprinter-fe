@@ -1,3 +1,5 @@
+import React from 'react';
+
 const WeightIndicator = ({ weight, showLabel = true, size = 'medium' }) => {
     const getWeightColor = (weight) => {
         if (weight <= 1) return 'bg-yellow-400';

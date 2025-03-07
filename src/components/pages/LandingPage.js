@@ -1,4 +1,4 @@
-import Layout from '../common/Layout';
+import Layout from '../common/layout/Layout';
 import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {

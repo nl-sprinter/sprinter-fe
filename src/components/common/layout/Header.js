@@ -1,10 +1,11 @@
-import { FiSearch, FiMenu, FiMessageSquare, FiUser } from 'react-icons/fi';
+import { FiSearch, FiMenu, FiMessageSquare, FiUser, FiBell } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
-import TodoModal from './modal/TodoModal';
-import ChatModal from './modal/ChatModal';
-import SearchModal from './modal/SearchModal';
-import UserModal from './modal/UserModal';
+import TodoModal from '../modal/TodoModal';
+import ChatModal from '../modal/ChatModal';
+import SearchModal from '../modal/SearchModal';
+import UserModal from '../modal/UserModal';
+import NotificationModal from '../modal/NotificationModal';
 
 const Header = ({ showSidebar = false, showFunctions = false }) => {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Header = ({ showSidebar = false, showFunctions = false }) => {
     const [chatModalOpen, setChatModalOpen] = useState(false);
     const [searchModalOpen, setSearchModalOpen] = useState(false);
     const [userModalOpen, setUserModalOpen] = useState(false);
+    const [notificationModalOpen, setNotificationModalOpen] = useState(false);
     const searchRef = useRef(null);
     
     const handleLogoClick = () => {
@@ -21,10 +23,10 @@ const Header = ({ showSidebar = false, showFunctions = false }) => {
     return (
         <header className={`fixed top-0 ${showSidebar ? 'sm:ml-60 sm:w-[calc(100%-240px)]' : 'w-full'} bg-white z-40`}>
             <div className="flex justify-between items-center px-4 h-16">
-                <div className="flex items-center gap-8 flex-grow justify-end">
+                <div className="flex items-center gap-4 flex-grow justify-end">
                     {showFunctions && (
                         <>
-                            <div ref={searchRef} className="relative flex items-center max-w-[400px] w-full bg-gray-100 rounded-3xl">
+                            <div ref={searchRef} className="relative flex items-center max-w-[300px] w-full bg-gray-100 rounded-3xl">
                                 <input
                                     type="text"
                                     placeholder="검색"
@@ -36,19 +38,25 @@ const Header = ({ showSidebar = false, showFunctions = false }) => {
                                 </div>
                             </div>
                             <button 
-                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-full"
+                                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
                                 onClick={() => setTodoModalOpen(true)}
                             >
                                 <FiMenu className="text-xl" />
                             </button>
                             <button 
-                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-full"
+                                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
                                 onClick={() => setChatModalOpen(true)}
                             >
                                 <FiMessageSquare className="text-xl" />
                             </button>
                             <button 
-                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-full"
+                                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
+                                onClick={() => setNotificationModalOpen(true)}
+                            >
+                                <FiBell className="text-xl" />
+                            </button>
+                            <button 
+                                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
                                 onClick={() => setUserModalOpen(true)}
                             >
                                 <FiUser className="text-xl" />
@@ -79,6 +87,10 @@ const Header = ({ showSidebar = false, showFunctions = false }) => {
             <UserModal
                 open={userModalOpen}
                 onClose={() => setUserModalOpen(false)}
+            />
+            <NotificationModal
+                open={notificationModalOpen}
+                onClose={() => setNotificationModalOpen(false)}
             />
         </header>
     );

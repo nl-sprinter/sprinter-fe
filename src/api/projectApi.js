@@ -49,6 +49,20 @@ export const getSprintList = async (projectId) => {
             startDate: '2026-01-31',
             endDate: '2026-02-15',
             sprintOrder: 3
+        },
+        {
+            sprintId: 4,
+            sprintName: '배포하기',
+            startDate: '2026-02-16',
+            endDate: '2026-02-28',
+            sprintOrder: 4
+        },
+        {
+            sprintId: 5,
+            sprintName: '배포하기',
+            startDate: '2026-02-16',
+            endDate: '2026-02-28',
+            sprintOrder: 5
         }
     ]
     return dummyData;
@@ -69,7 +83,7 @@ export const getProductBacklog = async (projectId) => {
     const dummyData = [
         {
             backlogId: 1,
-            backlogName: '1-1설계',
+            backlogName: '프로젝트 전체 설계 및 디자인하기',
             sprintId: 1,
             sprintName: '설계하기',
             sprintOrder: 1,
@@ -184,6 +198,42 @@ export const getProductBacklog = async (projectId) => {
             weight: 1,
             isFinished: false
         },
+        {
+            backlogId: 14,
+            backlogName: '4-1배포',
+            sprintId: 4,
+            sprintName: '배포하기',
+            sprintOrder: 4,
+            weight: 1,
+            isFinished: false
+        },
+        {
+            backlogId: 15,
+            backlogName: '4-2배포', 
+            sprintId: 4,
+            sprintName: '배포하기',
+            sprintOrder: 4,
+            weight: 1,
+            isFinished: false
+        },
+        {
+            backlogId: 16,
+            backlogName: '5-1배포',
+            sprintId: 5,
+            sprintName: '배포하기',
+            sprintOrder: 5,
+            weight: 1,
+            isFinished: false
+        },
+        {
+            backlogId: 17,
+            backlogName: '5-2배포',
+            sprintId: 5,
+            sprintName: '배포하기',
+            sprintOrder: 5,
+            weight: 1,
+            isFinished: false
+        }
     ];
     // return response.data;
     return dummyData;
