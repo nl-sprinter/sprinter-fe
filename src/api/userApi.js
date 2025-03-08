@@ -18,3 +18,15 @@ export const getUserInfo = async () => {
     };
     return dummyData;
 };
+
+// 유저가 속한 프로젝트 조회
+export const getUserProjects = async () => {
+    const response = await axiosInstance.get('/user/projects');
+    console.log(`[API] userProjectApi.getUserProjects 호출, data=${JSON.stringify(response.data)}`);
+    // const dummyData = [
+    //     {projectId: 1, projectName: '더미프로젝트1'},
+    //     {projectId: 2, projectName: '더미프로젝트2'},
+    // ];
+    // return dummyData;
+    return response.data;
+};

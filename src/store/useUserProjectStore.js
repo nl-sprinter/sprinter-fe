@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { getUserProjects } from '../api/userProjectApi';
+
+import {getUserProjects} from "../api/userApi";
 
 export const useUserProjectStore = create((set) => ({
     projects: [],      // 유저가 속한 프로젝트 목록

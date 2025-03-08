@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../common/layout/Layout';
 import { FiPlus } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-import { getUserProjects } from '../../api/userProjectApi';
 import { useUserProjectStore } from '../../store/useUserProjectStore';
 import { useUserStore } from '../../store/useUserStore';
 import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
+import {getUserProjects} from "../../api/userApi";
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -50,7 +50,7 @@ const HomePage = () => {
         // 프로젝트 진입 시 store 초기화 및 현재 프로젝트 설정
         await fetchProjects();
         setProjectId(project.projectId);
-        navigate(`/project/${project.projectId}`);
+        navigate(`/projects/${project.projectId}`);
     };
 
     return (

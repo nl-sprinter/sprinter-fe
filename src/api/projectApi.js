@@ -16,9 +16,8 @@ export const createProject = async (data) => {
         }))
     };
 
-    console.log("서버로 보내는 최종 프로젝트데이터",requestBody);
-
-    const response = await axiosInstance.post('/project/create', requestBody);
+    const response = await axiosInstance.post('/projects/create', requestBody);
+    console.log(`[API] projectApi.getSprintList 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 };
 
@@ -26,46 +25,47 @@ export const createProject = async (data) => {
 
 // 스프린트 리스트 가져오기
 export const getSprintList = async (projectId) => {
-    // const response = await axiosInstance.get(`/project/${projectId}/sprint`);
-    console.log("projectApi.getSprintList axios 호출");
-    const dummyData = [
-        {
-            sprintId: 1,
-            sprintName: '설계하기',
-            startDate: '2026-01-01',
-            endDate: '2026-01-15',
-            sprintOrder: 1
-        },
-        {
-            sprintId: 2,
-            sprintName: '구현하기',
-            startDate: '2026-01-16',
-            endDate: '2026-01-30',
-            sprintOrder: 2
-        },
-        {
-            sprintId: 3,
-            sprintName: '테스트하기',
-            startDate: '2026-01-31',
-            endDate: '2026-02-15',
-            sprintOrder: 3
-        },
-        {
-            sprintId: 4,
-            sprintName: '배포하기',
-            startDate: '2026-02-16',
-            endDate: '2026-02-28',
-            sprintOrder: 4
-        },
-        {
-            sprintId: 5,
-            sprintName: '배포하기',
-            startDate: '2026-02-16',
-            endDate: '2026-02-28',
-            sprintOrder: 5
-        }
-    ]
-    return dummyData;
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints`);
+    console.log(`[API] projectApi.getSprintList 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+    // const dummyData = [
+    //     {
+    //         sprintId: 1,
+    //         sprintName: '설계하기',
+    //         startDate: '2026-01-01',
+    //         endDate: '2026-01-15',
+    //         sprintOrder: 1
+    //     },
+    //     {
+    //         sprintId: 2,
+    //         sprintName: '구현하기',
+    //         startDate: '2026-01-16',
+    //         endDate: '2026-01-30',
+    //         sprintOrder: 2
+    //     },
+    //     {
+    //         sprintId: 3,
+    //         sprintName: '테스트하기',
+    //         startDate: '2026-01-31',
+    //         endDate: '2026-02-15',
+    //         sprintOrder: 3
+    //     },
+    //     {
+    //         sprintId: 4,
+    //         sprintName: '배포하기',
+    //         startDate: '2026-02-16',
+    //         endDate: '2026-02-28',
+    //         sprintOrder: 4
+    //     },
+    //     {
+    //         sprintId: 5,
+    //         sprintName: '배포하기',
+    //         startDate: '2026-02-16',
+    //         endDate: '2026-02-28',
+    //         sprintOrder: 5
+    //     }
+    // ]
+    // return dummyData;
 };
 
 
@@ -79,7 +79,7 @@ export const getSprintList = async (projectId) => {
 // isFinished
 export const getProductBacklog = async (projectId) => {
     // const response = await axiosInstance.get(`/project/${projectId}/product-backlog`);
-    console.log("projectApi.getProductBacklog axios 호출");
+    console.log("[API] projectApi.getProductBacklog 호출");
     const dummyData = [
         {
             backlogId: 1,
@@ -237,4 +237,18 @@ export const getProductBacklog = async (projectId) => {
     ];
     // return response.data;
     return dummyData;
+};
+
+// 프로젝트 삭제
+export const deleteProject = async (projectId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}`);
+    return response.data;
+};
+
+// 프로젝트 이름 업데이트
+export const updateProjectName = async (projectId, newProjectName) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}`, {
+        projectName: newProjectName
+    });
+    return response.data;
 };

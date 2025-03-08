@@ -25,7 +25,7 @@ import SprintPage from '../components/pages/SprintPage';
 import SprintEachPage from '../components/pages/SprintEachPage';
 // 캘린더
 import CalendarPage from '../components/pages/CalendarPage';
-
+import ProjectSettingsPage from '../components/pages/ProjectSettingsPage';
 
 // 로그아웃
 import Logout from "../components/auth/Logout";
@@ -77,12 +77,12 @@ const AppRoutes = () => {
                 }/>
 
                 {/* // 프로젝트 내부 페이지 */}
-                <Route path="/project/:projectId" element={<PrivateRoute><OverviewPage showSidebar/></PrivateRoute>}/>
-                <Route path="/project/:projectId/overview" element={<PrivateRoute><OverviewPage showSidebar/></PrivateRoute>}/>
-                <Route path="/project/:projectId/productbacklog" element={<PrivateRoute><ProductBacklogPage showSidebar/></PrivateRoute>}/>
-                <Route path="/project/:projectId/sprint" element={<PrivateRoute><SprintPage showSidebar/></PrivateRoute>}/>
-                <Route path="/project/:projectId/sprint/:sprintId" element={<PrivateRoute><SprintEachPage showSidebar/></PrivateRoute>}/>
-                <Route path="/project/:projectId/calendar" element={<PrivateRoute><CalendarPage showSidebar/></PrivateRoute>}/>
+                <Route path="/projects/:projectId" element={<PrivateRoute><OverviewPage showSidebar/></PrivateRoute>}/>
+                <Route path="/projects/:projectId/settings" element={<PrivateRoute><ProjectSettingsPage showSidebar/></PrivateRoute>}/>
+                <Route path="/projects/:projectId/productbacklog" element={<PrivateRoute><ProductBacklogPage showSidebar/></PrivateRoute>}/>
+                <Route path="/projects/:projectId/sprints" element={<PrivateRoute><SprintPage showSidebar/></PrivateRoute>}/>
+                <Route path="/projects/:projectId/sprints/:sprintId" element={<PrivateRoute><SprintEachPage showSidebar/></PrivateRoute>}/>
+                <Route path="/projects/:projectId/calendar" element={<PrivateRoute><CalendarPage showSidebar/></PrivateRoute>}/>
 
                 {/* // 로그아웃 */}
                 <Route path="/logout" element={

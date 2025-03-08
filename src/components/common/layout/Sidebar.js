@@ -19,8 +19,6 @@ const Sidebar = () => {
         setIsSprintOpen 
     } = useProjectNavigationStore();
 
-    console.log(`isSprintOpen: ${isSprintOpen}`); // TODO
-
     // 현재 선택된 프로젝트 찾기
     const currentProject = projects.find(p => p.projectId === currentProjectId);
 
@@ -42,10 +40,10 @@ const Sidebar = () => {
         }
     }, []); // 최초 마운트 시에만 실행
 
-    // URL이 /sprint로 끝날 때 드롭다운 메뉴 열기
+    // URL이 /sprints로 끝날 때 드롭다운 메뉴 열기
     useEffect(() => {
-        if (location.pathname.endsWith('/sprint')) {
-            console.log(`[DEBUG] URL이 /sprint로 끝날 때 드롭다운 메뉴 열기, isSprintOpen = ${isSprintOpen}`)
+        if (location.pathname.endsWith('/sprints')) {
+            console.log(`[DEBUG] URL이 /sprints로 끝날 때 드롭다운 메뉴 열기, isSprintOpen = ${isSprintOpen}`)
             setIsSprintOpen(true);
         }
     }, [location.pathname]); // isSprintOpen 의존성 제거
@@ -56,16 +54,60 @@ const Sidebar = () => {
         navigate(`/project/${project.projectId}`);
     };
 
+    // 현재 경로가 정확히 일치하는지 확인
+    const isExactPath = (expectedPath) => {
+        const currentPath = location.pathname;
+        const fullExpectedPath = `/projects/${projectId}${expectedPath}`;
+        return currentPath === fullExpectedPath;
+    };
+
+    // 현재 경로가 특정 경로를 포함하는지 확인
+    const isPathIncluded = (pathSegment) => {
+        return location.pathname.includes(pathSegment);
+    };
+
+    // Overview 메뉴의 활성화 상태 확인
+    const isOverviewActive = () => {
+        const currentPath = location.pathname;
+        const projectRoot = `/projects/${projectId}`;
+        // 정확히 프로젝트 루트 경로일 때만 활성화
+        return currentPath === projectRoot;
+    };
+
+    // Settings 페이지 여부 확인
+    const isSettingsPage = () => {
+        return isExactPath('/settings');
+    };
+
     const menuItems = [
-        { text: 'Overview', path: 'overview', type: 'link' },
-        { text: 'Product Backlog', path: 'productbacklog', type: 'link' },
-        { text: 'Sprint', type: 'dropdown' },
-        { text: 'Calendar', path: 'calendar', type: 'link' }
+        { 
+            text: 'Overview', 
+            path: '', 
+            type: 'link',
+            isActive: isOverviewActive
+        },
+        { 
+            text: 'Product Backlog', 
+            path: '/productbacklog', 
+            type: 'link',
+            isActive: () => isExactPath('/productbacklog')
+        },
+        { 
+            text: 'Sprint', 
+            type: 'dropdown',
+            isActive: () => isPathIncluded('/sprints')
+        },
+        { 
+            text: 'Calendar', 
+            path: '/calendar', 
+            type: 'link',
+            isActive: () => isExactPath('/calendar')
+        }
     ];
 
     return (
         <div className="fixed left-0 top-0 h-full w-60 bg-gray-100 border-r border-gray-200">
-            <div className="flex items-center p-4 w-full">
+            <div className="flex items-center p-4 w-full  border-gray-200">
                 <div 
                     className="w-8 h-8 rounded-lg mr-3 flex items-center justify-center text-white font-medium bg-green-500"
                 >
@@ -80,8 +122,8 @@ const Sidebar = () => {
                 </button>
             </div>
             
-            <div className={`transition-all duration-200 ${isOpen ? 'h-auto mb-2' : 'h-0'} overflow-hidden`}>
-                <div className="mx-4 bg-white rounded-lg overflow-hidden shadow-sm">
+            <div className={`transition-all duration-200 ${isOpen ? 'h-auto mb-4' : 'h-0'} overflow-hidden`}>
+                <div className="mx-4 mt-2 bg-white rounded-lg overflow-hidden shadow-sm">
                     {projects.map((project) => (
                         <div 
                             key={project.projectId}
@@ -101,17 +143,17 @@ const Sidebar = () => {
                 </div>
             </div>
 
-            <nav className="px-2">
+            <nav className="px-2 space-y-1">
                 {menuItems.map((item) => (
                     item.type === 'link' ? (
                         <NavLink 
-                            key={item.path}
-                            to={`/project/${projectId}/${item.path}`}
+                            key={item.text}
+                            to={`/projects/${projectId}${item.path}`}
                             className={({ isActive }) => `
-                                block px-3 py-2 my-1
+                                block px-3 py-2
                                 rounded-lg
                                 transition-colors
-                                ${isActive 
+                                ${item.isActive()
                                     ? 'bg-gray-200 text-gray-900' 
                                     : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'}
                             `}
@@ -119,14 +161,14 @@ const Sidebar = () => {
                             {item.text}
                         </NavLink>
                     ) : (
-                        <div key={item.text} className="relative">
+                        <div key={item.text}>
                             <div className="flex items-center">
                                 <button
                                     onClick={() => {
-                                        navigate(`/project/${projectId}/sprint`);
+                                        navigate(`/projects/${projectId}/sprints`);
                                     }}
-                                    className={`flex-1 flex items-center px-3 py-2 my-1 rounded-lg transition-colors ${
-                                        location.pathname.includes('/sprint')
+                                    className={`flex-1 flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                        item.isActive()
                                             ? 'bg-gray-200 text-gray-900'
                                             : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900'
                                     }`}
@@ -136,20 +178,20 @@ const Sidebar = () => {
                                 <button
                                     onClick={() => setIsSprintOpen(!isSprintOpen)}
                                     className={`p-2 rounded-lg transition-colors ${
-                                        location.pathname.includes('/sprint')
+                                        item.isActive()
                                             ? 'text-gray-900'
                                             : 'text-gray-600'
                                     }`}
                                 >
-                                    {isSprintOpen ? <FiChevronDown className="ml-2" /> : <FiChevronRight className="ml-2" />}
+                                    {isSprintOpen ? <FiChevronDown /> : <FiChevronRight />}
                                 </button>
                             </div>
                             
-                            <div className={isSprintOpen ? 'block' : 'hidden'}>
+                            <div className={`mt-1 ${isSprintOpen ? 'block' : 'hidden'}`}>
                                 {sprints.map((sprint) => (
                                     <NavLink
                                         key={sprint.sprintId}
-                                        to={`/project/${projectId}/sprint/${sprint.sprintId}`}
+                                        to={`/projects/${projectId}/sprints/${sprint.sprintId}`}
                                         className={({ isActive }) => `
                                             block pl-6 pr-3 py-2
                                             text-sm
@@ -159,7 +201,7 @@ const Sidebar = () => {
                                                 : 'text-gray-600 hover:text-gray-900'}
                                         `}
                                         onClick={(e) => {
-                                            e.stopPropagation();  // 이벤트 버블링 방지
+                                            e.stopPropagation();
                                         }}
                                     >
                                         {sprint.sprintName}

@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 const SideScrollableCardBox = ({children, className = ''}) => {
-    const handleWheel = (e) => {
-        e.preventDefault();
-        const container = e.currentTarget;
-        container.scrollLeft += e.deltaY;
-    };
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const handleWheel = (e) => {
+            if (e.deltaY !== 0) {
+                container.scrollLeft += e.deltaY;
+            }
+        };
+
+        container.addEventListener('wheel', handleWheel, { passive: true });
+
+        return () => {
+            container.removeEventListener('wheel', handleWheel);
+        };
+    }, []);
 
     return (
         <div className="relative">
             <div
+                ref={containerRef}
                 className={`
                     flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth
                     scrollbar scrollbar-thin 
@@ -24,7 +38,6 @@ const SideScrollableCardBox = ({children, className = ''}) => {
                     WebkitOverflowScrolling: 'touch',
                     scrollBehavior: 'smooth'
                 }}
-                onWheel={handleWheel}
             >
                 <div className="flex gap-6 px-1 py-2">
                     {children}
