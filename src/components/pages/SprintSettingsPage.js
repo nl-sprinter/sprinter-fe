@@ -7,7 +7,9 @@ import { FiEdit2, FiPlus } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
 import { updateSprintName, createSprint, getSprintPeriod, updateSprintPeriod } from '../../api/projectApi';
-import SprintFormModal from '../common/modal/SprintFormModal';
+import SprintCreateFormModal from '../common/modal/SprintCreateFormModal';
+import SprintEditFormModal from '../common/modal/SprintEditFormModal';
+import SmallInfoModal from '../common/modal/SmallInfoModal';
 import { addDays, format } from 'date-fns';
 
 const SprintSettingsPage = () => {
@@ -19,6 +21,12 @@ const SprintSettingsPage = () => {
     const [selectedSprint, setSelectedSprint] = useState(null);
     const [sprintPeriod, setSprintPeriod] = useState(30);
     const [isUpdatingPeriod, setIsUpdatingPeriod] = useState(false);
+    const [infoModal, setInfoModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'success'
+    });
 
     useEffect(() => {
         const fetchSprintPeriod = async () => {
@@ -36,12 +44,21 @@ const SprintSettingsPage = () => {
     const handleCreateSprint = async (data) => {
         try {
             await createSprint(projectId, data.sprintName);
-            
             await fetchSprints();
             setIsCreateModalOpen(false);
-            alert('스프린트가 생성되었습니다.');
+            setInfoModal({
+                isOpen: true,
+                title: '스프린트 생성 완료',
+                message: '스프린트가 생성되었습니다.',
+                type: 'success'
+            });
         } catch (error) {
-            alert('스프린트 생성에 실패했습니다.');
+            setInfoModal({
+                isOpen: true,
+                title: '스프린트 생성 실패',
+                message: '스프린트 생성에 실패했습니다.',
+                type: 'error'
+            });
             console.error('스프린트 생성 실패:', error);
         }
     };
@@ -57,9 +74,19 @@ const SprintSettingsPage = () => {
             await fetchSprints();
             setIsEditModalOpen(false);
             setSelectedSprint(null);
-            alert('스프린트 이름이 변경되었습니다.');
+            setInfoModal({
+                isOpen: true,
+                title: '스프린트 수정 완료',
+                message: '스프린트 이름이 변경되었습니다.',
+                type: 'success'
+            });
         } catch (error) {
-            alert('스프린트 이름 변경에 실패했습니다.');
+            setInfoModal({
+                isOpen: true,
+                title: '스프린트 수정 실패',
+                message: '스프린트 이름 변경에 실패했습니다.',
+                type: 'error'
+            });
             console.error('스프린트 이름 변경 실패:', error);
         }
     };
@@ -75,9 +102,19 @@ const SprintSettingsPage = () => {
         setIsUpdatingPeriod(true);
         try {
             await updateSprintPeriod(projectId, sprintPeriod);
-            alert('스프린트 주기가 변경되었습니다.');
+            setInfoModal({
+                isOpen: true,
+                title: '스프린트 주기 변경 완료',
+                message: '스프린트 주기가 변경되었습니다.',
+                type: 'success'
+            });
         } catch (error) {
-            alert('스프린트 주기 변경에 실패했습니다.');
+            setInfoModal({
+                isOpen: true,
+                title: '스프린트 주기 변경 실패',
+                message: '스프린트 주기 변경에 실패했습니다.',
+                type: 'error'
+            });
             console.error('스프린트 주기 변경 실패:', error);
         } finally {
             setIsUpdatingPeriod(false);
@@ -162,22 +199,28 @@ const SprintSettingsPage = () => {
                 </SettingsCard>
             </div>
 
-            <SprintFormModal
+            <SmallInfoModal
+                isOpen={infoModal.isOpen}
+                onClose={() => setInfoModal({ ...infoModal, isOpen: false })}
+                title={infoModal.title}
+                message={infoModal.message}
+                type={infoModal.type}
+            />
+
+            <SprintCreateFormModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSubmit={handleCreateSprint}
-                mode="create"
             />
 
-            <SprintFormModal
+            <SprintEditFormModal
                 isOpen={isEditModalOpen}
                 onClose={() => {
                     setIsEditModalOpen(false);
                     setSelectedSprint(null);
                 }}
                 onSubmit={handleEditSprint}
-                initialData={selectedSprint}
-                mode="edit"
+                sprint={selectedSprint}
             />
         </Layout>
     );

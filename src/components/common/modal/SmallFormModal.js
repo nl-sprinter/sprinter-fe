@@ -1,6 +1,5 @@
 import Modal from 'react-modal';
 import { IoMdClose } from 'react-icons/io';
-import { useState, useEffect } from 'react';
 
 const customStyles = {
     overlay: {
@@ -21,26 +20,19 @@ const customStyles = {
     }
 };
 
-const SprintFormModal = ({ 
+const SmallFormModal = ({ 
     isOpen, 
     onClose, 
-    onSubmit, 
-    initialData = null,
-    mode = 'create' // 'create' or 'edit'
+    title,
+    children,
+    submitText = '확인',
+    cancelText = '취소',
+    onSubmit,
+    isSubmitDisabled = false
 }) => {
-    const [sprintName, setSprintName] = useState('');
-
-    useEffect(() => {
-        if (isOpen && initialData) {
-            setSprintName(initialData.sprintName);
-        } else if (isOpen) {
-            setSprintName('');
-        }
-    }, [isOpen, initialData]);
-
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit({ sprintName });
+        onSubmit();
     };
 
     return (
@@ -48,12 +40,12 @@ const SprintFormModal = ({
             isOpen={isOpen}
             onRequestClose={onClose}
             style={customStyles}
-            contentLabel="Sprint Form Modal"
+            contentLabel="Small Form Modal"
         >
             <div className="w-full">
                 <div className="flex justify-between items-center p-4 border-b border-gray-200">
                     <h2 className="text-lg font-semibold">
-                        {mode === 'create' ? '새 스프린트 생성' : '스프린트 수정'}
+                        {title}
                     </h2>
                     <button
                         onClick={onClose}
@@ -65,19 +57,7 @@ const SprintFormModal = ({
 
                 <form onSubmit={handleSubmit} className="p-4">
                     <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                스프린트 이름
-                            </label>
-                            <input
-                                type="text"
-                                value={sprintName}
-                                onChange={(e) => setSprintName(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
-                                placeholder="스프린트 이름을 입력하세요"
-                                required
-                            />
-                        </div>
+                        {children}
                     </div>
 
                     <div className="flex justify-end gap-2 mt-6">
@@ -86,14 +66,18 @@ const SprintFormModal = ({
                             onClick={onClose}
                             className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
                         >
-                            취소
+                            {cancelText}
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                            disabled={!sprintName.trim()}
+                            disabled={isSubmitDisabled}
+                            className={`px-4 py-2 rounded-lg transition-colors ${
+                                isSubmitDisabled
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    : 'bg-green-500 text-white hover:bg-green-600'
+                            }`}
                         >
-                            {mode === 'create' ? '생성' : '수정'}
+                            {submitText}
                         </button>
                     </div>
                 </form>
@@ -102,4 +86,4 @@ const SprintFormModal = ({
     );
 };
 
-export default SprintFormModal; 
+export default SmallFormModal; 

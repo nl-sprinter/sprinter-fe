@@ -3,25 +3,31 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import Modal from 'react-modal';
 import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { FiEdit2 } from "react-icons/fi";
 import { createProject } from '../../api/projectApi';
 import WeightIndicator from '../common/WeightIndicator';
+import BacklogCreateFormModal from '../common/modal/BacklogCreateFormModal';
+import BacklogEditFormModal from '../common/modal/BacklogEditFormModal';
+import SmallInfoModal from '../common/modal/SmallInfoModal';
 
 const BacklogConfirmPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [backlogData, setBacklogData] = useState(location.state?.backlogData || null);
     const [editingBacklog, setEditingBacklog] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editTitle, setEditTitle] = useState('');
-    const [selectedWeight, setSelectedWeight] = useState(null);
-    const [isAddingBacklog, setIsAddingBacklog] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [targetSprintNumber, setTargetSprintNumber] = useState(null);
     const [sprintPeriod, setSprintPeriod] = useState(backlogData?.sprint.sprint_period || 7);
     const [isEditingProjectName, setIsEditingProjectName] = useState(false);
     const [projectName, setProjectName] = useState(backlogData?.project.project_name || '');
+    const [infoModal, setInfoModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'success'
+    });
 
     if (!backlogData) {
         return <div>데이터가 없습니다.</div>;
@@ -40,8 +46,22 @@ const BacklogConfirmPage = () => {
         event.preventDefault();
         try {
             await createProject(backlogData);
-        navigate('/home');
+            setInfoModal({
+                isOpen: true,
+                title: '프로젝트 생성 완료',
+                message: '프로젝트가 성공적으로 생성되었습니다.',
+                type: 'success'
+            });
+            setTimeout(() => {
+                navigate('/home');
+            }, 1500);
         } catch (error) {
+            setInfoModal({
+                isOpen: true,
+                title: '프로젝트 생성 실패',
+                message: '프로젝트 생성에 실패했습니다.',
+                type: 'error'
+            });
             console.error('Error creating project:', error);
         }
     };
@@ -97,25 +117,44 @@ const BacklogConfirmPage = () => {
 
     const handleEditClick = (backlog) => {
         setEditingBacklog(backlog);
-        setEditTitle(backlog.title);
-        setSelectedWeight(backlog.weight);
-        setIsModalOpen(true);
+        setIsEditModalOpen(true);
     };
 
-    const handleAddSprint = () => {
-        const lastSprintNumber = backlogData.sprint.sprint_count;
-        const lastSprintEndDate = getSprintDates(lastSprintNumber).end;
-        
-        // 마지막 스프린트 종료일의 다음날을 계산
-        const newSprintStartDate = addDays(new Date(lastSprintEndDate.replace(/\./g, '-')), 1);
+    const handleAddBacklogClick = (sprintNumber) => {
+        setTargetSprintNumber(sprintNumber);
+        setIsCreateModalOpen(true);
+    };
+
+    const handleCreateBacklog = (data) => {
+        const newBacklog = {
+            title: data.title.trim(),
+            weight: data.weight,
+            sprint_number: targetSprintNumber
+        };
         
         setBacklogData({
             ...backlogData,
-            sprint: {
-                ...backlogData.sprint,
-                sprint_count: lastSprintNumber + 1
-            }
+            backlog: [...backlogData.backlog, newBacklog]
         });
+        setIsCreateModalOpen(false);
+        setTargetSprintNumber(null);
+    };
+
+    const handleEditBacklog = (data) => {
+        const updatedBacklog = backlogData.backlog.map(item =>
+            item === editingBacklog ? {
+                ...item,
+                title: data.title.trim(),
+                weight: data.weight
+            } : item
+        );
+        
+        setBacklogData({
+            ...backlogData,
+            backlog: updatedBacklog
+        });
+        setIsEditModalOpen(false);
+        setEditingBacklog(null);
     };
 
     const handleDeleteSprint = (sprintNumber) => {
@@ -141,14 +180,6 @@ const BacklogConfirmPage = () => {
         });
     };
 
-    const handleAddBacklogClick = (sprintNumber) => {
-        setTargetSprintNumber(sprintNumber);
-        setEditTitle('');
-        setSelectedWeight(null);
-        setIsAddingBacklog(true);
-        setIsModalOpen(true);
-    };
-
     const handleDeleteBacklog = (backlogToDelete) => {
         if (window.confirm('이 백로그를 삭제하시겠습니까?')) {
             const updatedBacklog = backlogData.backlog.filter(item => item !== backlogToDelete);
@@ -157,39 +188,6 @@ const BacklogConfirmPage = () => {
                 backlog: updatedBacklog
             });
         }
-    };
-
-    const handleModalSave = () => {
-        if (isAddingBacklog) {
-            // 새 백로그 추가
-            const newBacklog = {
-                title: editTitle.trim(),
-                weight: selectedWeight,
-                sprint_number: targetSprintNumber
-            };
-            
-            setBacklogData({
-                ...backlogData,
-                backlog: [...backlogData.backlog, newBacklog]
-            });
-        } else {
-            // 기존 백로그 수정
-            const updatedBacklog = backlogData.backlog.map(item =>
-                item === editingBacklog ? {
-                    ...item,
-                    title: editTitle.trim(),
-                    weight: selectedWeight
-                } : item
-            );
-            
-            setBacklogData({
-                ...backlogData,
-                backlog: updatedBacklog
-            });
-        }
-        setIsModalOpen(false);
-        setIsAddingBacklog(false);
-        setTargetSprintNumber(null);
     };
 
     const handleSprintPeriodChange = (e) => {
@@ -233,257 +231,228 @@ const BacklogConfirmPage = () => {
     return (
         <Layout>
             <DragDropContext onDragEnd={handleDragEnd}>
-                <form onSubmit={handleSubmit} className="px-[10%] py-8 overflow-y-auto">
-                    <div className="flex flex-col items-center mb-8">
-                        <div className="mb-4">
-                            <div className="flex items-center justify-center gap-2">
-                                {isEditingProjectName ? (
-                                    <input
-                                        type="text"
-                                        value={projectName}
-                                        onChange={(e) => setProjectName(e.target.value)}
-                                        onKeyDown={(e) => handleProjectNameSave(e)}
-                                        onBlur={handleProjectNameSave}
-                                        autoFocus
-                                        className="text-3xl font-bold text-center bg-transparent border-b-2 border-green-500 outline-none"
-                                    />
-                                ) : (
-                                    <>
-                                        <h1 className="text-3xl font-bold text-center">
-                                            {backlogData.project.project_name}
-                                        </h1>
-                                        <button
-                                            type="button"
-                                            onClick={handleProjectNameEdit}
-                                            className="text-gray-400 hover:text-gray-600"
-                                        >
-                                            <FiEdit2 size={20} />
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                            <p className="text-gray-600 text-center">
-                                AI가 추천하는 백로그입니다
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                스프린트 단위 기간:
-                            </label>
-                            <input
-                                type="number"
-                                min="1"
-                                value={sprintPeriod}
-                                onChange={handleSprintPeriodChange}
-                                className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
-                            />
-                            <span className="text-sm text-gray-600">일</span>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6 mb-8">
-                        {[...Array(backlogData.sprint.sprint_count)].map((_, index) => {
-                            const sprintNumber = index + 1;
-                            const dates = getSprintDates(sprintNumber);
-                            const sprintBacklogs = backlogData.backlog.filter(
-                                item => item.sprint_number === sprintNumber
-                            );
-                            const isLastSprint = sprintNumber === backlogData.sprint.sprint_count;
-                            const canDelete = isLastSprint && sprintBacklogs.length === 0;
-
-                            return (
-                                <div key={sprintNumber} className="bg-white rounded-lg shadow-sm border border-gray-200">
-                                    <div className="border-b border-gray-200 p-4 flex justify-between items-center">
-                                        <div>
-                                            <h2 className="text-xl font-semibold text-gray-800">
-                                                Sprint {sprintNumber}
-                                            </h2>
-                                            <p className="text-sm text-gray-600">
-                                                {dates.start} - {dates.end}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center gap-2">
+                <div className="px-[10%] py-8 overflow-y-auto">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="flex flex-col items-center mb-8">
+                            <div className="mb-4">
+                                <div className="flex items-center justify-center gap-2">
+                                    {isEditingProjectName ? (
+                                        <input
+                                            type="text"
+                                            value={projectName}
+                                            onChange={(e) => setProjectName(e.target.value)}
+                                            onKeyDown={(e) => handleProjectNameSave(e)}
+                                            onBlur={handleProjectNameSave}
+                                            autoFocus
+                                            className="text-3xl font-bold text-center bg-transparent border-b-2 border-green-500 outline-none"
+                                        />
+                                    ) : (
+                                        <>
+                                            <h1 className="text-3xl font-bold text-center">
+                                                {backlogData.project.project_name}
+                                            </h1>
                                             <button
                                                 type="button"
-                                                onClick={() => handleAddBacklogClick(sprintNumber)}
-                                                className="p-1.5 text-green-600 hover:bg-green-50 rounded-full"
+                                                onClick={handleProjectNameEdit}
+                                                className="text-gray-400 hover:text-gray-600"
                                             >
-                                                <IoMdAdd size={20} />
+                                                <FiEdit2 size={20} />
                                             </button>
-                                            {canDelete && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleDeleteSprint(sprintNumber)}
-                                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-full"
-                                                >
-                                                    <IoMdClose size={20} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <Droppable droppableId={String(sprintNumber)}>
-                                        {(provided) => (
-                                            <div 
-                                                ref={provided.innerRef}
-                                                {...provided.droppableProps}
-                                                className="p-4"
-                                            >
-                                                {sprintBacklogs.map((backlog, idx) => (
-                                                    <Draggable
-                                                        key={`${backlog.sprint_number}-${idx}`}
-                                                        draggableId={`${backlog.sprint_number}-${idx}`}
-                                                        index={idx}
-                                                    >
-                                                        {(provided) => (
-                                                            <div
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                {...provided.dragHandleProps}
-                                                                className="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 cursor-pointer hover:bg-gray-50"
-                                                            >
-                                                                <span className="text-gray-800 flex-grow" onClick={() => handleEditClick(backlog)}>
-                                                                    {backlog.title}
-                                                                </span>
-                                                                <div className="flex items-center gap-3">
-                                                                    <WeightIndicator weight={backlog.weight} size="small" />
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleDeleteBacklog(backlog);
-                                                                        }}
-                                                                        className="p-1 text-gray-400 hover:text-red-500 rounded-full"
-                                                                    >
-                                                                        <IoMdClose size={18} />
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
-                                                {provided.placeholder}
-                                            </div>
-                                        )}
-                                    </Droppable>
+                                        </>
+                                    )}
                                 </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* 수정 모달 */}
-                    <Modal
-                        isOpen={isModalOpen}
-                        onRequestClose={() => {
-                            setIsModalOpen(false);
-                            setIsAddingBacklog(false);
-                            setTargetSprintNumber(null);
-                        }}
-                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg w-96"
-                        overlayClassName="fixed inset-0 bg-black bg-opacity-50"
-                    >
-                        <h2 className="text-xl font-bold mb-4">
-                            {isAddingBacklog ? '백로그 추가' : '백로그 수정'}
-                        </h2>
-                        <div className="space-y-4">
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    내용
+                                <p className="text-gray-600 text-center">
+                                    AI가 추천하는 스프린트 계획 입니다.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm font-medium text-gray-700">
+                                    스프린트 단위 기간:
                                 </label>
                                 <input
-                                    type="text"
-                                    value={editTitle}
-                                    onChange={(e) => setEditTitle(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    type="number"
+                                    min="1"
+                                    value={sprintPeriod}
+                                    onChange={handleSprintPeriodChange}
+                                    className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
                                 />
+                                <span className="text-sm text-gray-600">일</span>
                             </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    가중치
-                                </label>
-                                <div className="flex items-center justify-between gap-4 mt-2">
-                                    {[1, 2, 3].map((weight) => (
-                                        <button
-                                            key={weight}
-                                            type="button"
-                                            onClick={() => setSelectedWeight(weight)}
-                                            className={`flex-1 py-2 px-4 rounded-lg border ${
-                                                selectedWeight === weight 
-                                                    ? 'border-green-500 bg-green-50 text-green-700' 
-                                                    : 'border-gray-300 hover:bg-gray-50'
-                                            }`}
-                                        >
-                                            <div className="flex flex-col items-center gap-1">
-                                                <WeightIndicator 
-                                                    weight={weight} 
-                                                    showLabel={false} 
-                                                    size="small" 
-                                                />
-                                                <span className="text-sm">
-                                                    {weight === 1 ? '1. 낮음' : weight === 2 ? '2. 보통' : '3. 높음'}
-                                                </span>
+                        </div>
+
+                        <div className="space-y-6 mb-8">
+                            {[...Array(backlogData.sprint.sprint_count)].map((_, index) => {
+                                const sprintNumber = index + 1;
+                                const sprintDates = getSprintDates(sprintNumber);
+                                const sprintBacklogs = backlogData.backlog.filter(
+                                    item => item.sprint_number === sprintNumber
+                                );
+
+                                return (
+                                    <div key={sprintNumber} className="bg-white rounded-lg shadow">
+                                        <div className="flex items-center justify-between p-4 border-b">
+                                            <div>
+                                                <h3 className="text-lg font-medium">
+                                                    Sprint {sprintNumber}
+                                                </h3>
+                                                <p className="text-sm text-gray-500">
+                                                    {sprintDates.start} - {sprintDates.end}
+                                                </p>
                                             </div>
-                                        </button>
-                                    ))}
-                                </div>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleAddBacklogClick(sprintNumber)}
+                                                    className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                                                >
+                                                    <IoMdAdd size={20} />
+                                                </button>
+                                                {sprintNumber === backlogData.sprint.sprint_count && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteSprint(sprintNumber)}
+                                                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                                    >
+                                                        <IoMdClose size={20} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <Droppable droppableId={String(sprintNumber)}>
+                                            {(provided) => (
+                                                <div 
+                                                    ref={provided.innerRef}
+                                                    {...provided.droppableProps}
+                                                    className="p-4"
+                                                >
+                                                    {sprintBacklogs.map((backlog, idx) => (
+                                                        <Draggable
+                                                            key={`${backlog.sprint_number}-${idx}`}
+                                                            draggableId={`${backlog.sprint_number}-${idx}`}
+                                                            index={idx}
+                                                        >
+                                                            {(provided) => (
+                                                                <div
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                    className="flex items-center justify-between p-3 mb-2 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-green-500 group"
+                                                                >
+                                                                    <div className="flex-1">
+                                                                        <span className="text-sm">
+                                                                            {backlog.title}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <WeightIndicator weight={backlog.weight} size="small" />
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleEditClick(backlog);
+                                                                            }}
+                                                                            className="p-1.5 text-gray-400 hover:text-green-600 rounded-full transition-colors"
+                                                                        >
+                                                                            <FiEdit2 size={16} />
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleDeleteBacklog(backlog);
+                                                                            }}
+                                                                            className="p-1 text-gray-400 hover:text-red-500 rounded-full"
+                                                                        >
+                                                                            <IoMdClose size={18} />
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* 백로그 목록이 비어있을 때 표시할 메시지 */}
+                        {backlogData.backlog.length === 0 && (
+                            <div className="text-center py-8 text-gray-500">
+                                백로그가 없습니다.
                             </div>
-                            <div className="flex justify-end gap-2">
+                        )}
+
+                        <div className="flex flex-col gap-6">
+                            <button
+                                type="button"
+                                onClick={() => setBacklogData({
+                                    ...backlogData,
+                                    sprint: {
+                                        ...backlogData.sprint,
+                                        sprint_count: backlogData.sprint.sprint_count + 1
+                                    }
+                                })}
+                                className="w-full p-4 border border-dashed border-gray-300 rounded-lg text-gray-500 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <IoMdAdd size={20} />
+                                새 스프린트 추가
+                            </button>
+
+                            <div className="flex justify-center gap-4">
                                 <button
                                     type="button"
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                                    onClick={() => navigate('/home')}
+                                    className="px-4 py-2 border border-green-500 text-green-500 rounded hover:bg-green-50 transition-colors"
                                 >
                                     취소
                                 </button>
                                 <button
-                                    type="button"
-                                    disabled={!editTitle.trim() || !selectedWeight}
-                                    onClick={handleModalSave}
-                                    className={`px-4 py-2 rounded ${
-                                        !editTitle.trim() || !selectedWeight
-                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                            : 'bg-green-500 text-white hover:bg-green-600'
-                                    }`}
+                                    type="submit"
+                                    className="w-[120px] px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 transition-colors"
                                 >
-                                    {isAddingBacklog ? '추가' : '수정'}
+                                    만들기
                                 </button>
                             </div>
                         </div>
-                    </Modal>
+                    </form>
 
-                    {/* 백로그 목록이 비어있을 때 표시할 메시지 */}
-                    {backlogData.backlog.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                            백로그가 없습니다.
-                        </div>
-                    )}
+                    <SmallInfoModal
+                        isOpen={infoModal.isOpen}
+                        onClose={() => {
+                            setInfoModal({ ...infoModal, isOpen: false });
+                            if (infoModal.type === 'success') {
+                                navigate('/home');
+                            }
+                        }}
+                        title={infoModal.title}
+                        message={infoModal.message}
+                        type={infoModal.type}
+                    />
 
-                    <div className="flex flex-col justify-between">
-                        <div className="flex justify-center">
-                            <button
-                                type="button"
-                                onClick={handleAddSprint}
-                                className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center mb-4"
-                            >
-                                <span className="text-xl mr-1">+</span> 스프린트 추가
-                            </button>
-                        </div>
-                        <div className="flex justify-between">
-                            <button
-                                type="button"
-                                className="w-[120px] px-4 py-2 border border-green-500 text-green-500 rounded hover:border-green-600 hover:text-green-600"
-                                onClick={() => navigate('/home')}
-                            >
-                                취소
-                            </button>
-                            <button
-                        type="submit"
-                                className={`w-[120px] px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600`}
-                            >
-                                만들기
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                    <BacklogCreateFormModal
+                        isOpen={isCreateModalOpen}
+                        onClose={() => {
+                            setIsCreateModalOpen(false);
+                            setTargetSprintNumber(null);
+                        }}
+                        onSubmit={handleCreateBacklog}
+                    />
+
+                    <BacklogEditFormModal
+                        isOpen={isEditModalOpen}
+                        onClose={() => {
+                            setIsEditModalOpen(false);
+                            setEditingBacklog(null);
+                        }}
+                        onSubmit={handleEditBacklog}
+                        backlog={editingBacklog}
+                    />
+                </div>
             </DragDropContext>
         </Layout>
     );

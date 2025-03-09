@@ -51,7 +51,7 @@ const Sidebar = () => {
     const handleProjectClick = (project) => {
         setProjectId(project.projectId);
         setIsOpen(false);
-        navigate(`/projects/${project.projectId}`);
+        navigate(`/projects/${project.projectId}/overview`);
     };
 
     // 현재 경로가 정확히 일치하는지 확인

@@ -2,6 +2,7 @@ import Layout from '../common/layout/Layout';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { signup } from '../../api/authApi';
+import SmallInfoModal from '../common/modal/SmallInfoModal';
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -12,6 +13,12 @@ const SignUpPage = () => {
         passwordConfirm: ''
     });
     const [errors, setErrors] = useState({});
+    const [infoModal, setInfoModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'success'
+    });
 
     const validateEmail = (email) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -54,9 +61,22 @@ const SignUpPage = () => {
                 formData.password,
                 formData.nickname
             );
-            alert('회원가입이 완료되었습니다!');
-            navigate('/');
+            setInfoModal({
+                isOpen: true,
+                title: '회원가입 완료',
+                message: '회원가입이 성공적으로 완료되었습니다.',
+                type: 'success'
+            });
+            setTimeout(() => {
+                navigate('/');
+            }, 1500);
         } catch (error) {
+            setInfoModal({
+                isOpen: true,
+                title: '회원가입 실패',
+                message: error.message || '회원가입에 실패했습니다.',
+                type: 'error'
+            });
             setErrors({ submit: error.message || '회원가입에 실패했습니다' });
         }
     };
@@ -146,6 +166,19 @@ const SignUpPage = () => {
                         뒤로 가기
                     </button>
                 </form>
+                
+                <SmallInfoModal
+                    isOpen={infoModal.isOpen}
+                    onClose={() => {
+                        setInfoModal({ ...infoModal, isOpen: false });
+                        if (infoModal.type === 'success') {
+                            navigate('/');
+                        }
+                    }}
+                    title={infoModal.title}
+                    message={infoModal.message}
+                    type={infoModal.type}
+                />
             </div>
         </Layout>
     );
