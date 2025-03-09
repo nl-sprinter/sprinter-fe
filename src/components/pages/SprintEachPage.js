@@ -1,7 +1,7 @@
 import Layout from '../common/layout/Layout';
 import {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
-import {getProductBacklog} from '../../api/projectApi';
+import {getSprintBacklogList} from '../../api/projectApi';
 import {PieChart} from 'react-minimal-pie-chart';
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts';
 import {IoMdAdd} from 'react-icons/io';
@@ -11,10 +11,13 @@ import PageTitle from "../common/PageTitle";
 import DailyScrumItem from "../common/item/DailyScrumItem";
 import BacklogItem from "../common/item/BacklogItem";
 import W1H1Card from "../common/card/W1H1Card";
+import BacklogModal from '../common/modal/BacklogModal';
 
 const SprintEachPage = () => {
     const {projectId, sprintId} = useParams();
     const [backlogs, setBacklogs] = useState([]);
+    const [selectedBacklog, setSelectedBacklog] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // 더미 데이터 - 실제 구현 시 API에서 가져올 데이터
     const barChartData = [
@@ -36,19 +39,25 @@ const SprintEachPage = () => {
     useEffect(() => {
         const fetchBacklogs = async () => {
             try {
-                const data = await getProductBacklog(projectId);
-                // 현재 스프린트의 백로그만 필터링
-                const sprintBacklogs = data.filter(
-                    backlog => backlog.sprintId === parseInt(sprintId)
-                );
-                setBacklogs(sprintBacklogs);
+                const data = await getSprintBacklogList(projectId, sprintId);
+                setBacklogs(data);
             } catch (err) {
-                console.error('Error fetching backlogs:', err);
+                console.error('스프린트 백로그 목록을 불러오는데 실패했습니다:', err);
             }
         };
 
         fetchBacklogs();
     }, [projectId, sprintId]);
+
+    const handleBacklogClick = (backlog) => {
+        setSelectedBacklog(backlog);
+        setIsModalOpen(true);
+    };
+
+    // 완료된 백로그 수 계산
+    const completedBacklogs = backlogs.filter(backlog => backlog.isFinished).length;
+    const totalBacklogs = backlogs.length;
+    const inProgressBacklogs = totalBacklogs - completedBacklogs;
 
     return (
         <Layout showFunctions showSidebar>
@@ -60,9 +69,8 @@ const SprintEachPage = () => {
                             <div className="w-24 h-24">
                                 <PieChart
                                     data={[
-                                        {title: '완료', value: 60, color: '#22c55e'},
-                                        {title: '진행중', value: 30, color: '#3b82f6'},
-                                        {title: '예정', value: 10, color: '#e5e7eb'},
+                                        {title: '완료', value: completedBacklogs, color: '#22c55e'},
+                                        {title: '진행중', value: inProgressBacklogs, color: '#3b82f6'},
                                     ]}
                                     lineWidth={35}
                                     paddingAngle={2}
@@ -95,13 +103,20 @@ const SprintEachPage = () => {
                     <div className="space-y-3">
                         {backlogs.map((backlog) => (
                             <BacklogItem
-                                backlogId={backlog.id}
+                                key={backlog.backlogId}
+                                backlogId={backlog.backlogId}
                                 sprintOrder={backlog.sprintOrder}
-                                backlogName={backlog.backlogName}
+                                backlogName={backlog.title}
                                 weight={backlog.weight}
                                 isFinished={backlog.isFinished}
-                                />
+                                onClick={() => handleBacklogClick(backlog)}
+                            />
                         ))}
+                        {backlogs.length === 0 && (
+                            <div className="text-center py-4 text-gray-500">
+                                백로그가 없습니다.
+                            </div>
+                        )}
                     </div>
                 </W1H1Card>
 
@@ -116,6 +131,7 @@ const SprintEachPage = () => {
                     <div className="space-y-3">
                         {dailyScrums.map((scrum) => (
                             <DailyScrumItem
+                                key={scrum.id}
                                 id={scrum.id}
                                 date={scrum.date}
                                 content={scrum.content}
@@ -124,6 +140,15 @@ const SprintEachPage = () => {
                     </div>
                 </W1H1Card>
             </CardBox>
+
+            <BacklogModal
+                isOpen={isModalOpen}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setSelectedBacklog(null);
+                }}
+                backlog={selectedBacklog}
+            />
         </Layout>
     );
 };

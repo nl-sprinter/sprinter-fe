@@ -4,7 +4,7 @@ import { getSprintList } from '../api/projectApi';
 /**
  * 프로젝트 관련한 네비게이트 스토어
  */
-export const useProjectNavigationStore = create((set) => ({
+export const useProjectNavigationStore = create((set, get) => ({
     projectId: null,
     sprintId: null,
     backlogId: null,
@@ -30,6 +30,18 @@ export const useProjectNavigationStore = create((set) => ({
                 backlogId: null,
                 sprints: []
             });
+        }
+    },
+
+    fetchSprints: async () => {
+        const projectId = get().projectId;
+        if (!projectId) return;
+        
+        try {
+            const sprintList = await getSprintList(projectId);
+            set({ sprints: sprintList });
+        } catch (error) {
+            console.error('스프린트 목록을 불러오는데 실패했습니다:', error);
         }
     },
 

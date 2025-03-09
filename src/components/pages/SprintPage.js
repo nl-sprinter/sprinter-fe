@@ -1,7 +1,7 @@
 import Layout from '../common/layout/Layout';
 import {useState, useEffect} from 'react';
-import {useParams} from 'react-router-dom';
-import {getProductBacklog} from '../../api/projectApi';
+import {useNavigate, useParams} from 'react-router-dom';
+import {getProductBacklogList} from '../../api/projectApi';
 import {useUserStore} from '../../store/useUserStore';
 import {PieChart} from 'react-minimal-pie-chart';
 import CardBox from "../common/layout/CardBox";
@@ -9,7 +9,9 @@ import PageTitle from "../common/PageTitle";
 import BacklogItem from "../common/item/BacklogItem";
 import W1H1Card from "../common/card/W1H1Card";
 import {FiSettings} from 'react-icons/fi';
+
 const SprintPage = () => {
+    const navigate = useNavigate();
     const {projectId} = useParams();
     const [backlogs, setBacklogs] = useState([]);
     const {user} = useUserStore();
@@ -17,7 +19,7 @@ const SprintPage = () => {
     useEffect(() => {
         const fetchBacklogs = async () => {
             try {
-                const data = await getProductBacklog(projectId);
+                const data = await getProductBacklogList(projectId);
                 setBacklogs(data);
             } catch (err) {
                 console.error('Error fetching backlogs:', err);
@@ -33,7 +35,11 @@ const SprintPage = () => {
                 title="스프린트 현황"
                 description="스프린트의 전반적인 진행 상황을 확인할 수 있습니다."
                 rightContent={
-                    <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+                    <button
+                        onClick={() => navigate(`/projects/${projectId}/sprints/settings`)}
+                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+
                         <FiSettings size={20} />
                     </button>
                 }

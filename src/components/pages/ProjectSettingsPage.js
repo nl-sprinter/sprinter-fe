@@ -71,7 +71,7 @@ const ProjectSettingsPage = () => {
                 title="프로젝트 설정" 
                 rightContent={
                     <button 
-                        onClick={() => navigate(`/projects/${projectId}`)}
+                        onClick={() => navigate(`/projects/${projectId}/overview`)}
                         className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
                     >
                         <IoMdClose size={20} />

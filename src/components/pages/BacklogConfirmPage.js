@@ -19,7 +19,7 @@ const BacklogConfirmPage = () => {
     const [selectedWeight, setSelectedWeight] = useState(null);
     const [isAddingBacklog, setIsAddingBacklog] = useState(false);
     const [targetSprintNumber, setTargetSprintNumber] = useState(null);
-    const [sprintDuration, setSprintDuration] = useState(backlogData?.sprint.sprint_duration || 7);
+    const [sprintPeriod, setSprintPeriod] = useState(backlogData?.sprint.sprint_period || 7);
     const [isEditingProjectName, setIsEditingProjectName] = useState(false);
     const [projectName, setProjectName] = useState(backlogData?.project.project_name || '');
 
@@ -28,8 +28,8 @@ const BacklogConfirmPage = () => {
     }
 
     const getSprintDates = (sprintNumber) => {
-        const startDate = addDays(new Date(), (sprintNumber - 1) * backlogData.sprint.sprint_duration);
-        const endDate = addDays(startDate, backlogData.sprint.sprint_duration - 1);
+        const startDate = addDays(new Date(), (sprintNumber - 1) * sprintPeriod);
+        const endDate = addDays(startDate, sprintPeriod - 1);
         return {
             start: format(startDate, 'yyyy.MM.dd'),
             end: format(endDate, 'yyyy.MM.dd')
@@ -192,15 +192,15 @@ const BacklogConfirmPage = () => {
         setTargetSprintNumber(null);
     };
 
-    const handleSprintDurationChange = (e) => {
+    const handleSprintPeriodChange = (e) => {
         const value = parseInt(e.target.value);
         if (value > 0) {
-            setSprintDuration(value);
+            setSprintPeriod(value);
             setBacklogData({
                 ...backlogData,
                 sprint: {
                     ...backlogData.sprint,
-                    sprint_duration: value
+                    sprint_period: value
                 }
             });
         }
@@ -273,8 +273,8 @@ const BacklogConfirmPage = () => {
                             <input
                                 type="number"
                                 min="1"
-                                value={sprintDuration}
-                                onChange={handleSprintDurationChange}
+                                value={sprintPeriod}
+                                onChange={handleSprintPeriodChange}
                                 className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
                             />
                             <span className="text-sm text-gray-600">일</span>

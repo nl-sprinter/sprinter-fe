@@ -16,7 +16,7 @@ const OverviewPage = () => {
                 description="프로젝트의 전반적인 진행 상황을 확인할 수 있습니다."
                 rightContent={
                     <button 
-                        onClick={() => navigate(`/projects/${projectId}/settings`)}
+                        onClick={() => navigate(`/projects/${projectId}/overview/settings`)}
                         className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
                     >
                         <FiSettings size={20} />

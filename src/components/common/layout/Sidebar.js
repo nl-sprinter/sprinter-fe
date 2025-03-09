@@ -51,7 +51,7 @@ const Sidebar = () => {
     const handleProjectClick = (project) => {
         setProjectId(project.projectId);
         setIsOpen(false);
-        navigate(`/project/${project.projectId}`);
+        navigate(`/projects/${project.projectId}`);
     };
 
     // 현재 경로가 정확히 일치하는지 확인
@@ -69,9 +69,9 @@ const Sidebar = () => {
     // Overview 메뉴의 활성화 상태 확인
     const isOverviewActive = () => {
         const currentPath = location.pathname;
-        const projectRoot = `/projects/${projectId}`;
+        const projectRoot = `/projects/${projectId}/overview`;
         // 정확히 프로젝트 루트 경로일 때만 활성화
-        return currentPath === projectRoot;
+        return currentPath.startsWith(projectRoot);
     };
 
     // Settings 페이지 여부 확인
@@ -82,7 +82,7 @@ const Sidebar = () => {
     const menuItems = [
         { 
             text: 'Overview', 
-            path: '', 
+            path: '/overview', 
             type: 'link',
             isActive: isOverviewActive
         },

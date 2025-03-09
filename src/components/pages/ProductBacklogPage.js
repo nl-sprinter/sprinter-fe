@@ -1,7 +1,8 @@
 import Layout from '../common/layout/Layout';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getProductBacklog } from '../../api/projectApi';
+import { getProductBacklogList } from '../../api/projectApi';
+import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
 import BacklogModal from '../common/modal/BacklogModal';
 import SideScrollableCardBox from '../common/layout/SideScrollableCardBox';
 import PageTitle from '../common/PageTitle';
@@ -10,6 +11,7 @@ import W1H2Card from '../common/card/W1H2Card';
 
 const ProductBacklogPage = () => {
     const { projectId } = useParams();
+    const { sprints } = useProjectNavigationStore();
     const [backlogs, setBacklogs] = useState([]);
     const [selectedBacklog, setSelectedBacklog] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,7 +19,7 @@ const ProductBacklogPage = () => {
     useEffect(() => {
         const fetchBacklogs = async () => {
             try {
-                const data = await getProductBacklog(projectId);
+                const data = await getProductBacklogList(projectId);
                 setBacklogs(data);
             } catch (err) {
                 console.error('백로그 목록을 불러오는데 실패했습니다:', err);
@@ -50,30 +52,40 @@ const ProductBacklogPage = () => {
                 <PageTitle title="Product Backlog" />
 
                 <SideScrollableCardBox>
-                    {Object.entries(groupedBacklogs).map(([sprintOrder, { sprintName, backlogs }]) => (
-                        <W1H2Card
-                            key={sprintOrder}
-                            title={`Sprint ${sprintOrder} - ${sprintName}`}
-                        >
-                            <div className="space-y-3">
-                                {backlogs.map((backlog) => (
-                                    <BacklogItem
-                                        key={backlog.backlogId}
-                                        backlogId={backlog.backlogId}
-                                        sprintOrder={backlog.sprintOrder}
-                                        backlogName={backlog.backlogName}
-                                        weight={backlog.weight}
-                                        isFinished={backlog.isFinished}
-                                        onClick={() => handleBacklogClick(backlog)}
-                                    />
-                                ))}
-                            </div>
-                        </W1H2Card>
-                    ))}
+                    {sprints.map((sprint) => {
+                        const sprintBacklogs = backlogs.filter(backlog => backlog.sprintOrder === sprint.sprintOrder);
+                        
+                        return (
+                            <W1H2Card
+                                key={sprint.sprintId}
+                                title={`Sprint ${sprint.sprintOrder} - ${sprint.sprintName}`}
+                            >
+                                <div className="space-y-3">
+                                    {sprintBacklogs.length > 0 ? (
+                                        sprintBacklogs.map((backlog) => (
+                                            <BacklogItem
+                                                key={backlog.backlogId}
+                                                backlogId={backlog.backlogId}
+                                                sprintOrder={backlog.sprintOrder}
+                                                backlogName={backlog.title}
+                                                weight={backlog.weight}
+                                                isFinished={backlog.isFinished}
+                                                onClick={() => handleBacklogClick(backlog)}
+                                            />
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-4 text-gray-500">
+                                            백로그가 없습니다.
+                                        </div>
+                                    )}
+                                </div>
+                            </W1H2Card>
+                        );
+                    })}
 
-                    {Object.keys(groupedBacklogs).length === 0 && (
+                    {sprints.length === 0 && (
                         <div className="w-full text-center py-8 text-gray-500">
-                            백로그가 없습니다.
+                            스프린트가 없습니다.
                         </div>
                     )}
                 </SideScrollableCardBox>

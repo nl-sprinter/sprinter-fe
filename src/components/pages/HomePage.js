@@ -50,7 +50,7 @@ const HomePage = () => {
         // 프로젝트 진입 시 store 초기화 및 현재 프로젝트 설정
         await fetchProjects();
         setProjectId(project.projectId);
-        navigate(`/projects/${project.projectId}`);
+        navigate(`/projects/${project.projectId}/overview`);
     };
 
     return (
