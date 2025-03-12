@@ -1,11 +1,11 @@
 import { FiSearch, FiMenu, FiMessageSquare, FiUser, FiBell } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
-import TodoModal from '../modal/TodoModal';
-import ChatModal from '../modal/ChatModal';
+import RightSideTodoModal from '../modal/rightside/RightSideTodoModal';
+import RightSideChatModal from '../modal/rightside/RightSideChatModal';
 import SearchModal from '../modal/SearchModal';
 import UserModal from '../modal/UserModal';
-import NotificationModal from '../modal/NotificationModal';
+import RightSideNotificationModal from '../modal/rightside/RightSideNotificationModal';
 
 const Header = ({ showSidebar = false, showFunctions = false }) => {
     const navigate = useNavigate();
@@ -71,11 +71,11 @@ const Header = ({ showSidebar = false, showFunctions = false }) => {
                     />
                 </div>
             </div>
-            <TodoModal 
+            <RightSideTodoModal
                 open={todoModalOpen} 
                 onClose={() => setTodoModalOpen(false)} 
             />
-            <ChatModal 
+            <RightSideChatModal
                 open={chatModalOpen}
                 onClose={() => setChatModalOpen(false)}
             />
@@ -88,7 +88,7 @@ const Header = ({ showSidebar = false, showFunctions = false }) => {
                 open={userModalOpen}
                 onClose={() => setUserModalOpen(false)}
             />
-            <NotificationModal
+            <RightSideNotificationModal
                 open={notificationModalOpen}
                 onClose={() => setNotificationModalOpen(false)}
             />

@@ -9,7 +9,7 @@ import React from 'react';
  */
 const SettingsCard = ({ title, description, children }) => {
     return (
-        <div className="bg-white rounded-lg shadow-sm">
+        <div className="bg-white rounded-lg shadow-md">
             <div className="border-b border-gray-100">
                 <div className="p-4">
                     <h3 className="text-lg font-medium text-gray-900">{title}</h3>

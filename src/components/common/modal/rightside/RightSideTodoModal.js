@@ -1,27 +1,7 @@
-import Modal from 'react-modal';
-import { FiX } from 'react-icons/fi';
+import React from 'react';
+import RightSideModal from './RightSideModal';
 
-const customStyles = {
-    overlay: {
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
-        zIndex: 50
-    },
-    content: {
-        top: '0',
-        right: '0',
-        bottom: '0',
-        left: 'auto',
-        width: '300px',
-        margin: '0',
-        padding: '20px',
-        border: '0px solid',
-        borderRadius: '0',
-        transform: 'none',
-        position: 'fixed'
-    }
-};
-
-const TodoModal = ({ open, onClose }) => {
+const RightSideTodoModal = ({ open, onClose }) => {
     const todos = [
         { project: 'proj1', task: 'Sprint3 - Do Task 1', status: '(0-6)', color: '#4CAF50' },
         { project: 'proj1', task: 'Sprint3 - Do Task 2', status: '(0-6)', color: '#4CAF50' },
@@ -29,21 +9,13 @@ const TodoModal = ({ open, onClose }) => {
     ];
 
     return (
-        <Modal
+        <RightSideModal
             isOpen={open}
-            onRequestClose={onClose}
-            style={customStyles}
+            onClose={onClose}
+            title="Todo List"
             contentLabel="Todo Modal"
+            customContentStyle={{ width: '300px' }}
         >
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Todo List</h2>
-                <button 
-                    onClick={onClose}
-                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                    <FiX className="text-xl text-gray-600" />
-                </button>
-            </div>
             <ul>
                 {todos.map((todo, index) => (
                     <li key={index} className="flex items-center py-3 border-b border-gray-100 last:border-b-0">
@@ -60,8 +32,8 @@ const TodoModal = ({ open, onClose }) => {
                     </li>
                 ))}
             </ul>
-        </Modal>
+        </RightSideModal>
     );
 };
 
-export default TodoModal;
+export default RightSideTodoModal;

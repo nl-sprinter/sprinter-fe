@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useLoading } from '../components/common/modal/LoadingModal';
-import { useError } from '../components/common/modal/ErrorModal';
+import { useLoading } from '../components/common/modal/global/LoadingModal';
+import { useError } from '../components/common/modal/global/ErrorModal';
 import { setLoadingHandler, setErrorHandler } from './axiosInstance';
 
 const AxiosSetup = ({ children }) => {

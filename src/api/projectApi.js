@@ -102,3 +102,99 @@ export const createSprint = async (projectId, sprintName) => {
     console.log(`[API] projectApi.createSprint 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 };
+
+
+export const getUsersInProject = async (projectId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/users`);
+    console.log(`[API] projectApi.getUsersInProject 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+};
+
+// 프로젝트에 추가할 유저 검색
+export const searchUserToAddProject = async (projectId, keyword) => {
+    try {
+        const response = await axiosInstance.get(`/projects/${projectId}/users/search?keyword=${keyword}`);
+        console.log(`[API] projectApi.searchUserToAddProject 호출 성공, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.error(`[API] projectApi.searchUserToAddProject 호출 실패:`, error.response?.data);
+        throw error;
+    }
+};
+
+// 프로젝트에 유저 추가
+export const addUserToProject = async (projectId, userId) => {
+    try {
+        const response = await axiosInstance.post(`/projects/${projectId}/users`, { userId });
+        console.log(`[API] projectApi.addUserToProject 호출 성공, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.error(`[API] projectApi.addUserToProject 호출 실패:`, error.response?.data);
+        throw error;
+    }
+};
+
+// 프로젝트에서 유저 삭제
+export const removeUserFromProject = async (projectId, userId) => {
+    try {
+        const response = await axiosInstance.delete(`/projects/${projectId}/users?targetUserId=${userId}`);
+        console.log(`[API] projectApi.removeUserFromProject 호출 성공, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.error(`[API] projectApi.removeUserFromProject 호출 실패:`, error.response?.data);
+        throw error;
+    }
+};
+
+
+// 유저가 해당 프로젝트의 팀장인지 확인
+export const checkUserIsProjectLeader = async (projectId, token) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/users/isleader`, {
+        headers: { Authorization: token }
+    });
+    console.log(`[API] projectApi.checkUserIsProjectLeader : ${JSON.stringify(response.data)}`);
+    return response.data;
+};
+
+
+
+// Sprint 에 Backlog 추가
+export const addBacklogToSprint = async(projectId, sprintId, title, weight) => {
+try {
+        const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/backlogs`, {
+            title,
+            weight
+        });
+        console.log(`[API] projectApi.addBacklogToSprint 호출, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.error(`[API] projectApi.addBacklogToSprint 호출 실패:`, error.response?.data);
+        throw error;
+    } 
+}
+
+export const getDailyScrumInfoList = async (projectId, sprintId) => {
+    /**
+     *     private Long dailyScrumId;
+            private LocalDate createdAt;
+            private Long sprintId;
+            private Long sprintOrder;
+     */
+    // const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/dailyscrums`);
+    const dummyData = [
+        {
+            dailyScrumId: 1,
+            createdAt: "2025-03-10",
+            sprintId: 91,
+            sprintOrder: 1
+        },
+        {
+            dailyScrumId: 2,
+            createdAt: "2025-03-11",
+            sprintId: 91,
+            sprintOrder: 1
+        },
+    ]
+    // console.log(`[API] projectApi.getDailyScrumInfoList 호출, data=${JSON.stringify(dummyData)}`);
+    return dummyData;
+}

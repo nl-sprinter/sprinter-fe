@@ -7,8 +7,8 @@ import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { FiEdit2 } from "react-icons/fi";
 import { createProject } from '../../api/projectApi';
 import WeightIndicator from '../common/WeightIndicator';
-import BacklogCreateFormModal from '../common/modal/BacklogCreateFormModal';
-import BacklogEditFormModal from '../common/modal/BacklogEditFormModal';
+import SmallFormBacklogCreateModal from '../common/modal/form/SmallFormBacklogCreateModal';
+import SmallFormBacklogEditModal from '../common/modal/form/SmallFormBacklogEditModal';
 import SmallInfoModal from '../common/modal/SmallInfoModal';
 
 const BacklogConfirmPage = () => {
@@ -53,7 +53,7 @@ const BacklogConfirmPage = () => {
                 type: 'success'
             });
             setTimeout(() => {
-                navigate('/home');
+        navigate('/home');
             }, 1500);
         } catch (error) {
             setInfoModal({
@@ -406,13 +406,13 @@ const BacklogConfirmPage = () => {
                             <div className="flex justify-center gap-4">
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/home')}
+                        onClick={() => navigate('/home')}
                                     className="px-4 py-2 border border-green-500 text-green-500 rounded hover:bg-green-50 transition-colors"
-                                >
-                                    취소
+                    >
+                        취소
                                 </button>
                                 <button
-                                    type="submit"
+                        type="submit"
                                     className="w-[120px] px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 transition-colors"
                                 >
                                     만들기
@@ -434,7 +434,7 @@ const BacklogConfirmPage = () => {
                         type={infoModal.type}
                     />
 
-                    <BacklogCreateFormModal
+                    <SmallFormBacklogCreateModal
                         isOpen={isCreateModalOpen}
                         onClose={() => {
                             setIsCreateModalOpen(false);
@@ -443,7 +443,7 @@ const BacklogConfirmPage = () => {
                         onSubmit={handleCreateBacklog}
                     />
 
-                    <BacklogEditFormModal
+                    <SmallFormBacklogEditModal
                         isOpen={isEditModalOpen}
                         onClose={() => {
                             setIsEditModalOpen(false);

@@ -1,10 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SmallFormModal from './SmallFormModal';
-import WeightIndicator from '../WeightIndicator';
+import WeightIndicator from '../../WeightIndicator';
 
-const BacklogCreateFormModal = ({ isOpen, onClose, onSubmit }) => {
+const SmallFormBacklogCreateModal = ({ isOpen, onClose, onSubmit }) => {
     const [title, setTitle] = useState('');
     const [selectedWeight, setSelectedWeight] = useState(null);
+
+    // 모달이 열릴 때마다 입력값 초기화
+    useEffect(() => {
+        if (isOpen) {
+            setTitle('');
+            setSelectedWeight(null);
+        }
+    }, [isOpen]);
 
     const handleSubmit = () => {
         onSubmit({
@@ -70,4 +78,4 @@ const BacklogCreateFormModal = ({ isOpen, onClose, onSubmit }) => {
     );
 };
 
-export default BacklogCreateFormModal;
+export default SmallFormBacklogCreateModal;

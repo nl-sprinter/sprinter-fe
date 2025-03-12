@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import SmallFormModal from './SmallFormModal';
-import WeightIndicator from '../WeightIndicator';
+import WeightIndicator from '../../WeightIndicator';
 
-const BacklogEditFormModal = ({ isOpen, onClose, onSubmit, backlog }) => {
+const SmallFormBacklogEditModal = ({ isOpen, onClose, onSubmit, backlog }) => {
     const [title, setTitle] = useState('');
     const [selectedWeight, setSelectedWeight] = useState(null);
 
@@ -77,4 +77,4 @@ const BacklogEditFormModal = ({ isOpen, onClose, onSubmit, backlog }) => {
     );
 };
 
-export default BacklogEditFormModal;
+export default SmallFormBacklogEditModal;

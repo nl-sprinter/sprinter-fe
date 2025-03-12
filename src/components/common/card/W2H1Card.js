@@ -7,7 +7,7 @@ const W2H1Card = ({ title, children, headerRight, className = '' }) => {
                 <h2 className="text-base font-semibold text-gray-900">{title}</h2>
                 {headerRight}
             </div>
-            <div className="flex-1 p-3">
+            <div className="flex-1 p-3 overflow-y-auto">
                 {children}
             </div>
         </div>

@@ -7,8 +7,8 @@ import { FiEdit2, FiPlus } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
 import { updateSprintName, createSprint, getSprintPeriod, updateSprintPeriod } from '../../api/projectApi';
-import SprintCreateFormModal from '../common/modal/SprintCreateFormModal';
-import SprintEditFormModal from '../common/modal/SprintEditFormModal';
+import SmallFormSprintCreateModal from '../common/modal/form/SmallFormSprintCreateModal';
+import SmallFormSprintEditModal from '../common/modal/form/SmallFormSprintEditModal';
 import SmallInfoModal from '../common/modal/SmallInfoModal';
 import { addDays, format } from 'date-fns';
 
@@ -207,13 +207,13 @@ const SprintSettingsPage = () => {
                 type={infoModal.type}
             />
 
-            <SprintCreateFormModal
+            <SmallFormSprintCreateModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSubmit={handleCreateSprint}
             />
 
-            <SprintEditFormModal
+            <SmallFormSprintEditModal
                 isOpen={isEditModalOpen}
                 onClose={() => {
                     setIsEditModalOpen(false);

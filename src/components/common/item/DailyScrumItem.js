@@ -1,17 +1,43 @@
 import React from 'react';
+import { FiCalendar, FiUsers } from 'react-icons/fi';
 
-const DailyScrumItem = (props) => {
+const DailyScrumItem = ({ 
+    dailyScrumId, 
+    date, 
+    attendees, 
+    backlogCount, 
+    onClick 
+}) => {
+    // 날짜 포맷팅
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).replace(/\. /g, '.').replace(/\.$/, '');
+    };
+
     return (
-        <div
-            key={props.id}
-            className="p-2 hover:bg-gray-50 rounded-lg border border-gray-100 transition-colors"
+        <div 
+            className="bg-white rounded-lg p-3 border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer"
+            onClick={() => onClick && onClick(dailyScrumId)}
         >
-            <div className="flex justify-between items-center mb-1">
-                <span className="text-xs text-gray-500">{props.date}</span>
+            <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center gap-1 text-gray-600">
+                    <FiCalendar size={14} />
+                    <span className="text-sm font-medium">{formatDate(date)}</span>
+                </div>
+                <div className="flex items-center gap-1 text-gray-600">
+                    <FiUsers size={14} />
+                    <span className="text-sm">{attendees}명</span>
+                </div>
             </div>
-            <p className="text-sm text-gray-700">{props.content}</p>
+            <div className="text-xs text-gray-500">
+                논의된 백로그: {backlogCount}개
+            </div>
         </div>
     );
-}
+};
 
 export default DailyScrumItem;

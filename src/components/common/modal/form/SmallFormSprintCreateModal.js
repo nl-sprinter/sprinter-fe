@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import SmallFormModal from './SmallFormModal';
 
-const SprintCreateFormModal = ({ isOpen, onClose, onSubmit }) => {
+const SmallFormSprintCreateModal = ({ isOpen, onClose, onSubmit }) => {
     const [sprintName, setSprintName] = useState('');
 
     useEffect(() => {
@@ -39,4 +39,4 @@ const SprintCreateFormModal = ({ isOpen, onClose, onSubmit }) => {
     );
 };
 
-export default SprintCreateFormModal;
+export default SmallFormSprintCreateModal;

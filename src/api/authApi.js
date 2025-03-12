@@ -6,7 +6,7 @@ export const login = async (email, password) => {
             email,
             password
         }, {withCredentials: true});
-        console.log('전체 헤더:', Object.keys(response.headers));
+        console.log(`[API] authApi.login 호출, data=${Object.keys(response.headers)}`);
 
         const accessToken = response.headers['authorization']?.split(' ')[1];
         console.log(accessToken);
@@ -20,7 +20,7 @@ export const login = async (email, password) => {
 
 
         // response.data 안에 200 OK를 리턴해줘야함
-        return response.data;
+        return response;
     } catch (error) {
         console.log(`로그인 요청 실패:${error}`)
         throw error;

@@ -1,7 +1,7 @@
 import Layout from '../common/layout/Layout';
 import {useState, useEffect} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {getProductBacklogList} from '../../api/projectApi';
+import {getProductBacklogList, checkUserIsProjectLeader} from '../../api/projectApi';
 import {useUserStore} from '../../store/useUserStore';
 import {PieChart} from 'react-minimal-pie-chart';
 import CardBox from "../common/layout/CardBox";
@@ -15,6 +15,7 @@ const SprintPage = () => {
     const {projectId} = useParams();
     const [backlogs, setBacklogs] = useState([]);
     const {user} = useUserStore();
+    const [isProjectLeader, setIsProjectLeader] = useState(false);
 
     useEffect(() => {
         const fetchBacklogs = async () => {
@@ -26,7 +27,21 @@ const SprintPage = () => {
             }
         };
 
+        const checkIsLeader = async () => {
+            try {
+                const token = localStorage.getItem('accessToken');
+                if (token && projectId) {
+                    const result = await checkUserIsProjectLeader(projectId, token);
+                    setIsProjectLeader(result);
+                }
+            } catch (error) {
+                console.error('팀장 권한 확인 중 오류 발생:', error);
+                setIsProjectLeader(false);
+            }
+        };
+
         fetchBacklogs();
+        checkIsLeader();
     }, [projectId]);
 
     return (
@@ -35,13 +50,14 @@ const SprintPage = () => {
                 title="스프린트 현황"
                 description="스프린트의 전반적인 진행 상황을 확인할 수 있습니다."
                 rightContent={
-                    <button
-                        onClick={() => navigate(`/projects/${projectId}/sprints/settings`)}
-                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-
-                        <FiSettings size={20} />
-                    </button>
+                    isProjectLeader && (
+                        <button 
+                            onClick={() => navigate(`/projects/${projectId}/sprints/settings`)}
+                            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            <FiSettings size={20} />
+                        </button>
+                    )
                 }
             />
             <CardBox>

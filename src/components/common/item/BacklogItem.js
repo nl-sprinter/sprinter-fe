@@ -7,17 +7,26 @@ import WeightIndicator from "../WeightIndicator";
  * @param backlogName
  * @param weight
  * @param isFinished
+ * @param onClick
  */
 const BacklogItem = (props) => {
+    const handleClick = () => {
+        console.log('BacklogItem 클릭됨:', props.backlogId, props.backlogName);
+        if (props.onClick) {
+            props.onClick();
+        }
+    };
+
     return (
         <div
             key={props.backlogId}
             className={`flex items-center justify-between p-2 rounded-lg transition-all duration-300
-                border border-gray-200 relative overflow-hidden
+                border border-gray-200 relative overflow-hidden cursor-pointer
                 ${props.isFinished 
                     ? 'border-l-4 border-l-gray-300 bg-gray-50 hover:bg-gray-100' 
                     : 'border-l-4 border-l-blue-500 hover:bg-blue-50'
                 }`}
+            onClick={handleClick}
         >
             {!props.isFinished && (
                 <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-blue-50/80 to-transparent" />
