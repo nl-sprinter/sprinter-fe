@@ -173,28 +173,207 @@ try {
     } 
 }
 
-export const getDailyScrumInfoList = async (projectId, sprintId) => {
-    /**
-     *     private Long dailyScrumId;
-            private LocalDate createdAt;
-            private Long sprintId;
-            private Long sprintOrder;
-     */
-    // const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/dailyscrums`);
-    const dummyData = [
-        {
-            dailyScrumId: 1,
-            createdAt: "2025-03-10",
-            sprintId: 91,
-            sprintOrder: 1
-        },
-        {
-            dailyScrumId: 2,
-            createdAt: "2025-03-11",
-            sprintId: 91,
-            sprintOrder: 1
-        },
-    ]
-    // console.log(`[API] projectApi.getDailyScrumInfoList 호출, data=${JSON.stringify(dummyData)}`);
-    return dummyData;
+//////////////////// Backlog 관련 API ////////////////////
+export const updateBacklog = async (projectId, sprintId, backlogId, title, weight) => {
+    console.log(`[API] projectApi.updateBacklog 호출, data=${JSON.stringify({title, weight})}`);
+    const response = await axiosInstance.patch(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}`, {
+        title,
+        weight
+    });
+    console.log(`[API] projectApi.updateBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+export const getUsersInBacklog = async (projectId, sprintId, backlogId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/users`);
+    console.log(`[API] projectApi.getUsersInBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+export const addUserInBacklog = async (projectId, sprintId, backlogId, userId) => {
+    const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/users/${userId}`);
+    console.log(`[API] projectApi.addUserInBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+export const deleteUserInBacklog = async (projectId, sprintId, backlogId, userId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/users/${userId}`);
+    console.log(`[API] projectApi.deleteUserInBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+//////////////////// Task 관련 API ////////////////////
+
+// Task 조회
+export const getTasksInBacklog = async (projectId, sprintId, backlogId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/tasks`);
+    console.log(`[API] projectApi.getTasksInBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+
+
+// Task 추가
+export const addTaskToBacklog = async (projectId, sprintId, backlogId, taskContent) => {
+    const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/tasks`, {
+        content: taskContent
+    });
+    console.log(`[API] projectApi.addTaskToBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// Task 완료 상태 변경 (toggle)
+export const updateTaskChecked = async (projectId, sprintId, backlogId, taskId, checked) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/tasks/${taskId}/check`, {
+        checked: checked
+    });
+    console.log(`[API] projectApi.updateTaskChecked 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// Task content 수정
+export const updateTaskContent = async (projectId, sprintId, backlogId, taskId, content) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/tasks/${taskId}/content`, {
+        content: content
+    });
+    console.log(`[API] projectApi.updateTaskContent 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// Task 에 유저 추가
+export const addUserOnTask = async (projectId, sprintId, backlogId, taskId, userId) => {
+    const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/tasks/${taskId}/user`, {
+        userId: userId
+    });
+    console.log(`[API] projectApi.addUserOnTask 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// Task 에 유저 삭제
+export const deleteUserOnTask = async (projectId, sprintId, backlogId, taskId, userId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/tasks/${taskId}/user`, {
+        userId: userId
+    });
+    console.log(`[API] projectApi.deleteUserOnTask 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// Task 삭제
+export const deleteTask = async (projectId, sprintId, backlogId, taskId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/tasks/${taskId}`);
+    console.log(`[API] projectApi.deleteTask 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+//////////////////// Issue 관련 API ////////////////////
+
+export const getIssuesInBacklog = async (projectId, sprintId, backlogId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/issues`);
+    console.log(`[API] projectApi.getIssuesInBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+export const addIssueToBacklog = async (projectId, sprintId, backlogId, content) => {
+    const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/issues`, {
+        content: content
+    });
+    console.log(`[API] projectApi.addIssueToBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+export const updateIssueChecked = async (projectId, sprintId, backlogId, issueId, checked) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/issues/${issueId}/check`, {
+        checked: checked
+    });
+    console.log(`[API] projectApi.updateIssueChecked 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+export const updateIssueContent = async (projectId, sprintId, backlogId, issueId, content) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/issues/${issueId}`, {
+        content: content
+    });
+    console.log(`[API] projectApi.updateIssueContent 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+export const deleteIssue = async (projectId, sprintId, backlogId, issueId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/issues/${issueId}`);
+    console.log(`[API] projectApi.deleteIssue 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+//////////////////// DailyScrum 관련 API ////////////////////
+export const getDailyScrumList = async (projectId, sprintId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/dailyscrums`);
+    console.log(`[API] projectApi.getDailyScrumList 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// Sprint 에 DailyScrum 생성
+export const addDailyScrumToSprint = async (projectId, sprintId) => {
+    const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/dailyscrums`);
+    console.log(`[API] projectApi.addDailyScrumToSprint 호출 성공`);
+    return response.data;
+}
+
+// DailyScrum 참석 유저 조회
+export const getDailyScrumUserList = async (projectId, sprintId, dailyScrumId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}/users`);
+    console.log(`[API] projectApi.getDailyScrumUserList 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// DailyScrum 참석 유저 추가
+export const addUserToDailyScrum = async (projectId, sprintId, dailyScrumId, userId) => {
+    const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}/users/${userId}`);
+    console.log(`[API] projectApi.addUserToDailyScrum 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// DailyScrum 참석 유저 삭제
+export const deleteUserFromDailyScrum = async (projectId, sprintId, dailyScrumId, userId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}/users/${userId}`);
+    console.log(`[API] projectApi.deleteUserFromDailyScrum 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// DailyScrum 백로그 조회
+export const getBacklogListInDailyScrum = async (projectId, sprintId, dailyScrumId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}/backlogs`);
+    console.log(`[API] projectApi.getBacklogListInDailyScrum 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// DailyScrum 에 백로그 추가
+export const addBacklogToDailyScrum = async (projectId, sprintId, dailyScrumId, backlogId) => {
+    const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}/backlogs/${backlogId}`);
+    console.log(`[API] projectApi.addBacklogToDailyScrum 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// DailyScrum 에 있는 백로그 삭제
+export const removeBacklogFromDailyScrum = async (projectId, sprintId, dailyScrumId, backlogId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}/backlogs/${backlogId}`);
+    console.log(`[API] projectApi.removeBacklogFromDailyScrum 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// DailyScrum 의 회의노트 조회
+export const getDailyScrumContent = async (projectId, sprintId, dailyScrumId) => {
+    console.log(`projectId = ${projectId}`);
+    console.log(`sprintId = ${sprintId}`);
+    console.log(`dailyScrumId = ${dailyScrumId}`);
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}/content`);
+    console.log(`[API] projectApi.getDailyScrumContent 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// DailyScrum 에 회의노트 저장
+export const saveDailyScrumContent = async (projectId, sprintId, dailyScrumId, content) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}/content`, {
+        content: content
+    });
+    console.log(`[API] projectApi.saveDailyScrumContent 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
 }

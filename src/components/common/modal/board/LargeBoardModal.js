@@ -19,7 +19,7 @@ const customStyles = {
         bottom: 'auto',
         width: 'calc(100% - 3rem)', // 좌우 1.5rem 여백으로 조금 더 넓게 설정
         height: 'calc(100% - 3rem)', // 상하 1.5rem 여백으로 조금 더 높게 설정
-        maxWidth: 'calc(100vw - 10rem)', // 최대 너비를 뷰포트 너비로 설정하여 화면을 거의 채울 수 있게 함
+        maxWidth: 'calc(100vw - 30rem)', // 최대 너비를 뷰포트 너비로 설정하여 화면을 거의 채울 수 있게 함
         maxHeight: 'calc(100vh - 5rem)', // 최대 높이를 뷰포트 높이로 설정하여 화면을 거의 채울 수 있게 함
         padding: 0,
         border: 'none',
@@ -38,12 +38,6 @@ const LargeFormModal = ({
     cancelText = '취소',
     children
 }) => {
-    // 모달 열림 상태 로깅
-    React.useEffect(() => {
-        if (isOpen) {
-            console.log('ContentModal이 열렸습니다. 제목:', title);
-        }
-    }, [isOpen, title]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -73,7 +67,7 @@ const LargeFormModal = ({
                 </div>
 
                 {/* 콘텐츠 영역 */}
-                <div className="flex-1 p-6 overflow-auto">
+                <div className="flex-1 p-3 overflow-auto">
                     {children}
                 </div>
             </div>

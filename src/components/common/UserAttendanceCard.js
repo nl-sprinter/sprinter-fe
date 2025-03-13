@@ -18,6 +18,7 @@ const UserAttendanceCard = ({
     title = "참석자"
 }) => {
     const [isUserListModalOpen, setIsUserListModalOpen] = useState(false);
+    const [hoveredUserId, setHoveredUserId] = useState(null);
 
     // 선택 가능한 유저 목록 (이미 선택된 유저 제외)
     const availableUsers = allUsers.filter(
@@ -25,8 +26,8 @@ const UserAttendanceCard = ({
     );
 
     return (
-        <div className="bg-gray-50 p-3 rounded-lg">
-            <div className="flex justify-between items-center mb-3">
+        <div className="bg-gray-50 p-3 rounded-lg h-[100px]">
+            <div className="flex justify-between items-center mb-2">
                 <h3 className="text-lg font-medium">{title}</h3>
                 <button 
                     className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
@@ -35,29 +36,36 @@ const UserAttendanceCard = ({
                     <FiPlus size={18}/>
                 </button>
             </div>
-            <div className="overflow-x-auto pb-2">
-                <div className="flex flex-nowrap gap-3 min-w-full">
+            <div className="overflow-y-auto max-h-[50px]">
+                <div className="flex flex-wrap gap-2">
                     {attendedUsers.map(user => (
                         <div 
                             key={user.userId}
-                            className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-gray-200 whitespace-nowrap"
+                            className={`relative flex items-center gap-2 px-3 py-1 rounded-lg border whitespace-nowrap transition-all duration-200 cursor-pointer
+                                ${hoveredUserId === user.userId 
+                                    ? 'bg-red-50 border-red-500 text-red-500' 
+                                    : 'bg-white border-gray-200'}`}
+                            onMouseEnter={() => setHoveredUserId(user.userId)}
+                            onMouseLeave={() => setHoveredUserId(null)}
+                            onClick={() => hoveredUserId === user.userId && onUserRemove && onUserRemove(user)}
                         >
-                            <div className="relative group">
-                                <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs">
-                                    {user.nickname.charAt(0).toUpperCase()}
-                                </div>
-                                <button 
-                                    className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                                    onClick={() => onUserRemove && onUserRemove(user)}
-                                >
-                                    <FiX size={10} />
-                                </button>
+                            <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs">
+                                {user.nickname.charAt(0).toUpperCase()}
                             </div>
                             <span className="text-sm">{user.nickname}</span>
+                            
+                            {hoveredUserId === user.userId && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-red-50 bg-opacity-90 rounded-lg text-red-500">
+                                    <div className="flex items-center gap-1">
+                                        <FiX size={14} />
+                                        <span className="text-sm">삭제</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))}
                     {attendedUsers.length === 0 && (
-                        <div className="text-center py-2 text-gray-500 w-full">
+                        <div className="text-center text-gray-500 w-full">
                             선택된 팀원이 없습니다.
                         </div>
                     )}

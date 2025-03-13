@@ -1,11 +1,12 @@
 import React from 'react';
 import { FiCalendar, FiUsers } from 'react-icons/fi';
 
+
 const DailyScrumItem = ({ 
     dailyScrumId, 
-    date, 
-    attendees, 
-    backlogCount, 
+    createdAt,
+    userCount,
+    backlogCount,
     onClick 
 }) => {
     // 날짜 포맷팅
@@ -26,11 +27,11 @@ const DailyScrumItem = ({
             <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-1 text-gray-600">
                     <FiCalendar size={14} />
-                    <span className="text-sm font-medium">{formatDate(date)}</span>
+                    <span className="text-sm font-medium">{formatDate(createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-1 text-gray-600">
                     <FiUsers size={14} />
-                    <span className="text-sm">{attendees}명</span>
+                    <span className="text-sm">{userCount}명</span>
                 </div>
             </div>
             <div className="text-xs text-gray-500">

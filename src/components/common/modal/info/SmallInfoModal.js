@@ -1,3 +1,4 @@
+import React from 'react';
 import Modal from 'react-modal';
 import { IoMdClose } from 'react-icons/io';
 
@@ -16,31 +17,23 @@ const customStyles = {
         padding: '0',
         border: 'none',
         borderRadius: '0.5rem',
-        width: '480px'
+        width: '400px'
     }
 };
 
-const SmallFormModal = ({ 
+const SmallInfoModal = ({ 
     isOpen, 
     onClose, 
-    title,
-    children,
-    submitText = '확인',
-    cancelText = '취소',
-    onSubmit,
-    isSubmitDisabled = false
+    title = '알림',
+    message,
+    buttonText = '확인'
 }) => {
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit();
-    };
-
     return (
         <Modal
             isOpen={isOpen}
             onRequestClose={onClose}
             style={customStyles}
-            contentLabel="Small Form Modal"
+            contentLabel="Small Info Modal"
         >
             <div className="w-full">
                 <div className="flex justify-between items-center p-4 border-b border-gray-200">
@@ -55,35 +48,23 @@ const SmallFormModal = ({
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-4">
-                    <div className="space-y-4">
-                        {children}
+                <div className="p-6">
+                    <div className="text-center mb-6">
+                        <p className="text-gray-700">{message}</p>
                     </div>
 
-                    <div className="flex justify-end gap-2 mt-6">
+                    <div className="flex justify-center">
                         <button
-                            type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                         >
-                            {cancelText}
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isSubmitDisabled}
-                            className={`px-4 py-2 rounded-lg transition-colors ${
-                                isSubmitDisabled
-                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    : 'bg-green-500 text-white hover:bg-green-600'
-                            }`}
-                        >
-                            {submitText}
+                            {buttonText}
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </Modal>
     );
 };
 
-export default SmallFormModal; 
+export default SmallInfoModal; 
