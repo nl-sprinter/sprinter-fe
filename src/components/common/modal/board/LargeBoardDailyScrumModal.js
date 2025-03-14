@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import {FiTrash2} from 'react-icons/fi';
 import {
     getUsersInProject, 
     getSprintBacklogList, 
@@ -9,9 +10,11 @@ import {
     addBacklogToDailyScrum,
     removeBacklogFromDailyScrum,
     getDailyScrumContent,
-    saveDailyScrumContent
+    saveDailyScrumContent,
+    deleteDailyScrum
 } from '../../../../api/projectApi';
 import SmallListModal from '../list/SmallListModal';
+import SmallFormModal from '../form/SmallFormModal';
 import UserAttendanceCard from '../../UserAttendanceCard';
 import BacklogSelectCard from '../../BacklogSelectCard';
 import NoteWritedownCard from '../../NoteWritedownCard';
@@ -34,6 +37,7 @@ const LargeBoardDailyScrumModal = ({
     const [meetingNote, setMeetingNote] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isBacklogListModalOpen, setIsBacklogListModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [infoModal, setInfoModal] = useState({
         isOpen: false,
         title: '',
@@ -167,7 +171,6 @@ const LargeBoardDailyScrumModal = ({
         if (!dailyScrum) return;
         
         try {
-
             await deleteUserFromDailyScrum(projectId, sprintId, dailyScrum.dailyScrumId, user.userId);
             // 서버에서 최신 참석자 목록 다시 조회
             await fetchDailyScrumUsers();
@@ -251,6 +254,35 @@ const LargeBoardDailyScrumModal = ({
         }
     };
 
+    // 데일리 스크럼 삭제 확인 모달 열기
+    const handleOpenDeleteModal = () => {
+        setIsDeleteModalOpen(true);
+    };
+
+    // 데일리 스크럼 삭제 처리
+    const handleDeleteDailyScrum = async () => {
+        if (!dailyScrum) return;
+        
+        setIsLoading(true);
+        try {
+            await deleteDailyScrum(projectId, sprintId, dailyScrum.dailyScrumId);
+            setIsDeleteModalOpen(false);
+            
+            // 삭제 성공 후 모달 닫기 및 부모 컴포넌트에 알림
+            onSubmit && onSubmit();
+            onClose();
+        } catch (err) {
+            console.error('데일리 스크럼 삭제에 실패했습니다:', err);
+            setInfoModal({
+                isOpen: true,
+                title: '오류',
+                message: '데일리 스크럼 삭제에 실패했습니다.',
+                type: 'error'
+            });
+            setIsLoading(false);
+        }
+    };
+
     // 모달 제목에 날짜 표시
     const getModalTitle = () => {
         if (!dailyScrum) return "새 데일리 스크럼";
@@ -288,6 +320,21 @@ const LargeBoardDailyScrumModal = ({
         </div>
     );
 
+    // 삭제 버튼 렌더링 (기존 데일리 스크럼에만 표시)
+    const renderDeleteButton = () => {
+        if (!dailyScrum) return null;
+        
+        return (
+            <button
+                onClick={handleOpenDeleteModal}
+                className="p-1.5 text-red-500 hover:bg-red-50 rounded-full transition-colors mr-2"
+                title="데일리 스크럼 삭제"
+            >
+                <FiTrash2 size={18} />
+            </button>
+        );
+    };
+
     return (
         <>
             <LargeModal
@@ -297,7 +344,12 @@ const LargeBoardDailyScrumModal = ({
                     onSubmit && onSubmit();
                     onClose();
                 }}
-                title={getModalTitle()}
+                title={
+                    <div className="flex items-center">
+                        <span>{getModalTitle()}</span>
+                    </div>
+                }
+                extraHeaderContent={renderDeleteButton()}
             >
                 {/* 1. 유저 출석 카드 */}
                 <UserAttendanceCard
@@ -341,6 +393,21 @@ const LargeBoardDailyScrumModal = ({
                 onItemSelect={handleBacklogSelect}
                 renderItem={renderBacklogItem}
             />
+
+            {/* 삭제 확인 모달 */}
+            <SmallFormModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                title="데일리 스크럼 삭제"
+                submitText="삭제"
+                cancelText="취소"
+                onSubmit={handleDeleteDailyScrum}
+            >
+                <div className="text-center py-4">
+                    <p className="text-gray-700 mb-2">이 데일리 스크럼을 삭제하시겠습니까?</p>
+                    <p className="text-sm text-red-500">이 작업은 되돌릴 수 없습니다.</p>
+                </div>
+            </SmallFormModal>
 
             {/* 알림 모달 */}
             <SmallInfoModal

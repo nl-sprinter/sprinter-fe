@@ -19,7 +19,11 @@ import {
     updateBacklog,
     updateTaskChecked,
     addUserOnTask,
-    deleteTask
+    deleteTask,
+    updateTaskContent,
+    getBacklogComments,
+    createBacklogComment,
+    deleteBacklogComment
 } from '../../../../api/projectApi';
 import UserAttendanceCard from '../../UserAttendanceCard';
 import TaskSelectCard from '../../TaskSelectCard';
@@ -45,6 +49,7 @@ const LargeBoardBacklogModal = ({
     const [issues, setIssues] = useState([]);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
+    const [replyingTo, setReplyingTo] = useState(null);
     const [projectUsers, setProjectUsers] = useState([]);
 
     // 모달 상태
@@ -55,6 +60,8 @@ const LargeBoardBacklogModal = ({
     const [newTaskContent, setNewTaskContent] = useState('');
     const [newIssueContent, setNewIssueContent] = useState('');
     const [editingIssue, setEditingIssue] = useState({ id: null, content: '' });
+    const [isTaskEditModalOpen, setIsTaskEditModalOpen] = useState(false);
+    const [editingTask, setEditingTask] = useState({ id: null, content: '' });
 
     // 백로그 데이터 로드
     useEffect(() => {
@@ -76,6 +83,7 @@ const LargeBoardBacklogModal = ({
                 fetchBacklogTasks(projectId, sprintId, backlogId);
                 fetchBacklogIssues(projectId, sprintId, backlogId);
                 fetchBacklogUsers(projectId, sprintId, backlogId);
+                fetchBacklogComments(projectId, sprintId, backlogId);
             }
         } else {
             // 새 백로그 생성 시 초기화
@@ -101,8 +109,7 @@ const LargeBoardBacklogModal = ({
             if (onSubmit) {
                 onSubmit({
                     title,
-                    weight,
-                    description
+                    weight
                 });
             }
         }
@@ -145,7 +152,7 @@ const LargeBoardBacklogModal = ({
             const formattedTasks = taskList.map(task => ({
                 id: task.taskId,
                 content: task.content,
-                isCompleted: task.checked,
+                isChecked: task.checked,
                 assignedUserId: task.userId
             }));
             
@@ -162,14 +169,12 @@ const LargeBoardBacklogModal = ({
         
         try {
             const issueList = await getIssuesInBacklog(projectId, sprintId, backlogId);
-            console.log(`이슈 목록 로드 성공:`, issueList);
-            
+
             // API 응답 데이터를 컴포넌트 상태에 맞게 변환
             const formattedIssues = issueList.map(issue => ({
                 id: issue.issueId,
                 content: issue.content,
                 isChecked: issue.checked,
-                assignedUserId: null // 이슈 DTO에는 userId가 없으므로 null로 설정
             }));
             
             setIssues(formattedIssues);
@@ -210,39 +215,49 @@ const LargeBoardBacklogModal = ({
     const handleAddTask = async () => {
         if (newTaskContent.trim()) {
             try {
-                const response = await addTaskToBacklog(projectId, sprintId, backlogId, newTaskContent);
-
-                // 태스크 목록 업데이트
-                setTasks([...tasks, {
-                    id: response.taskId,
-                    content: newTaskContent,
-                    isCompleted: false,
-                    assignedUserId: null
-                }]);
+                // API 호출하여 태스크 추가
+                await addTaskToBacklog(projectId, sprintId, backlogId, newTaskContent);
+                
+                // 입력 필드 초기화 및 모달 닫기
                 setNewTaskContent('');
                 setIsTaskAddModalOpen(false);
+                
+                // 서버에서 최신 태스크 목록 다시 조회
+                await fetchBacklogTasks(projectId, sprintId, backlogId);
             } catch (error) {
                 console.error('태스크 추가 실패:', error);
             }
         }
     };
 
+    const handleIssueResoluvfgt2ion = async (issueId) => {
+        try {
+            // 현재 이슈 찾기
+            const issue = issues.find(issue => issue.id === issueId);
+            if (!issue) return;
+            
+            // API 호출하여 서버에 상태 업데이트
+            await updateIssueChecked(projectId, sprintId, backlogId, issueId, issue.isChecked);
+
+            await fetchBacklogIssues(projectId, sprintId, backlogId);
+        } catch (error) {
+            
+            // API 호출 실패 시 원래 상태로 되돌리기
+            fetchBacklogIssues(projectId, sprintId, backlogId);
+        }
+    };
+
     const handleTaskCompletion = async (taskId) => {
         try {
             // 현재 태스크 찾기
-            const task = tasks.find(t => t.id === taskId);
+            const task = tasks.find(task => task.id === taskId);
             if (!task) return;
             
-            // 상태 변경
-            const newIsCompleted = !task.isCompleted;
-            
             // API 호출하여 서버에 상태 업데이트
-            await updateTaskChecked(projectId, sprintId, backlogId, taskId, newIsCompleted);
+            await updateTaskChecked(projectId, sprintId, backlogId, taskId, task.isChecked);
             
-            // 태스크 목록 다시 로드
             await fetchBacklogTasks(projectId, sprintId, backlogId);
         } catch (error) {
-            console.error('태스크 상태 변경 실패:', error);
             // 실패 시 원래 상태로 되돌리기
             await fetchBacklogTasks(projectId, sprintId, backlogId);
         }
@@ -262,6 +277,7 @@ const LargeBoardBacklogModal = ({
         }
     };
 
+
     const handleRemoveTask = async (taskId) => {
         try {
             // API 호출하여 서버에서 태스크 삭제
@@ -271,8 +287,6 @@ const LargeBoardBacklogModal = ({
             await fetchBacklogTasks(projectId, sprintId, backlogId);
         } catch (error) {
             console.error('태스크 삭제 실패:', error);
-            // 실패 시 원래 상태로 되돌리기
-            await fetchBacklogTasks(projectId, sprintId, backlogId);
         }
     };
 
@@ -310,12 +324,6 @@ const LargeBoardBacklogModal = ({
             // API 호출 실패 시 원래 상태로 되돌리기
             fetchBacklogIssues(projectId, sprintId, backlogId);
         }
-    };
-
-    const handleIssueAssignment = (issueId, userId) => {
-        setIssues(issues.map(issue =>
-            issue.id === issueId ? {...issue, assignedUserId: userId} : issue
-        )); 
     };
 
     const handleRemoveIssue = async (issueId) => {
@@ -360,34 +368,37 @@ const LargeBoardBacklogModal = ({
     };
 
     // 댓글 관리
-    const handleAddComment = () => {
-        if (newComment.trim()) {
-            const comment = {
-                id: Date.now(),
-                userId: 1, // 현재 로그인한 사용자 ID
-                content: newComment,
-                createdAt: new Date().toISOString(),
-                likes: 0,
-                isLiked: false,
-                replies: []
-            };
-            setComments([...comments, comment]);
-            setNewComment('');
+    const handleAddComment = async (content, parentCommentId = null) => {
+        if (content && content.trim()) {
+            try {
+                await createBacklogComment(
+                    projectId, 
+                    sprintId, 
+                    backlogId, 
+                    parentCommentId,
+                    content
+                );
+                
+                // 입력 필드 초기화 (메인 댓글 입력창인 경우에만)
+                if (!parentCommentId) {
+                    setNewComment('');
+                }
+                
+                // 댓글 목록 새로고침
+                await fetchBacklogComments();
+            } catch (error) {
+                console.error('댓글 추가 실패:', error);
+            }
         }
     };
 
-    const handleLikeComment = (commentId) => {
-        setComments(comments.map(comment => {
-            if (comment.id === commentId) {
-                const isLiked = !comment.isLiked;
-                return {
-                    ...comment,
-                    isLiked,
-                    likes: isLiked ? comment.likes + 1 : comment.likes - 1
-                };
-            }
-            return comment;
-        }));
+    const handleReplyClick = (commentId) => {
+        setReplyingTo(commentId);
+    };
+
+    const handleCancelReply = () => {
+        setReplyingTo(null);
+        setNewComment('');
     };
 
     // 백로그 제목 수정
@@ -447,6 +458,51 @@ const LargeBoardBacklogModal = ({
         return '높음';
     };
 
+    // Task 수정 관련 함수 추가
+    const handleEditTaskClick = (taskId, content) => {
+        setEditingTask({ id: taskId, content });
+        setIsTaskEditModalOpen(true);
+    };
+
+    const handleEditTaskChange = (e) => {
+        setEditingTask({ ...editingTask, content: e.target.value });
+    };
+
+    const handleEditTaskSubmit = async () => {
+        if (editingTask.content.trim() && editingTask.id) {
+            try {
+                // API 호출하여 서버에 태스크 내용 업데이트
+                await updateTaskContent(projectId, sprintId, backlogId, editingTask.id, editingTask.content);
+                
+                // 모달 닫기
+                setIsTaskEditModalOpen(false);
+                
+                // 서버에서 최신 태스크 목록 다시 조회
+                await fetchBacklogTasks(projectId, sprintId, backlogId);
+            } catch (error) {
+                console.error('태스크 수정 실패:', error);
+            }
+        }
+    };
+
+    // 댓글 로드 함수 추가
+    const fetchBacklogComments = async () => {
+        try {
+            const commentsData = await getBacklogComments(projectId, sprintId, backlogId);
+            setComments(commentsData);
+        } catch (error) {
+            console.error('댓글 로드 실패:', error);
+            setComments([]);
+        }
+    };
+
+    // 댓글 삭제 함수 추가 (API 연동은 아직)
+    const handleRemoveComment = async (commentId) => {
+        await deleteBacklogComment(projectId, sprintId, backlogId, commentId);
+        // 임시로 프론트에서만 삭제 처리
+        setComments(comments.filter(comment => comment.backlogCommentId !== commentId));
+    };
+
     return (
         <>
             <LargeBoardModal
@@ -493,6 +549,7 @@ const LargeBoardBacklogModal = ({
                         onRemoveTask={handleRemoveTask}
                         onTaskCompletion={handleTaskCompletion}
                         onTaskAssignment={handleTaskAssignment}
+                        onEditTask={handleEditTaskClick}
                         title="태스크"
                         renderUserAvatar={renderUserAvatar}
                     />
@@ -504,10 +561,8 @@ const LargeBoardBacklogModal = ({
                         onAddIssue={() => setIsIssueAddModalOpen(true)}
                         onRemoveIssue={handleRemoveIssue}
                         onIssueResolution={handleIssueResolution}
-                        onIssueAssignment={handleIssueAssignment}
                         onEditIssue={handleEditIssueClick}
                         title="이슈"
-                        renderUserAvatar={renderUserAvatar}
                     />
                 </div>
 
@@ -520,8 +575,7 @@ const LargeBoardBacklogModal = ({
                         newComment={newComment}
                         onCommentChange={setNewComment}
                         onAddComment={handleAddComment}
-                        onLikeComment={handleLikeComment}
-                        allUsers={projectUsers}
+                        onRemoveComment={handleRemoveComment}
                         title="댓글"
                     />
                 </div>
@@ -604,6 +658,31 @@ const LargeBoardBacklogModal = ({
                             placeholder="이슈 내용을 입력하세요"
                             value={editingIssue.content}
                             onChange={handleEditIssueChange}
+                        />
+                    </div>
+                </SmallFormModal>
+            </div>
+
+            {/* 태스크 수정 모달 */}
+            <div className="relative z-[1100]">
+                <SmallFormModal
+                    isOpen={isTaskEditModalOpen}
+                    onClose={() => setIsTaskEditModalOpen(false)}
+                    title="태스크 수정"
+                    submitText="수정"
+                    onSubmit={handleEditTaskSubmit}
+                >
+                    <div>
+                        <label htmlFor="taskEditContent" className="block text-sm font-medium text-gray-700 mb-1">
+                            태스크 내용
+                        </label>
+                        <input
+                            type="text"
+                            id="taskEditContent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="태스크 내용을 입력하세요"
+                            value={editingTask.content}
+                            onChange={handleEditTaskChange}
                         />
                     </div>
                 </SmallFormModal>

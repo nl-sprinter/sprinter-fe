@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiPlus, FiX, FiUser, FiUserX } from 'react-icons/fi';
+import { FiPlus, FiX, FiUser, FiUserX, FiEdit2 } from 'react-icons/fi';
 import SmallListModal from './modal/list/SmallListModal';
 
 /**
@@ -10,6 +10,7 @@ import SmallListModal from './modal/list/SmallListModal';
  * @param {function} onRemoveTask - 태스크 삭제 함수
  * @param {function} onTaskCompletion - 태스크 완료 상태 변경 함수
  * @param {function} onTaskAssignment - 태스크 할당 함수
+ * @param {function} onEditTask - 태스크 수정 함수
  * @param {string} title - 카드 제목
  * @param {function} renderUserAvatar - 사용자 아바타 렌더링 함수
  */
@@ -20,11 +21,12 @@ const TaskSelectCard = ({
     onRemoveTask,
     onTaskCompletion,
     onTaskAssignment,
+    onEditTask,
     title = "태스크",
     renderUserAvatar
 }) => {
     // 진행 중/완료된 태스크 개수 계산
-    const completedTasks = tasks.filter(task => task.isCompleted).length;
+    const completedTasks = tasks.filter(task => task.isChecked).length;
     const inProgressTasks = tasks.length - completedTasks;
     
     // 유저 선택 모달 상태
@@ -73,7 +75,7 @@ const TaskSelectCard = ({
                             <div
                                 key={task.id}
                                 className={`flex items-center justify-between p-3 rounded-lg border w-full transition-colors
-                                    ${task.isCompleted 
+                                    ${task.isChecked 
                                         ? 'bg-gray-100 border-gray-300 opacity-70' 
                                         : 'bg-green-50 border-green-200'}`}
                             >
@@ -81,18 +83,26 @@ const TaskSelectCard = ({
                                     {/* 체크박스 */}
                                     <input
                                         type="checkbox"
-                                        checked={task.isCompleted}
+                                        checked={task.isChecked}
                                         onChange={() => onTaskCompletion && onTaskCompletion(task.id)}
                                         className="w-4 h-4 text-green-600 rounded focus:ring-green-500 flex-shrink-0"
                                     />
                                     {/* content */}
                                     <span
-                                        className={`text-sm truncate ${task.isCompleted ? 'line-through text-gray-400' : ''}`}>
+                                        className={`text-sm truncate ${task.isChecked ? 'line-through text-gray-400' : ''}`}>
                                         {task.content}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                                     {task.assignedUserId && renderUserAvatar && renderUserAvatar(task.assignedUserId)}
+                                    
+                                    {/* 수정 버튼 추가 */}
+                                    <button
+                                        className="p-1 text-blue-500 hover:bg-blue-50 rounded-full flex-shrink-0"
+                                        onClick={() => onEditTask && onEditTask(task.id, task.content)}
+                                    >
+                                        <FiEdit2 size={16}/>
+                                    </button>
                                     
                                     {/* 담당자 아이콘 */}
                                     {task.assignedUserId ? (
@@ -116,7 +126,9 @@ const TaskSelectCard = ({
                                     {/* 삭제 버튼 */}
                                     <button
                                         className="p-1 text-red-500 hover:bg-red-50 rounded-full flex-shrink-0"
-                                        onClick={() => onRemoveTask && onRemoveTask(task.id)}
+                                        onClick={() => {
+                                            onRemoveTask && onRemoveTask(task.id)
+                                        }}
                                     >
                                         <FiX size={16}/>
                                     </button>

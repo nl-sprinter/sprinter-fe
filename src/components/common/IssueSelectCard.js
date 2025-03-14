@@ -17,10 +17,8 @@ const IssueSelectCard = ({
     onAddIssue,
     onRemoveIssue,
     onIssueResolution,
-    onIssueAssignment,
     onEditIssue,
     title = "이슈",
-    renderUserAvatar
 }) => {
     // 진행 중/완료된 이슈 개수 계산
     const completedIssues = issues.filter(issue => issue.isChecked).length;
