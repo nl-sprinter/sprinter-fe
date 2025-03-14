@@ -317,9 +317,18 @@ export const deleteIssue = async (projectId, sprintId, backlogId, issueId) => {
 }
 
 //////////////////// DailyScrum 관련 API ////////////////////
+
+// Sprint id 로 DailyScrum 리스트 조회
 export const getDailyScrumList = async (projectId, sprintId) => {
     const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/dailyscrums`);
     console.log(`[API] projectApi.getDailyScrumList 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// 오늘 날짜의 DailyScrum 조회
+export const getDailyScrumInToday = async (projectId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/0/dailyscrums/today`);
+    console.log(`[API] projectApi.getDailyScrumInToday 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 }
 
