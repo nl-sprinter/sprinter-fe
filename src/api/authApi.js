@@ -35,7 +35,10 @@ export const signup = async (email, password, nickname) => {
             nickname
         });
         return response.data;
-    } catch (error) {
+    } catch (error) { // 409 에러이면, 유저가 이미 존재한다는 뜻
+        if (error.response.status === 409) {
+            throw new Error('이미 존재하는 유저입니다.');
+        }
         throw error;
     }
 };

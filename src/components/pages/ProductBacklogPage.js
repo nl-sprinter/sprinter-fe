@@ -1,13 +1,13 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProductBacklogList } from '../../api/projectApi';
 import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
-import BacklogModal from '../common/modal/BacklogModal';
-import SideScrollableCardBox from '../common/layout/SideScrollableCardBox';
+import ProductBacklogModal from '../modals/ProductBacklogModal';
+import SideScrollablePanelBox from '../layouts/SideScrollablePanelBox';
 import PageTitle from '../common/PageTitle';
-import BacklogItem from '../common/item/BacklogItem';
-import W1H2Card from '../common/card/W1H2Card';
+import BacklogCard from '../common/BacklogCard';
+import W1H2Panel from '../panels/W1H2Panel';
 
 const ProductBacklogPage = () => {
     const { projectId } = useParams();
@@ -47,23 +47,23 @@ const ProductBacklogPage = () => {
     };
 
     return (
-        <Layout showFunctions showSidebar>
+        <MainLayout showFunctions showSidebar>
             <div className="space-y-6">
                 <PageTitle title="Product Backlog" />
 
-                <SideScrollableCardBox>
+                <SideScrollablePanelBox>
                     {sprints.map((sprint) => {
                         const sprintBacklogs = backlogs.filter(backlog => backlog.sprintOrder === sprint.sprintOrder);
                         
                         return (
-                            <W1H2Card
+                            <W1H2Panel
                                 key={sprint.sprintId}
                                 title={`Sprint ${sprint.sprintOrder} - ${sprint.sprintName}`}
                             >
                                 <div className="space-y-3">
                                     {sprintBacklogs.length > 0 ? (
                                         sprintBacklogs.map((backlog) => (
-                                            <BacklogItem
+                                            <BacklogCard
                                                 key={backlog.backlogId}
                                                 backlogId={backlog.backlogId}
                                                 sprintOrder={backlog.sprintOrder}
@@ -79,7 +79,7 @@ const ProductBacklogPage = () => {
                                         </div>
                                     )}
                                 </div>
-                            </W1H2Card>
+                            </W1H2Panel>
                         );
                     })}
 
@@ -88,9 +88,9 @@ const ProductBacklogPage = () => {
                             스프린트가 없습니다.
                         </div>
                     )}
-                </SideScrollableCardBox>
+                </SideScrollablePanelBox>
 
-                <BacklogModal
+                <ProductBacklogModal
                     isOpen={isModalOpen}
                     onClose={() => {
                         setIsModalOpen(false);
@@ -99,7 +99,7 @@ const ProductBacklogPage = () => {
                     backlog={selectedBacklog}
                 />
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
 

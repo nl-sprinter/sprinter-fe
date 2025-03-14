@@ -1,8 +1,8 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { signup } from '../../api/authApi';
-import SmallInfoModal from '../common/modal/SmallInfoModal';
+import SmallInfoModal from '../modals/info/SmallInfoModal';
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -71,13 +71,19 @@ const SignUpPage = () => {
                 navigate('/');
             }, 1500);
         } catch (error) {
-            setInfoModal({
-                isOpen: true,
-                title: '회원가입 실패',
-                message: error.message || '회원가입에 실패했습니다.',
-                type: 'error'
-            });
-            setErrors({ submit: error.message || '회원가입에 실패했습니다' });
+            let errorMessage = '회원가입에 실패했습니다';
+            
+            if (error.response && error.response.data) {
+                if (typeof error.response.data === 'string') {
+                    errorMessage = error.response.data;
+                } else if (error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                } else if (error.response.data.error) {
+                    errorMessage = error.response.data.error;
+                }
+            }
+            
+            setErrors({ submit: errorMessage });
         }
     };
 
@@ -90,7 +96,7 @@ const SignUpPage = () => {
     };
 
     return (
-        <Layout>
+        <MainLayout>
             <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-blue-900 overflow-hidden">
                 <form onSubmit={handleSubmit} className="w-full max-w-[400px] p-10 bg-white rounded-xl shadow-md flex flex-col gap-5 mx-5">
                     <h1 className="text-2xl font-bold text-center mb-6">
@@ -180,7 +186,7 @@ const SignUpPage = () => {
                     type={infoModal.type}
                 />
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
 

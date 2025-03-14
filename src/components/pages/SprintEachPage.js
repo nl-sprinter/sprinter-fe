@@ -1,29 +1,27 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import {useState, useEffect} from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {getSprintBacklogList, addBacklogToSprint, getDailyScrumList, addDailyScrumToSprint} from '../../api/projectApi';
 import {IoMdAdd} from 'react-icons/io';
-import CardBox from "../common/layout/CardBox";
+import PanelBox from "../layouts/PanelBox";
 import PageTitle from "../common/PageTitle";
-import DailyScrumItem from "../common/item/DailyScrumItem";
-import BacklogItem from "../common/item/BacklogItem";
-import W1H1Card from "../common/card/W1H1Card";
-import W2H1Card from "../common/card/W2H1Card";
-import SmallFormBacklogCreateModal from '../common/modal/form/SmallFormBacklogCreateModal';
-import SmallFormDailyScrumCreateModal from '../common/modal/form/SmallFormDailyScrumCreateModal';
-import SmallInfoModal from '../common/modal/SmallInfoModal';
-import LargeBoardBacklogModal from '../common/modal/board/LargeBoardBacklogModal';
-import LargeBoardDailyScrumModal from '../common/modal/board/LargeBoardDailyScrumModal';
+import DailyScrumCard from "../common/DailyScrumCard";
+import BacklogCard from "../common/BacklogCard";
+import W1H1Panel from "../panels/W1H1Panel";
+import W2H1Panel from "../panels/W2H1Panel";
+import SmallFormDailyScrumCreateModal from '../modals/form/SmallFormDailyScrumCreateModal';
+import SmallInfoModal from '../modals/info/SmallInfoModal';
+import LargeBoardBacklogModal from '../modals/board/LargeBoardBacklogModal';
+import LargeBoardDailyScrumModal from '../modals/board/LargeBoardDailyScrumModal';
+import SmallFormBacklogCreateEditModal from "../modals/form/SmallFormBacklogCreateEditModal";
 
 const SprintEachPage = () => {
-    const navigate = useNavigate();
     const {projectId, sprintId} = useParams();
     const [backlogs, setBacklogs] = useState([]);
     const [dailyScrums, setDailyScrums] = useState([]);
     const [selectedBacklog, setSelectedBacklog] = useState(null);
     const [selectedDailyScrum, setSelectedDailyScrum] = useState(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [isContentModalOpen, setIsContentModalOpen] = useState(false);
     const [isDailyScrumModalOpen, setIsDailyScrumModalOpen] = useState(false);
     const [isBacklogModalOpen, setIsBacklogModalOpen] = useState(false);
     const [isDailyScrumCreateModalOpen, setIsDailyScrumCreateModalOpen] = useState(false);
@@ -35,7 +33,7 @@ const SprintEachPage = () => {
         try {
             const data = await getSprintBacklogList(projectId, sprintId);
             setBacklogs(data);
-            
+
             // 현재 선택된 백로그가 있으면 최신 정보로 업데이트
             if (selectedBacklog) {
                 const updatedBacklog = data.find(backlog => backlog.backlogId === selectedBacklog.backlogId);
@@ -50,11 +48,7 @@ const SprintEachPage = () => {
 
     const fetchDailyScrums = async () => {
         try {
-            /**
-             * 야!!!!!!!!!!!![{"dailyScrumId":1,"createdAt":"2025-03-13","backlogCount":1,"userCount":0},{"dailyScrumId":2,"createdAt":"2025-03-13","backlogCount":0,"userCount":1},{"dailyScrumId":3,"createdAt":"2025-03-13","backlogCount":0,"userCount":1}]
-             */
             const data = await getDailyScrumList(projectId, sprintId);
-            console.log(`야!!!!!!!!!!!!${JSON.stringify(data)}`);
             setDailyScrums(data);
         } catch (err) {
             console.error('데일리 스크럼 목록을 불러오는데 실패했습니다:', err);
@@ -127,11 +121,6 @@ const SprintEachPage = () => {
         }
     };
 
-    const handleContentModalSubmit = () => {
-        // 여기에 백로그 상세 모달 제출 시 로직 추가
-        setIsContentModalOpen(false);
-    };
-
     const handleDailyScrumModalSubmit = (data) => {
         // 여기에 데일리 스크럼 모달 제출 시 로직 추가
         console.log('데일리 스크럼 데이터 저장:', data);
@@ -146,11 +135,6 @@ const SprintEachPage = () => {
         fetchBacklogs();
     };
 
-    // 완료된 백로그 수 계산
-    const completedBacklogs = backlogs.filter(backlog => backlog.isFinished).length;
-    const totalBacklogs = backlogs.length;
-    const inProgressBacklogs = totalBacklogs - completedBacklogs;
-
     // 날짜 포맷 함수
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -162,23 +146,25 @@ const SprintEachPage = () => {
     };
 
     return (
-        <Layout showFunctions showSidebar>
+        <MainLayout showFunctions showSidebar>
             <PageTitle title="스프린트 상세" />
-            <CardBox>
-                <W2H1Card
+            <PanelBox>
+                <W2H1Panel
                     title="Sprint Backlog"
                     headerRight={
-                        <button 
-                            className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
-                            onClick={handleAddBacklogClick}
-                        >
-                            <IoMdAdd size={20}/>
-                        </button>
+                        <>
+                            <button
+                                className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                                onClick={handleAddBacklogClick}
+                            >
+                                <IoMdAdd size={20}/>
+                            </button>
+                        </>
                     }
                 >
                     <div className="space-y-3">
                         {backlogs.map((backlog) => (
-                            <BacklogItem
+                            <BacklogCard
                                 key={backlog.backlogId}
                                 backlogId={backlog.backlogId}
                                 sprintOrder={backlog.sprintOrder}
@@ -194,9 +180,9 @@ const SprintEachPage = () => {
                             </div>
                         )}
                     </div>
-                </W2H1Card>
+                </W2H1Panel>
 
-                <W1H1Card
+                <W1H1Panel
                     title="Daily Scrum"
                     headerRight={
                         <button 
@@ -209,7 +195,7 @@ const SprintEachPage = () => {
                 >
                     <div className="space-y-3">
                         {dailyScrums.map((scrum) => (
-                            <DailyScrumItem
+                            <DailyScrumCard
                                 dailyScrumId={scrum.dailyScrumId}
                                 createdAt={formatDate(scrum.createdAt)}
                                 userCount={scrum.userCount}
@@ -223,13 +209,14 @@ const SprintEachPage = () => {
                             </div>
                         )}
                     </div>
-                </W1H1Card>
-            </CardBox>
+                </W1H1Panel>
+            </PanelBox>
 
-            <SmallFormBacklogCreateModal
+            <SmallFormBacklogCreateEditModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSubmit={handleCreateBacklog}
+                actionText='생성'
             />
 
             <SmallFormDailyScrumCreateModal
@@ -266,7 +253,7 @@ const SprintEachPage = () => {
                 sprintId={sprintId}
                 onSubmit={handleDailyScrumModalSubmit}
             />
-        </Layout>
+        </MainLayout>
     );
 };
 

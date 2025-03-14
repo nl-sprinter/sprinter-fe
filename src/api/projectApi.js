@@ -103,7 +103,7 @@ export const createSprint = async (projectId, sprintName) => {
     return response.data;
 };
 
-
+// 프로젝트에 속한 유저 조회
 export const getUsersInProject = async (projectId) => {
     const response = await axiosInstance.get(`/projects/${projectId}/users`);
     console.log(`[API] projectApi.getUsersInProject 호출, data=${JSON.stringify(response.data)}`);
@@ -146,6 +146,12 @@ export const removeUserFromProject = async (projectId, userId) => {
     }
 };
 
+// 프로젝트 유저 자진탈퇴
+export const goOutUserInProject = async (projectId) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/users`);
+    console.log(`[API] projectApi.goOutUserInProject 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
 
 // 유저가 해당 프로젝트의 팀장인지 확인
 export const checkUserIsProjectLeader = async (projectId, token) => {

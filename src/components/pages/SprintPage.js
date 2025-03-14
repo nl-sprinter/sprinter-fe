@@ -1,13 +1,13 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import {useState, useEffect} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {getProductBacklogList, checkUserIsProjectLeader} from '../../api/projectApi';
 import {useUserStore} from '../../store/useUserStore';
 import {PieChart} from 'react-minimal-pie-chart';
-import CardBox from "../common/layout/CardBox";
+import PanelBox from "../layouts/PanelBox";
 import PageTitle from "../common/PageTitle";
-import BacklogItem from "../common/item/BacklogItem";
-import W1H1Card from "../common/card/W1H1Card";
+import BacklogCard from "../common/BacklogCard";
+import W1H1Panel from "../panels/W1H1Panel";
 import {FiSettings} from 'react-icons/fi';
 
 const SprintPage = () => {
@@ -45,7 +45,7 @@ const SprintPage = () => {
     }, [projectId]);
 
     return (
-        <Layout showFunctions showSidebar>
+        <MainLayout showFunctions showSidebar>
             <PageTitle
                 title="스프린트 현황"
                 description="스프린트의 전반적인 진행 상황을 확인할 수 있습니다."
@@ -60,11 +60,11 @@ const SprintPage = () => {
                     )
                 }
             />
-            <CardBox>
-                <W1H1Card title="나의 Backlog">
+            <PanelBox>
+                <W1H1Panel title="나의 Backlog">
                     <div className="space-y-3">
                         {backlogs.map((backlog) => (
-                            <BacklogItem
+                            <BacklogCard
                                 backlogId={backlog.backlogId}
                                 sprintOrder={backlog.sprintOrder}
                                 backlogName={backlog.backlogName}
@@ -73,13 +73,13 @@ const SprintPage = () => {
                             />
                         ))}
                     </div>
-                </W1H1Card>
+                </W1H1Panel>
 
-                <W1H1Card title="Daily Scrum"/>
+                <W1H1Panel title="Daily Scrum"/>
 
-                <W1H1Card title="추가 예정"/>
+                <W1H1Panel title="추가 예정"/>
 
-                <W1H1Card title="나의 달성 현황">
+                <W1H1Panel title="나의 달성 현황">
                     <div className="flex items-center justify-center h-full">
                         <div className="w-28 h-28">
                             <PieChart
@@ -94,9 +94,9 @@ const SprintPage = () => {
                             />
                         </div>
                     </div>
-                </W1H1Card>
-            </CardBox>
-        </Layout>
+                </W1H1Panel>
+            </PanelBox>
+        </MainLayout>
     );
 };
 

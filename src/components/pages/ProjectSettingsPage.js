@@ -1,14 +1,14 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import PageTitle from '../common/PageTitle';
-import SettingsCard from '../common/card/SettingsCard';
+import SettingsPanel from '../panels/SettingsPanel';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IoMdClose } from 'react-icons/io';
 import { useState, useEffect } from 'react';
 import { deleteProject, updateProjectName, getUsersInProject, searchUserToAddProject, addUserToProject, removeUserFromProject } from '../../api/projectApi';
 import { useUserProjectStore } from '../../store/useUserProjectStore';
-import { FiEdit2, FiTrash2, FiPlus, FiSearch, FiX } from 'react-icons/fi';
-import SmallFormModal from '../common/modal/form/SmallFormModal';
-import SmallInfoModal from '../common/modal/SmallInfoModal';
+import { FiPlus, FiSearch, FiX } from 'react-icons/fi';
+import SmallFormModal from '../modals/form/SmallFormModal';
+import SmallInfoModal from '../modals/info/SmallInfoModal';
 
 const ProjectSettingsPage = () => {
     const navigate = useNavigate();
@@ -19,7 +19,6 @@ const ProjectSettingsPage = () => {
     const [projectName, setProjectName] = useState('');
     const [newProjectName, setNewProjectName] = useState('');
     const { projects, fetchProjects } = useUserProjectStore();
-    const [isEditing, setIsEditing] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
     const [users, setUsers] = useState([]);
@@ -98,7 +97,6 @@ const ProjectSettingsPage = () => {
             await updateProjectName(projectId, newProjectName);
             await fetchProjects(); // 프로젝트 목록 새로고침
             setProjectName(newProjectName);
-            setIsEditing(false);
             setInfoModal({
                 isOpen: true,
                 title: '프로젝트명 변경 완료',
@@ -238,7 +236,7 @@ const ProjectSettingsPage = () => {
     };
 
     return (
-        <Layout showFunctions showSidebar>
+        <MainLayout showFunctions showSidebar>
             <PageTitle 
                 title="프로젝트 설정" 
                 rightContent={
@@ -252,7 +250,7 @@ const ProjectSettingsPage = () => {
             />
             
             <div className="max-w-2xl space-y-6">
-                <SettingsCard
+                <SettingsPanel
                     title="프로젝트 이름 변경"
                     description="프로젝트의 이름을 변경합니다."
                 >
@@ -271,9 +269,9 @@ const ProjectSettingsPage = () => {
                             {isUpdating ? '변경 중...' : '변경'}
                         </button>
                     </div>
-                </SettingsCard>
+                </SettingsPanel>
 
-                <SettingsCard
+                <SettingsPanel
                     title="팀원 관리"
                     description="프로젝트에 참여하는 팀원을 관리합니다."
                 >
@@ -332,9 +330,9 @@ const ProjectSettingsPage = () => {
                             </div>
                         )}
                     </div>
-                </SettingsCard>
+                </SettingsPanel>
 
-                <SettingsCard
+                <SettingsPanel
                     title="프로젝트 삭제"
                     description="이 작업은 되돌릴 수 없습니다."
                 >
@@ -372,7 +370,7 @@ const ProjectSettingsPage = () => {
                             </div>
                         </div>
                     )}
-                </SettingsCard>
+                </SettingsPanel>
             </div>
 
             {/* 프로젝트 삭제 확인 모달 */}
@@ -562,7 +560,7 @@ const ProjectSettingsPage = () => {
                     </p>
                 </div>
             </SmallFormModal>
-        </Layout>
+        </MainLayout>
     );
 };
 

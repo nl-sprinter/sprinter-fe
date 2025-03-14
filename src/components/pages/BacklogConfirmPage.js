@@ -1,4 +1,4 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import { useState } from 'react';
@@ -7,9 +7,8 @@ import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { FiEdit2 } from "react-icons/fi";
 import { createProject } from '../../api/projectApi';
 import WeightIndicator from '../common/WeightIndicator';
-import SmallFormBacklogCreateModal from '../common/modal/form/SmallFormBacklogCreateModal';
-import SmallFormBacklogEditModal from '../common/modal/form/SmallFormBacklogEditModal';
-import SmallInfoModal from '../common/modal/SmallInfoModal';
+import SmallFormBacklogCreateEditModal from '../modals/form/SmallFormBacklogCreateEditModal';
+import SmallInfoModal from '../modals/info/SmallInfoModal';
 
 const BacklogConfirmPage = () => {
     const navigate = useNavigate();
@@ -66,22 +65,10 @@ const BacklogConfirmPage = () => {
         }
     };
 
-    const getWeightColor = (weight) => {
-        if (weight <= 1) return 'bg-yellow-500';
-        if (weight <= 2) return 'bg-green-500';
-        return 'bg-blue-800';
-    };
-
-    const getWeightBarWidth = (weight) => {
-        if (weight <= 1) return 'w-1/3';
-        if (weight <= 2) return 'w-2/3';
-        return 'w-full';
-    };
-
     const handleDragEnd = (result) => {
         if (!result.destination) return;
 
-        const { source, destination } = result;
+        const { destination } = result;
         const newBacklog = [...backlogData.backlog];
         
         // 전체 백로그에서 해당 항목의 실제 인덱스를 찾습니다
@@ -229,7 +216,7 @@ const BacklogConfirmPage = () => {
     };
 
     return (
-        <Layout>
+        <MainLayout>
             <DragDropContext onDragEnd={handleDragEnd}>
                 <div className="px-[10%] py-8 overflow-y-auto">
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -434,16 +421,18 @@ const BacklogConfirmPage = () => {
                         type={infoModal.type}
                     />
 
-                    <SmallFormBacklogCreateModal
+                    <SmallFormBacklogCreateEditModal
                         isOpen={isCreateModalOpen}
                         onClose={() => {
                             setIsCreateModalOpen(false);
                             setTargetSprintNumber(null);
                         }}
                         onSubmit={handleCreateBacklog}
+                        backlog={null}
+                        actionText='생성'
                     />
 
-                    <SmallFormBacklogEditModal
+                    <SmallFormBacklogCreateEditModal
                         isOpen={isEditModalOpen}
                         onClose={() => {
                             setIsEditModalOpen(false);
@@ -451,10 +440,11 @@ const BacklogConfirmPage = () => {
                         }}
                         onSubmit={handleEditBacklog}
                         backlog={editingBacklog}
+                        actionText='수정'
                     />
                 </div>
             </DragDropContext>
-        </Layout>
+        </MainLayout>
     );
 };
 

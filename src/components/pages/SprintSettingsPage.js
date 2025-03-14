@@ -1,16 +1,14 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import PageTitle from '../common/PageTitle';
-import SettingsCard from '../common/card/SettingsCard';
+import SettingsPanel from '../panels/SettingsPanel';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IoMdClose } from 'react-icons/io';
 import { FiEdit2, FiPlus } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
 import { updateSprintName, createSprint, getSprintPeriod, updateSprintPeriod } from '../../api/projectApi';
-import SmallFormSprintCreateModal from '../common/modal/form/SmallFormSprintCreateModal';
-import SmallFormSprintEditModal from '../common/modal/form/SmallFormSprintEditModal';
-import SmallInfoModal from '../common/modal/SmallInfoModal';
-import { addDays, format } from 'date-fns';
+import SmallFormSprintCreateEditModal from '../modals/form/SmallFormSprintCreateEditModal';
+import SmallInfoModal from '../modals/info/SmallInfoModal';
 
 const SprintSettingsPage = () => {
     const navigate = useNavigate();
@@ -122,7 +120,7 @@ const SprintSettingsPage = () => {
     };
 
     return (
-        <Layout showFunctions showSidebar>
+        <MainLayout showFunctions showSidebar>
             <PageTitle 
                 title="스프린트 설정" 
                 rightContent={
@@ -136,7 +134,7 @@ const SprintSettingsPage = () => {
             />
             
             <div className="max-w-2xl space-y-6">
-                <SettingsCard
+                <SettingsPanel
                     title="스프린트 단위 기간"
                     description="새로 생성되는 스프린트의 기본 기간을 설정합니다."
                 >
@@ -157,9 +155,9 @@ const SprintSettingsPage = () => {
                             {isUpdatingPeriod ? '저장 중...' : '저장'}
                         </button>
                     </div>
-                </SettingsCard>
+                </SettingsPanel>
 
-                <SettingsCard
+                <SettingsPanel
                     title="스프린트 관리"
                     description="스프린트 추가하거나 이름을 변경할 수 있습니다."
                 >
@@ -196,7 +194,7 @@ const SprintSettingsPage = () => {
                             새 스프린트 추가
                         </button>
                     </div>
-                </SettingsCard>
+                </SettingsPanel>
             </div>
 
             <SmallInfoModal
@@ -207,13 +205,15 @@ const SprintSettingsPage = () => {
                 type={infoModal.type}
             />
 
-            <SmallFormSprintCreateModal
+            <SmallFormSprintCreateEditModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSubmit={handleCreateSprint}
+                sprint={null}
+                actionText="생성"
             />
 
-            <SmallFormSprintEditModal
+            <SmallFormSprintCreateEditModal
                 isOpen={isEditModalOpen}
                 onClose={() => {
                     setIsEditModalOpen(false);
@@ -221,8 +221,9 @@ const SprintSettingsPage = () => {
                 }}
                 onSubmit={handleEditSprint}
                 sprint={selectedSprint}
+                actionText="수정"
             />
-        </Layout>
+        </MainLayout>
     );
 };
 

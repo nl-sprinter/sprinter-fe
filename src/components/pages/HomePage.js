@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { FiPlus } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useUserProjectStore } from '../../store/useUserProjectStore';
@@ -54,7 +54,7 @@ const HomePage = () => {
     };
 
     return (
-        <Layout showFunctions>
+        <MainLayout showFunctions>
             <div className="p-8">
                 <h1 className="text-2xl font-bold mb-8">
                     안녕하세요, {user?.nickname}님!
@@ -90,7 +90,7 @@ const HomePage = () => {
                     ))}
                 </div>
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
 

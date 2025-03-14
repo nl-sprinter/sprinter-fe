@@ -1,10 +1,10 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useUserStore } from '../../store/useUserStore';
-import { patchUserInfo, deleteUser } from '../../api/userApi';
-import SmallInfoModal from '../common/modal/SmallInfoModal';
-import SmallFormModal from '../common/modal/form/SmallFormModal';
+import { deleteUser } from '../../api/userApi';
+import SmallInfoModal from '../modals/info/SmallInfoModal';
+import SmallFormModal from '../modals/form/SmallFormModal';
 
 const AccountPage = () => {
     const navigate = useNavigate();
@@ -49,15 +49,6 @@ const AccountPage = () => {
         if (!validateForm()) return;
 
         try {
-            const updateData = {
-                userId: user.userId,
-                nickname: formData.nickname,
-                currentPassword: formData.currentPassword,
-                newPassword: formData.newPassword || null
-            };
-
-            const response = await patchUserInfo(updateData);
-            
             // 비밀번호 관련 필드만 초기화
             setFormData(prev => ({
                 ...prev,
@@ -157,7 +148,7 @@ const AccountPage = () => {
     };
 
     return (
-        <Layout>
+        <MainLayout>
             <div className="max-w-2xl mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold mb-8">
                     계정 정보 수정
@@ -296,7 +287,7 @@ const AccountPage = () => {
                     </div>
                 </SmallFormModal>
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
 

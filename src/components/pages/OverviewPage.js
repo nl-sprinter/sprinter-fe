@@ -1,17 +1,27 @@
-import Layout from '../common/layout/Layout';
-import CardBox from '../common/layout/CardBox';
+import MainLayout from '../layouts/MainLayout';
+import PanelBox from '../layouts/PanelBox';
 import PageTitle from '../common/PageTitle';
-import { FiSettings } from 'react-icons/fi';
-import W1H1Card from "../common/card/W1H1Card";
+import { FiSettings, FiLogOut } from 'react-icons/fi';
+import W1H1Panel from "../panels/W1H1Panel";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getUsersInProject, checkUserIsProjectLeader } from '../../api/projectApi';
+import { getUsersInProject, checkUserIsProjectLeader, goOutUserInProject } from '../../api/projectApi';
+import SmallInfoModal from '../modals/info/SmallInfoModal';
+import SmallFormModal from '../modals/form/SmallFormModal';
 
 const OverviewPage = () => {
     const navigate = useNavigate();
     const { projectId } = useParams();
     const [users, setUsers] = useState([]);
     const [isProjectLeader, setIsProjectLeader] = useState(false);
+    
+    const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+    const [infoModal, setInfoModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'success'
+    });
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -40,25 +50,61 @@ const OverviewPage = () => {
         checkIsLeader();
     }, [projectId]);
 
+    const handleLeaveClick = () => {
+        setIsLeaveModalOpen(true);
+    };
+
+    const handleLeaveProject = async () => {
+        try {
+            await goOutUserInProject(projectId);
+            
+            setIsLeaveModalOpen(false);
+            setInfoModal({
+                isOpen: true,
+                title: '프로젝트 탈퇴',
+                message: '프로젝트에서 탈퇴되었습니다.',
+                type: 'success'
+            });
+        } catch (error) {
+            console.error('프로젝트 탈퇴 중 오류 발생:', error);
+            setIsLeaveModalOpen(false);
+            setInfoModal({
+                isOpen: true,
+                title: '오류',
+                message: '프로젝트 탈퇴 중 오류가 발생했습니다.',
+                type: 'error'
+            });
+        }
+    };
+
     return (
-        <Layout showFunctions showSidebar>
+        <MainLayout showFunctions showSidebar>
             <PageTitle 
                 title="프로젝트 개요" 
                 description="프로젝트의 전반적인 진행 상황을 확인할 수 있습니다."
                 rightContent={
-                    isProjectLeader && (
+                    isProjectLeader ? (
                         <button 
                             onClick={() => navigate(`/projects/${projectId}/overview/settings`)}
                             className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="프로젝트 설정"
                         >
                             <FiSettings size={20} />
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={handleLeaveClick}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            title="프로젝트 나가기"
+                        >
+                            <FiLogOut size={20} />
                         </button>
                     )
                 }
             />
             
-            <CardBox>
-                <W1H1Card title="팀원 목록">
+            <PanelBox>
+                <W1H1Panel title="팀원 목록">
                     <div className="h-[200px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-300">
                         <div className="grid grid-cols-3 gap-4">
                             {users.map((user) => (
@@ -83,9 +129,9 @@ const OverviewPage = () => {
                             ))}
                         </div>
                     </div>
-                </W1H1Card>
+                </W1H1Panel>
 
-                <W1H1Card title="스프린트 현황">
+                <W1H1Panel title="스프린트 현황">
                     <div className="space-y-4">
                         <div className="flex justify-between items-center py-2 border-b border-gray-100">
                             <span className="text-gray-600">진행중인 스프린트</span>
@@ -96,9 +142,9 @@ const OverviewPage = () => {
                             <span className="font-medium">3개</span>
                         </div>
                     </div>
-                </W1H1Card>
+                </W1H1Panel>
 
-                <W1H1Card title="백로그 현황">
+                <W1H1Panel title="백로그 현황">
                     <div className="space-y-4">
                         <div className="flex justify-between items-center py-2 border-b border-gray-100">
                             <span className="text-gray-600">전체 백로그</span>
@@ -109,9 +155,9 @@ const OverviewPage = () => {
                             <span className="font-medium">8개</span>
                         </div>
                     </div>
-                </W1H1Card>
+                </W1H1Panel>
 
-                <W1H1Card title="일정 현황">
+                <W1H1Panel title="일정 현황">
                     <div className="space-y-4">
                         <div className="flex justify-between items-center py-2 border-b border-gray-100">
                             <span className="text-gray-600">시작일</span>
@@ -122,9 +168,36 @@ const OverviewPage = () => {
                             <span className="font-medium">2024.06.30</span>
                         </div>
                     </div>
-                </W1H1Card>
-            </CardBox>
-        </Layout>
+                </W1H1Panel>
+            </PanelBox>
+
+            <SmallFormModal
+                isOpen={isLeaveModalOpen}
+                onClose={() => setIsLeaveModalOpen(false)}
+                title="프로젝트 탈퇴"
+                submitText="탈퇴하기"
+                cancelText="취소"
+                onSubmit={handleLeaveProject}
+            >
+                <>
+                    <p>정말 프로젝트를 나가시겠습니까?</p>
+                    <p className="text-red-500">그동안의 모든 활동 내역은 삭제됩니다.</p>
+                </>
+            </SmallFormModal>
+
+            <SmallInfoModal
+                isOpen={infoModal.isOpen}
+                onClose={() => {
+                    setInfoModal({ ...infoModal, isOpen: false });
+                    if (infoModal.type === 'success') {
+                        navigate('/');
+                    }
+                }}
+                title={infoModal.title}
+                message={infoModal.message}
+                type={infoModal.type}
+            />
+        </MainLayout>
     );
 };
 
