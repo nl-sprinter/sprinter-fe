@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { FiPlus } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useUserProjectStore } from '../../store/useUserProjectStore';
@@ -50,11 +50,11 @@ const HomePage = () => {
         // 프로젝트 진입 시 store 초기화 및 현재 프로젝트 설정
         await fetchProjects();
         setProjectId(project.projectId);
-        navigate(`/projects/${project.projectId}`);
+        navigate(`/projects/${project.projectId}/overview`);
     };
 
     return (
-        <Layout showFunctions>
+        <MainLayout showFunctions>
             <div className="p-8">
                 <h1 className="text-2xl font-bold mb-8">
                     안녕하세요, {user?.nickname}님!
@@ -90,7 +90,7 @@ const HomePage = () => {
                     ))}
                 </div>
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
 

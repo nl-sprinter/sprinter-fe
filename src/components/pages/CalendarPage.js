@@ -1,8 +1,8 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { useState } from 'react';
 import PageTitle from '../common/PageTitle';
-import CardBox from '../common/layout/CardBox';
-import W3H2Card from '../common/card/W3H2Card';
+import PanelBox from '../layouts/PanelBox';
+import W3H2Panel from '../panels/W3H2Panel';
 import { IoMdAdd } from 'react-icons/io';
 
 const ScheduleItem = ({ title, date, type }) => {
@@ -100,7 +100,7 @@ const CalendarPage = () => {
     };
 
     return (
-        <Layout showFunctions showSidebar>
+        <MainLayout showFunctions showSidebar>
             <PageTitle 
                 title="캘린더" 
                 description="프로젝트의 주요 일정을 확인할 수 있습니다."
@@ -112,8 +112,8 @@ const CalendarPage = () => {
                 }
             />
             
-            <CardBox>
-                <W3H2Card 
+            <PanelBox>
+                <W3H2Panel
                     title={`${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`}
                 >
                     <div className="flex h-full gap-6">
@@ -141,9 +141,9 @@ const CalendarPage = () => {
                             </div>
                         </div>
                     </div>
-                </W3H2Card>
-            </CardBox>
-        </Layout>
+                </W3H2Panel>
+            </PanelBox>
+        </MainLayout>
     );
 };
 

@@ -6,7 +6,7 @@ export const login = async (email, password) => {
             email,
             password
         }, {withCredentials: true});
-        console.log('전체 헤더:', Object.keys(response.headers));
+        console.log(`[API] authApi.login 호출, data=${Object.keys(response.headers)}`);
 
         const accessToken = response.headers['authorization']?.split(' ')[1];
         console.log(accessToken);
@@ -20,7 +20,7 @@ export const login = async (email, password) => {
 
 
         // response.data 안에 200 OK를 리턴해줘야함
-        return response.data;
+        return response;
     } catch (error) {
         console.log(`로그인 요청 실패:${error}`)
         throw error;
@@ -35,7 +35,10 @@ export const signup = async (email, password, nickname) => {
             nickname
         });
         return response.data;
-    } catch (error) {
+    } catch (error) { // 409 에러이면, 유저가 이미 존재한다는 뜻
+        if (error.response.status === 409) {
+            throw new Error('이미 존재하는 유저입니다.');
+        }
         throw error;
     }
 };

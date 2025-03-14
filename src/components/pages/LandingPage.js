@@ -1,11 +1,11 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
     const navigate = useNavigate();
     
     return (
-        <Layout>
+        <MainLayout>
             <div className="fixed inset-0 bg-gradient-to-b from-white via-white to-[#3F5F8F] overflow-hidden">
                 <div className="relative w-full h-full">
                     <div className="absolute left-[15%] top-1/2 -translate-y-1/2">
@@ -38,7 +38,7 @@ const LandingPage = () => {
                     </div>
                 </div>
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
 

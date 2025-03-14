@@ -1,7 +1,8 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { signup } from '../../api/authApi';
+import SmallInfoModal from '../modals/info/SmallInfoModal';
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -12,6 +13,12 @@ const SignUpPage = () => {
         passwordConfirm: ''
     });
     const [errors, setErrors] = useState({});
+    const [infoModal, setInfoModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'success'
+    });
 
     const validateEmail = (email) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -54,10 +61,29 @@ const SignUpPage = () => {
                 formData.password,
                 formData.nickname
             );
-            alert('회원가입이 완료되었습니다!');
-            navigate('/');
+            setInfoModal({
+                isOpen: true,
+                title: '회원가입 완료',
+                message: '회원가입이 성공적으로 완료되었습니다.',
+                type: 'success'
+            });
+            setTimeout(() => {
+                navigate('/');
+            }, 1500);
         } catch (error) {
-            setErrors({ submit: error.message || '회원가입에 실패했습니다' });
+            let errorMessage = '회원가입에 실패했습니다';
+            
+            if (error.response && error.response.data) {
+                if (typeof error.response.data === 'string') {
+                    errorMessage = error.response.data;
+                } else if (error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                } else if (error.response.data.error) {
+                    errorMessage = error.response.data.error;
+                }
+            }
+            
+            setErrors({ submit: errorMessage });
         }
     };
 
@@ -70,7 +96,7 @@ const SignUpPage = () => {
     };
 
     return (
-        <Layout>
+        <MainLayout>
             <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-blue-900 overflow-hidden">
                 <form onSubmit={handleSubmit} className="w-full max-w-[400px] p-10 bg-white rounded-xl shadow-md flex flex-col gap-5 mx-5">
                     <h1 className="text-2xl font-bold text-center mb-6">
@@ -146,8 +172,21 @@ const SignUpPage = () => {
                         뒤로 가기
                     </button>
                 </form>
+                
+                <SmallInfoModal
+                    isOpen={infoModal.isOpen}
+                    onClose={() => {
+                        setInfoModal({ ...infoModal, isOpen: false });
+                        if (infoModal.type === 'success') {
+                            navigate('/');
+                        }
+                    }}
+                    title={infoModal.title}
+                    message={infoModal.message}
+                    type={infoModal.type}
+                />
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
 

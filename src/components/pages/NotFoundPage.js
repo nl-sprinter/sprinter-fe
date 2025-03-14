@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 
 const NotFoundPage = () => {
     const navigate = useNavigate();
 
     return (
-        <Layout>
+        <MainLayout>
             <div className="flex flex-col items-center justify-center min-h-full text-center py-8">
                 <h1 className="text-6xl mb-4 text-gray-600">
                     404
@@ -20,7 +20,7 @@ const NotFoundPage = () => {
                     홈으로 돌아가기
                 </button>
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
 

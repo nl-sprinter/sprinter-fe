@@ -1,4 +1,4 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { useState } from 'react';
@@ -43,7 +43,7 @@ const LoginPage = () => {
     };
 
     return (
-        <Layout>
+        <MainLayout>
             <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-blue-900 overflow-hidden">
                 <form onSubmit={handleSubmit} className="w-full max-w-[400px] p-10 bg-white rounded-xl shadow-md flex flex-col gap-5 mx-5">
                     <h1 className="text-2xl font-bold text-center mb-6">
@@ -111,7 +111,7 @@ const LoginPage = () => {
                     </button>
                 </form>
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
 

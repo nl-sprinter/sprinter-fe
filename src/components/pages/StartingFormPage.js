@@ -1,4 +1,4 @@
-import Layout from '../common/layout/Layout';
+import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 import { sendStartingForm } from '../../api/startingFormApi';
 
@@ -17,7 +17,7 @@ const StartingFormPage = () => {
     };
 
     return (
-        <Layout>
+        <MainLayout>
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-center mb-8">
                     새 프로젝트 만들기
@@ -111,7 +111,7 @@ const StartingFormPage = () => {
                     </button>
                 </div>
             </form>
-        </Layout>
+        </MainLayout>
     );
 };
 

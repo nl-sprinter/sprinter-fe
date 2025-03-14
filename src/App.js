@@ -1,6 +1,6 @@
 import AppRoutes from './routes/Routes';
-import { LoadingModal } from './components/common/modal/LoadingModal';
-import { ErrorModal } from './components/common/modal/ErrorModal';
+import { LoadingModal } from './components/modals/global/LoadingModal';
+import { ErrorModal } from './components/modals/global/ErrorModal';
 import AxiosSetup from './api/AxiosSetup';
 import Modal from 'react-modal';
 
