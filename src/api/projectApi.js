@@ -190,6 +190,15 @@ export const updateBacklog = async (projectId, sprintId, backlogId, title, weigh
     return response.data;
 }
 
+// Backlog 완료 토글
+export const updateBacklogFinished = async (backlogId, finish) => {
+    const response = await axiosInstance.patch(`/projects/0/sprints/0/backlogs/${backlogId}/finish`, {
+        finish: finish
+    });
+    console.log(`[API] projectApi.updateBacklogFinished 호출, data=${JSON.stringify(response.data)}`);
+    return response.data.finish;
+}
+
 export const getUsersInBacklog = async (projectId, sprintId, backlogId) => {
     const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/users`);
     console.log(`[API] projectApi.getUsersInBacklog 호출, data=${JSON.stringify(response.data)}`);
@@ -203,8 +212,17 @@ export const addUserInBacklog = async (projectId, sprintId, backlogId, userId) =
 }
 
 export const deleteUserInBacklog = async (projectId, sprintId, backlogId, userId) => {
-    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/users/${userId}`);
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/users?userId=${userId}`);
     console.log(`[API] projectApi.deleteUserInBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// 유저가 참여하는 백로그 조회
+export const getUsersBacklogs = async (projectId, token) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/user-backlogs`, {
+        headers: { Authorization: token }
+    });
+    console.log(`[API] projectApi.getUsersBacklogs 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 }
 
@@ -421,12 +439,6 @@ export const getBacklogComments = async (projectId, sprintId, backlogId) => {
 
 // 백로그 댓글 생성
 export const createBacklogComment = async (projectId, sprintId, backlogId, parentCommentId, content) => {
-    console.log("=--=-=-=-=-=-=-=-=-=-=-=-=-=createBacklogComment 호출");
-    console.log(`projectId = ${projectId}`);
-    console.log(`sprintId = ${sprintId}`);
-    console.log(`backlogId = ${backlogId}`);
-    console.log(`parentCommentId = ${parentCommentId}`);
-    console.log(`content = ${content}`);
     const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments`, {
         parentCommentId: parentCommentId,
         content: content

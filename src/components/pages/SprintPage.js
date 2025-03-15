@@ -2,10 +2,10 @@ import MainLayout from '../layouts/MainLayout';
 import {useState, useEffect} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {
-    getProductBacklogList, 
     checkUserIsProjectLeader, 
     getDailyScrumInToday, 
-    goOutUserInProject
+    goOutUserInProject,
+    getUsersBacklogs
 } from '../../api/projectApi';
 import {useUserStore} from '../../store/useUserStore';
 import {PieChart} from 'react-minimal-pie-chart';
@@ -17,6 +17,7 @@ import W1H1Panel from "../panels/W1H1Panel";
 import {FiSettings, FiLogOut} from 'react-icons/fi';
 import W2H1Panel from "../panels/W2H1Panel";
 import LargeBoardDailyScrumModal from '../modals/board/LargeBoardDailyScrumModal';
+import LargeBoardBacklogModal from '../modals/board/LargeBoardBacklogModal';
 import SmallInfoModal from '../modals/info/SmallInfoModal';
 import SmallFormModal from '../modals/form/SmallFormModal';
 
@@ -30,6 +31,9 @@ const SprintPage = () => {
     const [todayDailyScrums, setTodayDailyScrums] = useState([]);
     const [selectedDailyScrum, setSelectedDailyScrum] = useState(null);
     const [isDailyScrumModalOpen, setIsDailyScrumModalOpen] = useState(false);
+    
+    const [selectedBacklog, setSelectedBacklog] = useState(null);
+    const [isBacklogModalOpen, setIsBacklogModalOpen] = useState(false);
     
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
     const [infoModal, setInfoModal] = useState({
@@ -52,10 +56,12 @@ const SprintPage = () => {
     useEffect(() => {
         const fetchBacklogs = async () => {
             try {
-                const data = await getProductBacklogList(projectId);
+                const token = localStorage.getItem('accessToken');
+                const data = await getUsersBacklogs(projectId, token);
                 setBacklogs(data);
             } catch (err) {
-                console.error('Error fetching backlogs:', err);
+                console.error('사용자 백로그 목록을 불러오는데 실패했습니다:', err);
+                setBacklogs([]);
             }
         };
 
@@ -84,6 +90,13 @@ const SprintPage = () => {
         setIsDailyScrumModalOpen(true);
     };
     
+    const handleBacklogClick = (backlogId) => {
+        console.log('백로그 클릭:', backlogId);
+        const backlog = backlogs.find(item => item.backlogId === backlogId);
+        setSelectedBacklog(backlog);
+        setIsBacklogModalOpen(true);
+    };
+    
     const handleDailyScrumModalClose = () => {
         setIsDailyScrumModalOpen(false);
         fetchTodayDailyScrums();
@@ -91,6 +104,33 @@ const SprintPage = () => {
     
     const handleDailyScrumModalSubmit = () => {
         fetchTodayDailyScrums();
+    };
+    
+    const handleBacklogModalClose = () => {
+        setIsBacklogModalOpen(false);
+        const fetchBacklogs = async () => {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const data = await getUsersBacklogs(projectId, token);
+                setBacklogs(data);
+            } catch (err) {
+                console.error('사용자 백로그 목록을 불러오는데 실패했습니다:', err);
+            }
+        };
+        fetchBacklogs();
+    };
+    
+    const handleBacklogModalSubmit = () => {
+        const fetchBacklogs = async () => {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const data = await getUsersBacklogs(projectId, token);
+                setBacklogs(data);
+            } catch (err) {
+                console.error('사용자 백로그 목록을 불러오는데 실패했습니다:', err);
+            }
+        };
+        fetchBacklogs();
     };
     
     const handleLeaveClick = () => {
@@ -191,11 +231,17 @@ const SprintPage = () => {
                                 key={backlog.backlogId}
                                 backlogId={backlog.backlogId}
                                 sprintOrder={backlog.sprintOrder}
-                                backlogName={backlog.backlogName}
+                                backlogName={backlog.title || backlog.backlogName}
                                 weight={backlog.weight}
                                 isFinished={backlog.isFinished}
+                                onClick={() => handleBacklogClick(backlog.backlogId)}
                             />
                         ))}
+                        {backlogs.length === 0 && (
+                            <div className="text-center py-4 text-gray-500">
+                                담당하는 백로그가 없습니다.
+                            </div>
+                        )}
                     </div>
                 </W2H1Panel>
             </PanelBox>
@@ -207,6 +253,16 @@ const SprintPage = () => {
                 projectId={projectId}
                 sprintId={selectedDailyScrum?.sprintId}
                 onSubmit={handleDailyScrumModalSubmit}
+            />
+            
+            <LargeBoardBacklogModal
+                isOpen={isBacklogModalOpen}
+                onClose={handleBacklogModalClose}
+                backlog={selectedBacklog}
+                projectId={projectId}
+                sprintId={selectedBacklog?.sprintId}
+                backlogId={selectedBacklog?.backlogId}
+                onSubmit={handleBacklogModalSubmit}
             />
             
             <SmallFormModal

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {FiEdit2} from 'react-icons/fi';
+import {FiEdit2, FiCheck, FiCircle} from 'react-icons/fi';
 import SmallFormModal from '../form/SmallFormModal';
 import LargeBoardModal from "./LargeBoardModal";
 import WeightIndicator from '../../common/WeightIndicator';
@@ -23,7 +23,8 @@ import {
     deleteIssue,
     getBacklogComments,
     createBacklogComment,
-    deleteBacklogComment
+    deleteBacklogComment,
+    updateBacklogFinished
 } from '../../../api/projectApi';
 import UserAttendanceContainer from '../../containers/UserAttendanceContainer';
 import BacklogTaskContainer from '../../containers/BacklogTaskContainer';
@@ -50,6 +51,7 @@ const LargeBoardBacklogModal = ({
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [projectUsers, setProjectUsers] = useState([]);
+    const [finished, setFinished] = useState(false);
 
     // 모달 상태
     const [isBacklogEditModalOpen, setIsBacklogEditModalOpen] = useState(false);
@@ -70,6 +72,7 @@ const LargeBoardBacklogModal = ({
             setDescription(backlog.description || '');
             setWeight(backlog.weight || 1);
             setComments(backlog.comments || []);
+            setFinished(backlog.isFinished || false);
 
             // 프로젝트 유저 로드
             if (projectId) {
@@ -93,6 +96,7 @@ const LargeBoardBacklogModal = ({
             setTasks([]);
             setIssues([]);
             setComments([]);
+            setFinished(false);
         }
     }, [backlog, isOpen, projectId, sprintId, backlogId]);
 
@@ -108,9 +112,35 @@ const LargeBoardBacklogModal = ({
             if (onSubmit) {
                 onSubmit({
                     title,
-                    weight
+                    weight,
+                    isFinished: finished
                 });
             }
+        }
+    };
+
+    // 백로그 완료 상태 토글
+    const handleToggleBacklogFinished = async () => {
+        if (!backlogId) return;
+        
+        try {
+            // API 호출
+            let newFinished = await updateBacklogFinished(backlogId, finished);
+            
+            // 상태 업데이트
+            setFinished(newFinished);
+            
+            // 부모 컴포넌트에 변경 알림
+            if (onSubmit) {
+                onSubmit({
+                    title,
+                    weight,
+                    isFinished: newFinished
+                });
+            }
+        } catch (error) {
+            console.error('백로그 완료 상태 업데이트 실패:', error);
+        } finally {
         }
     };
 
@@ -236,10 +266,11 @@ const LargeBoardBacklogModal = ({
             if (!task) return;
             
             // API 호출하여 서버에 상태 업데이트
-            await updateTaskChecked(projectId, sprintId, backlogId, taskId, task.isChecked);
+            await updateTaskChecked(projectId, sprintId, backlogId, taskId, !task.isChecked);
             
             await fetchBacklogTasks(projectId, sprintId, backlogId);
         } catch (error) {
+            console.error('태스크 상태 변경 실패:', error);
             // 실패 시 원래 상태로 되돌리기
             await fetchBacklogTasks(projectId, sprintId, backlogId);
         }
@@ -298,11 +329,11 @@ const LargeBoardBacklogModal = ({
             if (!issue) return;
             
             // API 호출하여 서버에 상태 업데이트
-            await updateIssueChecked(projectId, sprintId, backlogId, issueId, issue.isChecked);
+            await updateIssueChecked(projectId, sprintId, backlogId, issueId, !issue.isChecked);
 
             await fetchBacklogIssues(projectId, sprintId, backlogId);
         } catch (error) {
-            
+            console.error('이슈 상태 변경 실패:', error);
             // API 호출 실패 시 원래 상태로 되돌리기
             fetchBacklogIssues(projectId, sprintId, backlogId);
         }
@@ -401,7 +432,8 @@ const LargeBoardBacklogModal = ({
                 onSubmit({
                     title: data.title,
                     weight: data.weight,
-                    description
+                    description,
+                    isFinished: finished
                 });
             }
         } catch (error) {
@@ -476,6 +508,11 @@ const LargeBoardBacklogModal = ({
         setComments(comments.filter(comment => comment.backlogCommentId !== commentId));
     };
 
+    // 완료 상태에 따라 모달 스타일 클래스 결정
+    const modalHeaderClass = finished
+        ? "bg-gray-100"
+        : "bg-blue-100";
+
     return (
         <>
             <LargeBoardModal
@@ -500,6 +537,33 @@ const LargeBoardBacklogModal = ({
                         </button>
                     </div>
                 }
+                extraHeaderContent={
+                    backlog && (
+                        <div className="flex items-center gap-2 mr-3">
+                            <button
+                                onClick={handleToggleBacklogFinished}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                                    finished
+                                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-200'
+                                        : 'bg-blue-200 text-blue-700 hover:bg-blue-200'
+                                }`}
+                            >
+                                {finished ? (
+                                    <>
+                                        <FiCheck className="text-gray-600" />
+                                        <span>완료</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiCircle className="text-blue-500" />
+                                        <span>진행중</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )
+                }
+                customHeaderClass={modalHeaderClass}
             >
                 {/* 연관 팀원 - 3/20 비율 */}
                 <UserAttendanceContainer
@@ -513,7 +577,7 @@ const LargeBoardBacklogModal = ({
                 <p className="p-2"/>
 
                 {/* Task 와 Issue 를 한 행에 배치 - 10/20 비율 */}
-                <div className="grid grid-cols-2 gap-4  h-[calc(100%-380px)]">
+                <div className="grid grid-cols-2 gap-4 h-[calc(100%-380px)]">
                     {/* Task */}
                     <BacklogTaskContainer
                         tasks={tasks}

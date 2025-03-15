@@ -32,13 +32,15 @@ const customStyles = {
  * @param {string} title
  * @param children
  * @param extraHeaderContent
+ * @param customHeaderClass
  */
 const LargeBoardModal = ({
     isOpen, 
     onClose, 
     title,
     children,
-    extraHeaderContent
+    extraHeaderContent,
+    customHeaderClass = 'border-gray-200 bg-white'
 }) => {
     return (
         <Modal
@@ -47,8 +49,8 @@ const LargeBoardModal = ({
             style={customStyles}
             contentLabel="Large Board Modal"
         >
-            <div className="h-full flex flex-col">
-                <div className="flex justify-between items-center p-4 border-b border-gray-200">
+            <div className="h-full flex flex-col relative">
+                <div className={`flex justify-between items-center p-4 border-b ${customHeaderClass}`}>
                     <h2 className="text-xl font-semibold">
                         {title}
                     </h2>
