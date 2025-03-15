@@ -15,7 +15,7 @@ import {
     getTasksInBacklog,
     updateTaskContent,
     updateTaskChecked,
-    deleteTask,
+    deleteTask, 
     getIssuesInBacklog,
     addIssueToBacklog,
     updateIssueChecked,
@@ -41,7 +41,6 @@ const LargeBoardBacklogModal = ({
                                     backlogId,
                                     onSubmit
                                 }) => {
-    // 상태 관리
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [weight, setWeight] = useState(1);
@@ -64,9 +63,8 @@ const LargeBoardBacklogModal = ({
     const [isTaskEditModalOpen, setIsTaskEditModalOpen] = useState(false);
     const [editingTask, setEditingTask] = useState({ id: null, content: '' });
 
-    // 백로그 데이터 로드
+    // 데이터 로드
     useEffect(() => {
-        console.log(`backlog=${JSON.stringify(backlog)}`)
         if (backlog) {
             setTitle(backlog.title || '');
             setDescription(backlog.description || '');
@@ -88,7 +86,6 @@ const LargeBoardBacklogModal = ({
                 fetchBacklogComments(projectId, sprintId, backlogId);
             }
         } else {
-            // 새 백로그 생성 시 초기화
             setTitle('');
             setDescription('');
             setWeight(1);

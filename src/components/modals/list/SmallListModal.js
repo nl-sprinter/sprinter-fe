@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 const customStyles = {
     overlay: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        zIndex: 1000
+        zIndex: 1200
     },
     content: {
         top: '50%',
@@ -40,9 +40,13 @@ const SmallListModal = ({
     onItemSelect,
     renderItem
 }) => {
+    
     const handleItemClick = (item) => {
         onItemSelect && onItemSelect(item);
-        onClose();
+    };
+    
+    const handleClose = (e) => {
+        if (onClose) onClose(e);
     };
 
     // 기본 항목 렌더링 함수
@@ -59,7 +63,7 @@ const SmallListModal = ({
     return (
         <Modal
             isOpen={isOpen}
-            onRequestClose={onClose}
+            onRequestClose={handleClose}
             style={customStyles}
             contentLabel="List Modal"
             ariaHideApp={false}
