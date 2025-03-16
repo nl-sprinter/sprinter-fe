@@ -476,37 +476,43 @@ export const offLikeToBacklogComment = async (projectId, sprintId, backlogId, ba
 
 // 캘린더 내 Sprint + Schedule 조회
 export const getMySchedule = async (projectId, userId, year, month) => {
-    const response = await axiosInstance.get(`/projects/${projectId}/calendar/users/${userId}?year=${year}&month=${month}`);
-    console.log(`[API] projectApi.getMySchedule 호출, data=${JSON.stringify(response.data)}`);
-    return response.data;
+    try {
+        const response = await axiosInstance.get(`/projects/${projectId}/schedule/users/${userId}?year=${year}&month=${month}`);
+        console.log(`[API] projectApi.getMySchedule 호출, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.log(`[API] projectApi.getMySchedule 호출 error = ${error.message}`);
+    }
+
 }
 
 // 캘린더 내 Schedule 생성
 export const addMySchedule = async (scheduleAddRequest, projectId) => {
-    const response = await axiosInstance.post(`/projects/${projectId}/calendar`, scheduleAddRequest);
+    const response = await axiosInstance.post(`/projects/${projectId}/schedule`, scheduleAddRequest);
     console.log(`[API] projectApi.addMySchedule 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 }
 // Schedule 생성 dto
 /**
  * @Getter
-public class ScheduleAddRequest {
+
+@Getter
+public class ScheduleRequest {
+
     List<Long> userId;
-    //제목
+
     String title;
-    //종일여부
+
     Boolean isAllDay;
-    //시작
     LocalDateTime startTime;
-    //종료
     LocalDateTime endTime;
-    //알림여부
-    Boolean isAlarmOn;
-    //알림 전 시간
-    Integer preNotificationTime;
-    //일정색상
+
+    Boolean notified;
+    Integer preNotificationHours;
+
     ScheduleColor color;
 }
+
 
 public enum ScheduleColor {
     RED, ORANGE , YELLOW, GREEN, BLUE, NAVY , PURPLE;

@@ -1,23 +1,22 @@
 import MainLayout from '../layouts/MainLayout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import PageTitle from '../common/PageTitle';
 import PanelBox from '../layouts/PanelBox';
-import W3H2Panel from '../panels/W3H2Panel';
 import { IoMdAdd } from 'react-icons/io';
-import { IoChevronBack, IoChevronForward, IoToday } from 'react-icons/io5';
 import MiddleFormScheduleCreateEditModal from '../modals/form/MiddleFormScheduleCreateEditModal';
 import { getMySchedule, addMySchedule } from '../../api/projectApi';
 import { useUserStore } from '../../store/useUserStore';
 import {MyScheduleContainer} from "../containers/MyScheduleContainer";
 import W2H2Panel from "../panels/W2H2Panel";
 import W1H2Panel from "../panels/W1H2Panel";
+import {CalendarContainer} from "../containers/CalendarContainer";
 
 const CalendarPage = () => {
     // URL에서 projectId 가져오기
     const { projectId } = useParams();
-    const user = useUserStore(state => state.user); // 사용자 정보 직접 가져오기
-    console.log(JSON.stringify(user));
+    const { user, fetchUserInfo } = useUserStore();
+    console.log(`user=${JSON.stringify(user)}`);
 
     // 캘린더 상태
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -27,8 +26,9 @@ const CalendarPage = () => {
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-    // 일정 조회 함수
-    const fetchSchedules = async () => {
+    // useCallback으로 fetchSchedules 함수 메모이제이션
+    const fetchSchedules = useCallback(async () => {
+        console.log("Fetch Schedules 호출됨");
         try {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth() + 1; // JavaScript는 0부터 시작하므로 +1
@@ -41,17 +41,27 @@ const CalendarPage = () => {
             console.log(`일정 조회 요청: projectId=${projectId}, userId=${user.userId}, year=${year}, month=${month}`);
             const scheduleData = await getMySchedule(projectId, user.userId, year, month);
             console.log('일정 조회 결과:', scheduleData);
-            setSchedule(scheduleData);
+            
+            // API 응답이 null 또는 undefined인 경우 빈 배열로 처리
+            setSchedule(Array.isArray(scheduleData) ? scheduleData : []);
         } catch (error) {
             console.error('일정 조회 실패:', error);
+            setSchedule([]); // 오류 발생 시 빈 배열로 초기화
         }
-    };
+    }, [projectId, user, currentDate]);
 
     // 컴포넌트 마운트 시 일정 조회
     useEffect(() => {
         console.log('CalendarPage 마운트 또는 의존성 변경');
         fetchSchedules();
-    }, [projectId, user, currentDate]); // user 의존성 추가
+    }, [fetchSchedules]); // fetchSchedules만 의존성으로 추가
+
+    // 추가로 컴포넌트 마운트 시 한 번만 실행되는 useEffect 추가
+    useEffect(() => {
+        console.log('CalendarPage 최초 마운트');
+        fetchSchedules();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // 빈 의존성 배열로 컴포넌트 마운트 시 한 번만 실행
 
     // 일정 추가 모달 열기
     const openAddScheduleModal = async () => {
@@ -83,107 +93,19 @@ const CalendarPage = () => {
         fetchSchedules();
     };
 
-    // 달력 네비게이션 함수들
-    const goToPreviousMonth = () => {
-        setCurrentDate(prev => {
-            const newDate = new Date(prev);
-            newDate.setMonth(prev.getMonth() - 1);
-            return newDate;
-        });
-    };
-    
-    const goToNextMonth = () => {
-        setCurrentDate(prev => {
-            const newDate = new Date(prev);
-            newDate.setMonth(prev.getMonth() + 1);
-            return newDate;
-        });
-    };
-    
-    const goToToday = () => {
-        setCurrentDate(new Date());
-    };
-    
-    const changeYear = (year) => {
-        setCurrentDate(prev => {
-            const newDate = new Date(prev);
-            newDate.setFullYear(year);
-            return newDate;
-        });
-    };
-    
-    // 년도 리스트 생성 (현재 년도 기준 ±5년)
-    const generateYearOptions = () => {
-        const currentYear = new Date().getFullYear();
-        const years = [];
-        for (let i = currentYear - 5; i <= currentYear + 5; i++) {
-            years.push(i);
+    // 컴포넌트 마운트 시 사용자 정보 로드
+    useEffect(() => {
+        console.log('사용자 정보 로드 시작');
+        fetchUserInfo();
+    }, [fetchUserInfo]);
+
+    // user 정보가 로드된 후 일정 조회
+    useEffect(() => {
+        if (user) {
+            console.log('사용자 정보 로드 완료, 일정 조회 시작');
+            fetchSchedules();
         }
-        return years;
-    };
-
-    const getDaysInMonth = (date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        return new Date(year, month + 1, 0).getDate();
-    };
-
-    const getFirstDayOfMonth = (date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        return new Date(year, month, 1).getDay();
-    };
-
-    const renderCalendar = () => {
-        const daysInMonth = getDaysInMonth(currentDate);
-        const firstDay = getFirstDayOfMonth(currentDate);
-        const days = [];
-
-        // 이전 달의 날짜들
-        for (let i = 0; i < firstDay; i++) {
-            days.push(<div key={`empty-${i}`} className="p-2 text-gray-400" />)
-        }
-
-        // 현재 달의 날짜들 - 클릭 이벤트 제거
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-            const dateStr = dateObj.toISOString().split('T')[0];
-            const daySchedule = schedule.filter(schedule => schedule.date === dateStr);
-            
-            const isToday = new Date().getDate() === day && 
-                          new Date().getMonth() === currentDate.getMonth() &&
-                          new Date().getFullYear() === currentDate.getFullYear();
-
-            days.push(
-                <div 
-                    key={day} 
-                    className={`p-2 min-h-[80px] border-t border-l border-gray-100 ${isToday ? 'bg-green-50/30' : ''}`}
-                >
-                    <span className={`text-sm ${isToday ? 'text-green-600 font-medium' : 'text-gray-600'}`}>{day}</span>
-                    <div className="mt-1 space-y-1">
-                        {daySchedule.map((schedule) => (
-                            <div 
-                                key={schedule.id}
-                                className={`text-xs p-1.5 rounded-md cursor-pointer`}
-                                style={{ backgroundColor: schedule.color ? `${schedule.color}33` : '#EFF6FF', color: schedule.color || '#1D4ED8' }}
-                            >
-                                {schedule.title}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
-
-        return days;
-    };
-
-    // 현재 날짜가 이번 달에 있는지 확인
-    const isCurrentMonth = () => {
-        const today = new Date();
-        return today.getMonth() === currentDate.getMonth() && 
-               today.getFullYear() === currentDate.getFullYear();
-    };
+    }, [user, fetchSchedules]);
 
     return (
         <MainLayout showFunctions showSidebar>
@@ -201,61 +123,11 @@ const CalendarPage = () => {
                         </div>
                     }
                 >
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={goToPreviousMonth}
-                                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                                title="이전 달"
-                            >
-                                <IoChevronBack size={24}/>
-                            </button>
-
-                            <div className="flex items-center gap-2">
-                                <select
-                                    value={currentDate.getFullYear()}
-                                    onChange={(e) => changeYear(parseInt(e.target.value))}
-                                    className="bg-transparent border border-gray-200 rounded-md px-2 py-1 text-gray-700"
-                                >
-                                    {generateYearOptions().map(year => (
-                                        <option key={year} value={year}>{year}년</option>
-                                    ))}
-                                </select>
-                                <span className="text-lg font-medium">{currentDate.getMonth() + 1}월</span>
-                            </div>
-
-                            <button
-                                onClick={goToNextMonth}
-                                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                                title="다음 달"
-                            >
-                                <IoChevronForward size={24}/>
-                            </button>
-                        </div>
-
-                        <button
-                            onClick={goToToday}
-                            className={`px-3 py-1 rounded-lg text-sm flex items-center gap-1
-                                    ${isCurrentMonth() ? 'text-green-600' : 'bg-gray-100 hover:bg-gray-200 transition-colors'}`}
-                            disabled={isCurrentMonth()}
-                            title="오늘"
-                        >
-                            <IoToday size={16}/>
-                            오늘
-                        </button>
-                    </div>
-
-                    <div className="flex-1">
-                        <div className="grid grid-cols-7 border-r border-b border-gray-100">
-                            {['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                                <div key={day}
-                                     className="p-2 text-center font-medium text-gray-600 bg-gray-50/50 border-t border-l border-gray-100">
-                                    {day}
-                                </div>
-                            ))}
-                            {renderCalendar()}
-                        </div>
-                    </div>
+                    <CalendarContainer
+                        schedule={schedule}
+                        currentDate={currentDate}
+                        setCurrentDate={setCurrentDate}
+                    />
 
                 </W2H2Panel>
                 <W1H2Panel
