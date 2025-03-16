@@ -147,6 +147,7 @@ const BacklogCommentContainer = ({
 
     // 좋아요 버튼 렌더링 함수
     const renderLikeButton = (comment) => {
+        console.log(`aaaaaaaaasdasdasdcomment = ${JSON.stringify(comment)}`);
         console.log(`renderLikeButton comment.backlogCommentId=${comment.backlogCommentId}, comment.isLiked=${comment.isLiked}`);
 
         if (comment.isDeleted) return null;

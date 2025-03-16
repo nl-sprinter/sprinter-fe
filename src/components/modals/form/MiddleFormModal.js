@@ -30,7 +30,8 @@ const MiddleFormModal = ({
     submitText = '확인',
     cancelText = '취소',
     onSubmit,
-    isSubmitDisabled = false
+    isSubmitDisabled = false,
+    extraHeaderContent
 }) => {
     
     const handleClose = () => {
@@ -50,9 +51,12 @@ const MiddleFormModal = ({
             ariaHideApp={false}
         >
             <div className="flex flex-col h-full">
-                {/* 헤더 */}
-                <div className="bg-gray-50 p-4 border-b border-gray-200">
+                {/* 헤더 - 삭제 버튼 추가 */}
+                <div className="bg-gray-50 p-4 border-b border-gray-200 flex justify-between items-center">
                     <h2 className="text-xl font-medium text-gray-800">{title}</h2>
+                    <div className="flex items-center">
+                        {extraHeaderContent} {/* 추가 헤더 콘텐츠 렌더링 */}
+                    </div>
                 </div>
 
                 {/* 본문 */}

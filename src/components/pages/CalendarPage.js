@@ -1,5 +1,5 @@
 import MainLayout from '../layouts/MainLayout';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PageTitle from '../common/PageTitle';
 import PanelBox from '../layouts/PanelBox';
@@ -7,83 +7,72 @@ import W3H2Panel from '../panels/W3H2Panel';
 import { IoMdAdd } from 'react-icons/io';
 import { IoChevronBack, IoChevronForward, IoToday } from 'react-icons/io5';
 import MiddleFormScheduleCreateEditModal from '../modals/form/MiddleFormScheduleCreateEditModal';
-
-const ScheduleItem = ({ title, date, type, onClick }) => {
-    return (
-        <div 
-            className="flex items-center justify-between p-2 rounded-lg transition-all duration-300
-                border border-gray-200 relative overflow-hidden
-                border-l-4 border-l-green-500 hover:bg-green-50 cursor-pointer"
-            onClick={onClick}
-        >
-            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-green-50/80 to-transparent" />
-            <div className="flex flex-col gap-1 relative flex-1">
-                <span className="text-sm">{title}</span>
-                <span className="text-xs text-gray-500">{date}</span>
-            </div>
-            <span className={`px-2 py-1 rounded text-xs relative ${
-                type === 'sprint' 
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-blue-100 text-blue-700'
-            }`}>
-                {type === 'sprint' ? '스프린트' : '일정'}
-            </span>
-        </div>
-    );
-};
+import { getMySchedule, addMySchedule } from '../../api/projectApi';
+import { useUserStore } from '../../store/useUserStore';
+import {MyScheduleContainer} from "../containers/MyScheduleContainer";
+import W2H2Panel from "../panels/W2H2Panel";
+import W1H2Panel from "../panels/W1H2Panel";
 
 const CalendarPage = () => {
     // URL에서 projectId 가져오기
     const { projectId } = useParams();
+    const user = useUserStore(state => state.user); // 사용자 정보 직접 가져오기
+    console.log(JSON.stringify(user));
 
     // 캘린더 상태
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [events, setEvents] = useState([
-        {
-            id: 1,
-            date: '2024-03-15',
-            title: '더미일정1',
-            type: 'sprint',
-            color: '#4ADE80'
-        },
-        {
-            id: 2,
-            date: '2024-03-16',
-            title: '더미일정2',
-            type: 'sprint',
-            color: '#4ADE80'
-        },
-        {
-            id: 3,
-            date: '2024-03-20',
-            title: '더미일정3',
-            type: 'meeting',
-            color: '#60A5FA'
-        }
-    ]);
+    const [schedule, setSchedule] = useState([]);
     
     // 선택된 이벤트 상태
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+    // 일정 조회 함수
     const fetchSchedules = async () => {
+        try {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1; // JavaScript는 0부터 시작하므로 +1
+            
+            if (!projectId || !user?.userId) {
+                console.log('프로젝트 ID 또는 사용자 ID가 없습니다:', { projectId, userId: user?.userId });
+                return;
+            }
+            
+            console.log(`일정 조회 요청: projectId=${projectId}, userId=${user.userId}, year=${year}, month=${month}`);
+            const scheduleData = await getMySchedule(projectId, user.userId, year, month);
+            console.log('일정 조회 결과:', scheduleData);
+            setSchedule(scheduleData);
+        } catch (error) {
+            console.error('일정 조회 실패:', error);
+        }
+    };
 
-    }
-
+    // 컴포넌트 마운트 시 일정 조회
+    useEffect(() => {
+        console.log('CalendarPage 마운트 또는 의존성 변경');
+        fetchSchedules();
+    }, [projectId, user, currentDate]); // user 의존성 추가
 
     // 일정 추가 모달 열기
-    const openAddEventModal = async () => {
+    const openAddScheduleModal = async () => {
         setSelectedSchedule(null);
         setIsAddModalOpen(true);
     };
     
     // 일정 추가/편집 처리
-    const handleAddEditEvent = (scheduleData) => {
-        // api 호출
-        console.log('[debug] CalendarPage - handleAddEditEvent 호출됨', scheduleData);
-        
-        // 모달 닫기
-        setIsAddModalOpen(false);
+    const handleAddEditSchedule = async (scheduleData) => {
+        try {
+            // API 호출
+            await addMySchedule(scheduleData, projectId);
+            
+            // 모달 닫기
+            setIsAddModalOpen(false);
+            
+            // 일정 목록 새로고침
+            fetchSchedules();
+        } catch (error) {
+            console.error('일정 추가 실패:', error);
+        }
     };
 
     // 모달 닫기 함수 수정
@@ -159,7 +148,7 @@ const CalendarPage = () => {
         for (let day = 1; day <= daysInMonth; day++) {
             const dateObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
             const dateStr = dateObj.toISOString().split('T')[0];
-            const dayEvents = events.filter(event => event.date === dateStr);
+            const daySchedule = schedule.filter(schedule => schedule.date === dateStr);
             
             const isToday = new Date().getDate() === day && 
                           new Date().getMonth() === currentDate.getMonth() &&
@@ -172,7 +161,7 @@ const CalendarPage = () => {
                 >
                     <span className={`text-sm ${isToday ? 'text-green-600 font-medium' : 'text-gray-600'}`}>{day}</span>
                     <div className="mt-1 space-y-1">
-                        {dayEvents.map((schedule) => (
+                        {daySchedule.map((schedule) => (
                             <div 
                                 key={schedule.id}
                                 className={`text-xs p-1.5 rounded-md cursor-pointer`}
@@ -201,105 +190,96 @@ const CalendarPage = () => {
             <PageTitle 
                 title="캘린더" 
                 description="프로젝트의 주요 일정을 확인할 수 있습니다."
-                rightContent={
-                    <button 
-                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-1"
-                        onClick={() => openAddEventModal()}
-                    >
-                        <IoMdAdd size={20} />
-                        일정 추가
-                    </button>
-                }
             />
-            
+
             <PanelBox>
-                <W3H2Panel
-                    title={
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <button 
-                                    onClick={goToPreviousMonth}
-                                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                                    title="이전 달"
-                                >
-                                    <IoChevronBack size={24} />
-                                </button>
-                                
-                                <div className="flex items-center gap-2">
-                                    <select 
-                                        value={currentDate.getFullYear()} 
-                                        onChange={(e) => changeYear(parseInt(e.target.value))}
-                                        className="bg-transparent border border-gray-200 rounded-md px-2 py-1 text-gray-700"
-                                    >
-                                        {generateYearOptions().map(year => (
-                                            <option key={year} value={year}>{year}년</option>
-                                        ))}
-                                    </select>
-                                    <span className="text-lg font-medium">{currentDate.getMonth() + 1}월</span>
-                                </div>
-                                
-                                <button 
-                                    onClick={goToNextMonth}
-                                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                                    title="다음 달"
-                                >
-                                    <IoChevronForward size={24} />
-                                </button>
-                            </div>
-                            
-                            <button 
-                                onClick={goToToday}
-                                className={`px-3 py-1 rounded-lg text-sm flex items-center gap-1
-                                    ${isCurrentMonth() ? 'text-green-600' : 'bg-gray-100 hover:bg-gray-200 transition-colors'}`}
-                                disabled={isCurrentMonth()}
-                                title="오늘"
-                            >
-                                <IoToday size={16} />
-                                오늘
-                            </button>
+                <W2H2Panel
+                    title={'달력'}
+                    headerRight={
+                        <div className="w-8 h-8 opacity-0">
+                            <IoMdAdd size={20} />
                         </div>
                     }
                 >
-                    <div className="flex h-full gap-6">
-                        <div className="flex-1">
-                            <div className="grid grid-cols-7 border-r border-b border-gray-100">
-                                {['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                                    <div key={day} className="p-2 text-center font-medium text-gray-600 bg-gray-50/50 border-t border-l border-gray-100">
-                                        {day}
-                                    </div>
-                                ))}
-                                {renderCalendar()}
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={goToPreviousMonth}
+                                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                                title="이전 달"
+                            >
+                                <IoChevronBack size={24}/>
+                            </button>
+
+                            <div className="flex items-center gap-2">
+                                <select
+                                    value={currentDate.getFullYear()}
+                                    onChange={(e) => changeYear(parseInt(e.target.value))}
+                                    className="bg-transparent border border-gray-200 rounded-md px-2 py-1 text-gray-700"
+                                >
+                                    {generateYearOptions().map(year => (
+                                        <option key={year} value={year}>{year}년</option>
+                                    ))}
+                                </select>
+                                <span className="text-lg font-medium">{currentDate.getMonth() + 1}월</span>
                             </div>
+
+                            <button
+                                onClick={goToNextMonth}
+                                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                                title="다음 달"
+                            >
+                                <IoChevronForward size={24}/>
+                            </button>
                         </div>
-                        <div className="w-80">
-                            <h3 className="text-lg font-medium mb-4">My Schedule</h3>
-                            <div className="space-y-2">
-                                {events.map((event) => (
-                                    <ScheduleItem
-                                        key={event.id}
-                                        title={event.title}
-                                        date={event.date}
-                                        type={event.type}
-                                    />
-                                ))}
-                                {events.length === 0 && (
-                                    <div className="text-center py-6 text-gray-500">
-                                        등록된 일정이 없습니다
-                                    </div>
-                                )}
-                            </div>
+
+                        <button
+                            onClick={goToToday}
+                            className={`px-3 py-1 rounded-lg text-sm flex items-center gap-1
+                                    ${isCurrentMonth() ? 'text-green-600' : 'bg-gray-100 hover:bg-gray-200 transition-colors'}`}
+                            disabled={isCurrentMonth()}
+                            title="오늘"
+                        >
+                            <IoToday size={16}/>
+                            오늘
+                        </button>
+                    </div>
+
+                    <div className="flex-1">
+                        <div className="grid grid-cols-7 border-r border-b border-gray-100">
+                            {['일', '월', '화', '수', '목', '금', '토'].map(day => (
+                                <div key={day}
+                                     className="p-2 text-center font-medium text-gray-600 bg-gray-50/50 border-t border-l border-gray-100">
+                                    {day}
+                                </div>
+                            ))}
+                            {renderCalendar()}
                         </div>
                     </div>
-                </W3H2Panel>
+
+                </W2H2Panel>
+                <W1H2Panel
+                    headerRight={
+                        <button
+                            className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                            onClick={() => openAddScheduleModal()}
+                        >
+                            <IoMdAdd size={20} />
+                        </button>
+                    }
+                    title={'내 스케줄'}
+                >
+                    <MyScheduleContainer schedule={schedule}/>
+                </W1H2Panel>
             </PanelBox>
-            
+
             {/* 일정 추가/편집 모달 수정 */}
             <MiddleFormScheduleCreateEditModal
                 isOpen={isAddModalOpen}
                 onClose={handleCloseModal}
                 projectId={projectId}
                 schedule={selectedSchedule}
-                onSubmit={handleAddEditEvent}
+                onSubmit={handleAddEditSchedule}
             />
         </MainLayout>
     );

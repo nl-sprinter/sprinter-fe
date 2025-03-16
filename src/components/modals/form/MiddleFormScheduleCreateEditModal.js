@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import MiddleFormModal from './MiddleFormModal';
 import UserAttendanceContainer from "../../containers/UserAttendanceContainer";
 import { getUsersInProject } from '../../../api/projectApi';
+import { FiTrash2 } from 'react-icons/fi';
 
 // 모던한 라디오 버튼 컴포넌트
 const ModernRadioGroup = ({ options, value, onChange, name }) => {
@@ -80,8 +81,6 @@ const MiddleFormScheduleCreateEditModal = ({
         notifyHours: 3,
         color: '#F87171',
     });
-
-
 
     // 데이터 로드
     useEffect(() => {
@@ -173,17 +172,38 @@ const MiddleFormScheduleCreateEditModal = ({
         setAssignedUsers(prev => prev.filter(u => u.userId !== user.userId));
     };
     
-    // 폼 제출 처리
+    // 폼 제출 처리 수정
     const handleSubmit = () => {
-        // 알림 시간 계산
-        const notifyTime = formData.notifyBefore ? formData.notifyHours : 0;
+        // 날짜 및 시간 포맷팅
+        const startDateTime = formData.isAllDay 
+            ? `${formData.startDate}T00:00:00` 
+            : `${formData.startDate}T${formData.startTime}:00`;
             
+        const endDateTime = formData.isAllDay 
+            ? `${formData.endDate}T23:59:59` 
+            : `${formData.endDate}T${formData.endTime}:00`;
+        
+        // 색상 enum 변환
+        const colorMap = {
+            '#F87171': 'RED',
+            '#FB923C': 'ORANGE',
+            '#FBBF24': 'YELLOW',
+            '#4ADE80': 'GREEN',
+            '#60A5FA': 'BLUE',
+            '#818CF8': 'NAVY',
+            '#C084FC': 'PURPLE'
+        };
+        
         // 데이터 준비 및 제출
         const eventData = {
-            ...formData,
-            date: formData.startDate,
-            attendees: assignedUsers,
-            notifyTime
+            userId: assignedUsers.map(user => user.userId),
+            title: formData.title,
+            isAllDay: formData.isAllDay,
+            startTime: startDateTime,
+            endTime: endDateTime,
+            isAlarmOn: formData.notifyBefore,
+            preNotificationTime: formData.notifyBefore ? formData.notifyHours : 0,
+            color: colorMap[formData.color] || 'GREEN'
         };
         
         // 부모 컴포넌트의 onSubmit 호출
@@ -199,6 +219,16 @@ const MiddleFormScheduleCreateEditModal = ({
             cancelText="취소"
             onSubmit={handleSubmit}
             isSubmitDisabled={!formData.title}
+            extraHeaderContent={
+                schedule && (
+                    <button
+                        className="mr-2 p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                        title="일정 삭제"
+                    >
+                        <FiTrash2 size={20} />
+                    </button>
+                )
+            }
         >
             {/* 참석자 선택 컴포넌트 */}
             <UserAttendanceContainer

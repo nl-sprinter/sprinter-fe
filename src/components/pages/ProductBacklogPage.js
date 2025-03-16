@@ -7,7 +7,7 @@ import ProductBacklogModal from '../modals/ProductBacklogModal';
 import SideScrollablePanelBox from '../layouts/SideScrollablePanelBox';
 import PageTitle from '../common/PageTitle';
 import BacklogCard from '../common/BacklogCard';
-import W1H2Panel from '../panels/W1H2Panel';
+import W1H2PanelForProductBacklog from '../panels/W1H2PanelForProductBacklog';
 
 const ProductBacklogPage = () => {
     const { projectId } = useParams();
@@ -56,7 +56,7 @@ const ProductBacklogPage = () => {
                         const sprintBacklogs = backlogs.filter(backlog => backlog.sprintOrder === sprint.sprintOrder);
                         
                         return (
-                            <W1H2Panel
+                            <W1H2PanelForProductBacklog
                                 key={sprint.sprintId}
                                 title={`Sprint ${sprint.sprintOrder} - ${sprint.sprintName}`}
                             >
@@ -79,7 +79,7 @@ const ProductBacklogPage = () => {
                                         </div>
                                     )}
                                 </div>
-                            </W1H2Panel>
+                            </W1H2PanelForProductBacklog>
                         );
                     })}
 
