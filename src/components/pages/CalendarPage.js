@@ -5,7 +5,13 @@ import PageTitle from '../common/PageTitle';
 import PanelBox from '../layouts/PanelBox';
 import { IoMdAdd } from 'react-icons/io';
 import MiddleFormScheduleCreateEditModal from '../modals/form/MiddleFormScheduleCreateEditModal';
-import { getMySchedule, addMySchedule } from '../../api/projectApi';
+import { 
+    getScheduleList, 
+    addSchedule, 
+    updateSchedule, 
+    deleteSchedule,
+    getScheduleByScheduleId 
+} from '../../api/projectApi';
 import { useUserStore } from '../../store/useUserStore';
 import {MyScheduleContainer} from "../containers/MyScheduleContainer";
 import W2H2Panel from "../panels/W2H2Panel";
@@ -32,16 +38,9 @@ const CalendarPage = () => {
         try {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth() + 1; // JavaScript는 0부터 시작하므로 +1
-            
-            if (!projectId || !user?.userId) {
-                console.log('프로젝트 ID 또는 사용자 ID가 없습니다:', { projectId, userId: user?.userId });
-                return;
-            }
-            
-            console.log(`일정 조회 요청: projectId=${projectId}, userId=${user.userId}, year=${year}, month=${month}`);
-            const scheduleData = await getMySchedule(projectId, user.userId, year, month);
-            console.log('일정 조회 결과:', scheduleData);
-            
+            console.log(`year = ${year}, month = ${month}`);
+            const scheduleData = await getScheduleList(projectId, year, month);
+
             // API 응답이 null 또는 undefined인 경우 빈 배열로 처리
             setSchedule(Array.isArray(scheduleData) ? scheduleData : []);
         } catch (error) {
@@ -69,11 +68,41 @@ const CalendarPage = () => {
         setIsAddModalOpen(true);
     };
     
-    // 일정 추가/편집 처리
+    // 스케줄 클릭 처리 - 단일 스케줄 조회 API 호출 추가
+    const handleScheduleClick = async (schedule) => {
+        try {
+            // API를 통해 상세 정보 조회
+            console.log(`스케줄 ID ${schedule.id} 상세 정보 조회 중...`);
+            const detailedSchedule = await getScheduleByScheduleId(schedule.id);
+            console.log('스케줄 상세 정보:', detailedSchedule);
+            
+            // 조회된 상세 정보에 ID 추가 (API에서 ID를 반환하지 않는 경우)
+            const completeSchedule = {
+                ...detailedSchedule,
+                id: schedule.id
+            };
+            
+            // 상세 정보를 상태에 저장하고 모달 열기
+            setSelectedSchedule(completeSchedule);
+            setIsAddModalOpen(true);
+        } catch (error) {
+            console.error('스케줄 상세 정보 조회 실패:', error);
+            // 오류 발생 시 기본 정보로 모달 열기
+            setSelectedSchedule(schedule);
+            setIsAddModalOpen(true);
+        }
+    };
+    
+    // 스케줄 수정 처리
     const handleAddEditSchedule = async (scheduleData) => {
         try {
-            // API 호출
-            await addMySchedule(scheduleData, projectId);
+            if (selectedSchedule) {
+                // 수정 모드
+                await updateSchedule(projectId, selectedSchedule.id, scheduleData);
+            } else {
+                // 추가 모드
+                await addSchedule(scheduleData, projectId);
+            }
             
             // 모달 닫기
             setIsAddModalOpen(false);
@@ -81,13 +110,29 @@ const CalendarPage = () => {
             // 일정 목록 새로고침
             fetchSchedules();
         } catch (error) {
-            console.error('일정 추가 실패:', error);
+            console.error('일정 저장 실패:', error);
+        }
+    };
+    
+    // 스케줄 삭제 처리
+    const handleDeleteSchedule = async () => {
+        if (!selectedSchedule) return;
+        
+        try {
+            await deleteSchedule(projectId, selectedSchedule.id);
+            
+            // 모달 닫기
+            setIsAddModalOpen(false);
+            
+            // 일정 목록 새로고침
+            fetchSchedules();
+        } catch (error) {
+            console.error('일정 삭제 실패:', error);
         }
     };
 
     // 모달 닫기 함수 수정
     const handleCloseModal = () => {
-        console.log('[debug] CalendarPage - handleCloseModal 호출됨');
         setIsAddModalOpen(false);
         setSelectedSchedule(null); // 선택된 이벤트 초기화
         fetchSchedules();
@@ -102,7 +147,6 @@ const CalendarPage = () => {
     // user 정보가 로드된 후 일정 조회
     useEffect(() => {
         if (user) {
-            console.log('사용자 정보 로드 완료, 일정 조회 시작');
             fetchSchedules();
         }
     }, [user, fetchSchedules]);
@@ -141,7 +185,10 @@ const CalendarPage = () => {
                     }
                     title={'내 스케줄'}
                 >
-                    <MyScheduleContainer schedule={schedule}/>
+                    <MyScheduleContainer 
+                        schedule={schedule} 
+                        onScheduleClick={handleScheduleClick}
+                    />
                 </W1H2Panel>
             </PanelBox>
 
@@ -152,6 +199,7 @@ const CalendarPage = () => {
                 projectId={projectId}
                 schedule={selectedSchedule}
                 onSubmit={handleAddEditSchedule}
+                onDelete={handleDeleteSchedule}
             />
         </MainLayout>
     );

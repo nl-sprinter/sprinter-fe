@@ -1,9 +1,19 @@
 import React from 'react';
 import {ScheduleCard} from "../common/ScheduleCard";
 
-export const MyScheduleContainer = ({ schedule = [] }) => {
+export const MyScheduleContainer = ({ schedule = [], onScheduleClick }) => {
 
     console.log(`MyScheduleContainer  -  schedule = ${JSON.stringify(schedule)}`);
+
+    // 스케줄 클릭 핸들러 - SPRINT 타입인 경우 무시
+    const handleScheduleClick = (schedule) => {
+        // SPRINT 타입이면 클릭 이벤트를 처리하지 않음
+        if (schedule.scheduleType === 'SPRINT') {
+            return;
+        }
+        // 일반 일정인 경우에만 클릭 이벤트 처리
+        onScheduleClick(schedule);
+    };
 
     return (
         <div className="w-full">
@@ -13,6 +23,7 @@ export const MyScheduleContainer = ({ schedule = [] }) => {
                         <ScheduleCard 
                             key={schedule.id} 
                             schedule={schedule} 
+                            onClick={() => handleScheduleClick(schedule)}
                         />
                     ))
                 ) : (
@@ -23,5 +34,4 @@ export const MyScheduleContainer = ({ schedule = [] }) => {
             </div>
         </div>
     );
-
 }

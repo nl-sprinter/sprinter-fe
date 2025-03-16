@@ -474,48 +474,47 @@ export const offLikeToBacklogComment = async (projectId, sprintId, backlogId, ba
 
 //////////////////// Schedule 관련 API ////////////////////
 
-// 캘린더 내 Sprint + Schedule 조회
-export const getMySchedule = async (projectId, userId, year, month) => {
+// 프로젝트 내 특정 년/월 Sprint + Schedule list 조회
+export const getScheduleList = async (projectId, year, month) => {
+    console.log()
     try {
-        const response = await axiosInstance.get(`/projects/${projectId}/schedule/users/${userId}?year=${year}&month=${month}`);
-        console.log(`[API] projectApi.getMySchedule 호출, data=${JSON.stringify(response.data)}`);
+        const response = await axiosInstance.get(`/projects/${projectId}/schedule?year=${year}&month=${month}`);
+        console.log(`[API] projectApi.getSchedule 호출, data=${JSON.stringify(response.data)}`);
         return response.data;
     } catch (error) {
-        console.log(`[API] projectApi.getMySchedule 호출 error = ${error.message}`);
+        console.log(`[API] projectApi.getSchedule 호출 error = ${error.message}`);
     }
 
 }
 
-// 캘린더 내 Schedule 생성
-export const addMySchedule = async (scheduleAddRequest, projectId) => {
-    const response = await axiosInstance.post(`/projects/${projectId}/schedule`, scheduleAddRequest);
-    console.log(`[API] projectApi.addMySchedule 호출, data=${JSON.stringify(response.data)}`);
+// scheduleId 로 Schedule 조회
+export const getScheduleByScheduleId = async (scheduleId) => {
+    const response = await axiosInstance.get(`/projects/0/schedule/${scheduleId}`);
+    console.log(`[API] projectApi.getScheduleByScheduleId 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 }
-// Schedule 생성 dto
-/**
- * @Getter
 
-@Getter
-public class ScheduleRequest {
-
-    List<Long> userId;
-
-    String title;
-
-    Boolean isAllDay;
-    LocalDateTime startTime;
-    LocalDateTime endTime;
-
-    Boolean notified;
-    Integer preNotificationHours;
-
-    ScheduleColor color;
+// 캘린더 내 Schedule 생성
+export const addSchedule = async (scheduleAddRequest, projectId) => {
+    try {
+        const response = await axiosInstance.post(`/projects/${projectId}/schedule`, scheduleAddRequest);
+        console.log(`[API] projectApi.addMySchedule 호출, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.log(`[API] projectApi.addSchedule 호출 error = ${error.message}`);
+    }
 }
 
-
-public enum ScheduleColor {
-    RED, ORANGE , YELLOW, GREEN, BLUE, NAVY , PURPLE;
+// Schedule 수정
+export const updateSchedule = async (projectId, scheduleId, scheduleRequest) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/schedule/${scheduleId}`, scheduleRequest);
+    console.log(`[API] projectApi.updateSchedule 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
 }
 
- */
+// Schedule 삭제
+export const deleteSchedule = async (projectId, scheduleId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/schedule/${scheduleId}`);
+    console.log(`[API] projectApi.deleteSchedule 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
