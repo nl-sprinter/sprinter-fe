@@ -233,6 +233,7 @@ const SprintPage = () => {
                                 sprintOrder={backlog.sprintOrder}
                                 backlogName={backlog.title || backlog.backlogName}
                                 weight={backlog.weight}
+                                completeRate={backlog.completeRate}
                                 isFinished={backlog.isFinished}
                                 onClick={() => handleBacklogClick(backlog.backlogId)}
                             />

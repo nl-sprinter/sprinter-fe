@@ -190,7 +190,7 @@ export const updateBacklog = async (projectId, sprintId, backlogId, title, weigh
     return response.data;
 }
 
-// Backlog 완료 토글
+// Backlog 완료 toggle
 export const updateBacklogFinished = async (backlogId, finish) => {
     const response = await axiosInstance.patch(`/projects/0/sprints/0/backlogs/${backlogId}/finish`, {
         finish: finish
@@ -345,9 +345,14 @@ export const getDailyScrumList = async (projectId, sprintId) => {
 
 // 오늘 날짜의 DailyScrum 조회
 export const getDailyScrumInToday = async (projectId) => {
-    const response = await axiosInstance.get(`/projects/${projectId}/sprints/0/dailyscrums/today`);
-    console.log(`[API] projectApi.getDailyScrumInToday 호출, data=${JSON.stringify(response.data)}`);
-    return response.data;
+    try {
+        const response = await axiosInstance.get(`/projects/${projectId}/sprints/0/dailyscrums/today`);
+        console.log(`[API] projectApi.getDailyScrumInToday 호출, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.log(`getDailyScrumInToday 예외터짐!ㅃ!! error=${error.message}`);
+    }
+
 }
 
 // Sprint 에 DailyScrum 생성
@@ -429,9 +434,6 @@ export const deleteDailyScrum = async (projectId, sprintId, dailyScrumId) => {
 //////////////////// Backlog Comment 관련 API ////////////////////
 // 백로그 댓글 조회
 export const getBacklogComments = async (projectId, sprintId, backlogId) => {
-    console.log(`projectId = ${projectId}`);
-    console.log(`sprintId = ${sprintId}`);
-    console.log(`backlogId = ${backlogId}`);
     const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments`);
     console.log(`[API] projectApi.getBacklogComments 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
@@ -452,5 +454,19 @@ export const createBacklogComment = async (projectId, sprintId, backlogId, paren
 export const deleteBacklogComment = async (projectId, sprintId, backlogId, backlogCommentId) => {
     const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments/${backlogCommentId}`);
     console.log(`[API] projectApi.deleteBacklogComment 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// 백로그 댓글 좋아요 누르기
+export const onLikeToBacklogComment = async (projectId, sprintId, backlogId, backlogCommentId) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments/${backlogCommentId}/likes`);
+    console.log(`[API] projectApi.onLikeToBacklogComment 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// 백로그 댓글 좋아요 취소
+export const offLikeToBacklogComment = async (projectId, sprintId, backlogId, backlogCommentId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments/${backlogCommentId}/likes`);
+    console.log(`[API] projectApi.offLikeToBacklogComment 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 }

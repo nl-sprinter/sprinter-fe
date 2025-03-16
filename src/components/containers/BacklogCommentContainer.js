@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FiCornerDownRight, FiX } from 'react-icons/fi';
+import { FiCornerDownRight, FiX, FiSend, FiTrash2, FiHeart } from 'react-icons/fi';
+import { FaHeart } from 'react-icons/fa';
 import { useUserStore } from '../../store/useUserStore'; // 유저 스토어 임포트
 
 /**
@@ -9,7 +10,6 @@ import { useUserStore } from '../../store/useUserStore'; // 유저 스토어 임
  * @param {function} onCommentChange - 댓글 내용 변경 함수
  * @param {function} onAddComment - 댓글 추가 함수
  * @param {function} onLikeComment - 댓글 좋아요 함수
- * @param {array} allUsers - 전체 사용자 목록
  * @param {string} title - 카드 제목
  * @param {function} onRemoveComment - 댓글 삭제 함수
  */
@@ -19,7 +19,6 @@ const BacklogCommentContainer = ({
     onCommentChange,
     onAddComment,
     onLikeComment,
-    allUsers = [],
     title = "댓글",
     onRemoveComment
 }) => {
@@ -33,15 +32,19 @@ const BacklogCommentContainer = ({
 
     // 댓글 데이터 처리 - 삭제된 부모 댓글에 대한 더미 부모 생성
     useEffect(() => {
-        const parentComments = comments.filter(comment => !comment.parentCommentId);
-        const childComments = comments.filter(comment => comment.parentCommentId);
+        // comments가 배열인지 확인하고, 아니면 빈 배열로 처리
+        const commentsArray = Array.isArray(comments) ? comments : [];
+        console.log('comments 타입:', typeof comments, 'Array.isArray(comments):', Array.isArray(comments));
+        
+        const parentComments = commentsArray.filter(comment => !comment.parentCommentId);
+        const childComments = commentsArray.filter(comment => comment.parentCommentId);
         
         // 삭제된 부모 댓글을 위한 더미 부모 목록
         const missingParentIds = new Set();
         
         // 존재하지 않는 부모 ID 수집
         childComments.forEach(child => {
-            const parentExists = comments.some(c => c.backlogCommentId === child.parentCommentId);
+            const parentExists = commentsArray.some(c => c.backlogCommentId === child.parentCommentId);
             if (!parentExists) {
                 missingParentIds.add(child.parentCommentId);
             }
@@ -54,7 +57,9 @@ const BacklogCommentContainer = ({
             nickname: "",
             createdDate: new Date().toISOString(),
             isDeleted: true, // 삭제된 댓글 표시를 위한 플래그
-            userId: null // 삭제된 댓글에는 userId가 없음
+            userId: null, // 삭제된 댓글에는 userId가 없음
+            likeCount: 0, // 삭제된 댓글에는 좋아요 수 0
+            isLiked: false // 삭제된 댓글은 좋아요 상태 아님
         }));
         
         // 실제 부모 댓글과 더미 부모 댓글 합치기
@@ -122,6 +127,57 @@ const BacklogCommentContainer = ({
         return currentUser.userId === comment.userId;
     };
 
+    // 댓글 제출 핸들러
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (newComment.trim()) {
+            onAddComment(newComment);
+        }
+    };
+    
+    // 댓글 삭제 핸들러
+    const handleRemove = (commentId) => {
+        onRemoveComment && onRemoveComment(commentId);
+    };
+    
+    // 좋아요 핸들러
+    const handleLike = (commentId, isLiked) => {
+        onLikeComment && onLikeComment(commentId, !isLiked);
+    };
+
+    // 좋아요 버튼 렌더링 함수
+    const renderLikeButton = (comment) => {
+        console.log(`renderLikeButton comment.backlogCommentId=${comment.backlogCommentId}, comment.isLiked=${comment.isLiked}`);
+
+        if (comment.isDeleted) return null;
+        
+        return (
+            <div className="flex items-center gap-1">
+                <button 
+                    onClick={() => handleLike(comment.backlogCommentId, comment.isLiked)}
+                    className={`p-1 rounded-full transition-all duration-200 ${
+                        comment.isLiked 
+                            ? 'text-red-500 hover:bg-red-50' 
+                            : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+                    }`}
+                >
+                    {comment.isLiked ? (
+                        <FaHeart size={14} className="fill-current" />
+                    ) : (
+                        <FiHeart size={14} className="stroke-current" />
+                    )}
+                </button>
+                {comment.likeCount > 0 && (
+                    <span className={`text-xs font-medium ${
+                        comment.isLiked ? 'text-red-500' : 'text-gray-500'
+                    }`}>
+                        {comment.likeCount}
+                    </span>
+                )}
+            </div>
+        );
+    };
+
     return (
         <div className="bg-gray-50 p-3 rounded-lg flex flex-col h-full">
             <h3 className="text-lg font-medium mb-2">{title}</h3>
@@ -147,22 +203,27 @@ const BacklogCommentContainer = ({
                                         </span>
                                     </div>
                                     {!comment.isDeleted && (
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                className="text-xs text-blue-500 hover:text-blue-600"
-                                                onClick={() => handleReplyClick(comment.backlogCommentId)}
-                                            >
-                                                답글
-                                            </button>
-                                            {/* 현재 사용자가 댓글 작성자인 경우에만 삭제 버튼 표시 */}
-                                            {canDelete(comment) && (
+                                        <div className="flex items-center gap-3">
+                                            {/* 좋아요 버튼 */}
+                                            {renderLikeButton(comment)}
+                                            
+                                            <div className="flex items-center gap-2">
                                                 <button
-                                                    className="text-xs text-red-500 hover:text-red-600"
-                                                    onClick={() => onRemoveComment && onRemoveComment(comment.backlogCommentId)}
+                                                    className="text-xs text-blue-500 hover:text-blue-600"
+                                                    onClick={() => handleReplyClick(comment.backlogCommentId)}
                                                 >
-                                                    <FiX size={16} />
+                                                    답글
                                                 </button>
-                                            )}
+                                                {/* 현재 사용자가 댓글 작성자인 경우에만 삭제 버튼 표시 */}
+                                                {canDelete(comment) && (
+                                                    <button
+                                                        className="text-xs text-red-500 hover:text-red-600"
+                                                        onClick={() => handleRemove(comment.backlogCommentId)}
+                                                    >
+                                                        <FiTrash2 size={16} />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -214,15 +275,20 @@ const BacklogCommentContainer = ({
                                                     <span className="text-sm text-gray-700">{childComment.content}</span>
                                                 </div>
                                             </div>
-                                            {/* 현재 사용자가 답글 작성자인 경우에만 삭제 버튼 표시 */}
-                                            {canDelete(childComment) && (
-                                                <button
-                                                    className="text-xs text-red-500 hover:text-red-600"
-                                                    onClick={() => onRemoveComment && onRemoveComment(childComment.backlogCommentId)}
-                                                >
-                                                    <FiX size={16} />
-                                                </button>
-                                            )}
+                                            <div className="flex items-center gap-3">
+                                                {/* 답글 좋아요 버튼 */}
+                                                {renderLikeButton(childComment)}
+                                                
+                                                {/* 현재 사용자가 답글 작성자인 경우에만 삭제 버튼 표시 */}
+                                                {canDelete(childComment) && (
+                                                    <button
+                                                        className="text-xs text-red-500 hover:text-red-600"
+                                                        onClick={() => handleRemove(childComment.backlogCommentId)}
+                                                    >
+                                                        <FiTrash2 size={16} />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     ))
                                 }
@@ -237,7 +303,7 @@ const BacklogCommentContainer = ({
             </div>
             
             {/* 새 댓글 입력 영역 */}
-            <div className="mt-2">
+            <form onSubmit={handleSubmit} className="mt-2">
                 <div className="flex items-center gap-2">
                     <input
                         type="text"
@@ -245,16 +311,16 @@ const BacklogCommentContainer = ({
                         placeholder="댓글을 입력하세요"
                         value={newComment}
                         onChange={(e) => onCommentChange(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && onAddComment(newComment)}
                     />
                     <button
+                        type="submit"
                         className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors whitespace-nowrap"
-                        onClick={() => onAddComment(newComment)}
+                        disabled={!newComment.trim()}
                     >
-                        등록
+                        <FiSend size={18} />
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
     );
 };

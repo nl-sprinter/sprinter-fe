@@ -4,6 +4,21 @@ import SmallFormModal from '../form/SmallFormModal';
 import LargeBoardModal from "./LargeBoardModal";
 import WeightIndicator from '../../common/WeightIndicator';
 import SmallFormBacklogCreateEditModal from '../form/SmallFormBacklogCreateEditModal';
+/**
+ * // 백로그 댓글 좋아요 누르기
+export const onLikeToBacklogComment = async (projectId, sprintId, backlogId, backlogCommentId) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments/${backlogCommentId}/likes`);
+    console.log(`[API] projectApi.onLikeToBacklogComment 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// 백로그 댓글 좋아요 취소
+export const offLikeToBacklogComment = async (projectId, sprintId, backlogId, backlogCommentId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments/${backlogCommentId}/likes`);
+    console.log(`[API] projectApi.offLikeToBacklogComment 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+ */
 import {
     updateBacklog,
     getUsersInProject,
@@ -24,7 +39,9 @@ import {
     getBacklogComments,
     createBacklogComment,
     deleteBacklogComment,
-    updateBacklogFinished
+    updateBacklogFinished,
+    onLikeToBacklogComment,
+    offLikeToBacklogComment
 } from '../../../api/projectApi';
 import UserAttendanceContainer from '../../containers/UserAttendanceContainer';
 import BacklogTaskContainer from '../../containers/BacklogTaskContainer';
@@ -263,7 +280,7 @@ const LargeBoardBacklogModal = ({
             if (!task) return;
             
             // API 호출하여 서버에 상태 업데이트
-            await updateTaskChecked(projectId, sprintId, backlogId, taskId, !task.isChecked);
+            await updateTaskChecked(projectId, sprintId, backlogId, taskId, task.isChecked);
             
             await fetchBacklogTasks(projectId, sprintId, backlogId);
         } catch (error) {
@@ -326,7 +343,7 @@ const LargeBoardBacklogModal = ({
             if (!issue) return;
             
             // API 호출하여 서버에 상태 업데이트
-            await updateIssueChecked(projectId, sprintId, backlogId, issueId, !issue.isChecked);
+            await updateIssueChecked(projectId, sprintId, backlogId, issueId, issue.isChecked);
 
             await fetchBacklogIssues(projectId, sprintId, backlogId);
         } catch (error) {
@@ -491,7 +508,11 @@ const LargeBoardBacklogModal = ({
     const fetchBacklogComments = async () => {
         try {
             const commentsData = await getBacklogComments(projectId, sprintId, backlogId);
-            setComments(commentsData);
+            console.log('댓글 데이터 타입:', typeof commentsData, 'Array.isArray:', Array.isArray(commentsData));
+            console.log('댓글 데이터:', commentsData);
+            
+            // commentsData가 배열인지 확인하고, 아니면 빈 배열로 처리
+            setComments(Array.isArray(commentsData) ? commentsData : []);
         } catch (error) {
             console.error('댓글 로드 실패:', error);
             setComments([]);
@@ -503,6 +524,25 @@ const LargeBoardBacklogModal = ({
         await deleteBacklogComment(projectId, sprintId, backlogId, commentId);
         // 임시로 프론트에서만 삭제 처리
         setComments(comments.filter(comment => comment.backlogCommentId !== commentId));
+    };
+
+    // 댓글 좋아요 함수 추가
+    const handleLikeComment = async (commentId, isLiked) => {
+        try {
+            let newBacklogCommentData;
+            if (isLiked) {
+                // 좋아요 추가
+                newBacklogCommentData = await onLikeToBacklogComment(projectId, sprintId, backlogId, commentId);
+            } else {
+                // 좋아요 취소
+                newBacklogCommentData = await offLikeToBacklogComment(projectId, sprintId, backlogId, commentId);
+            }
+            
+            // 댓글 목록 새로고침
+            await fetchBacklogComments();
+        } catch (error) {
+            console.error('댓글 좋아요 처리 실패:', error);
+        }
     };
 
     // 완료 상태에 따라 모달 스타일 클래스 결정
@@ -607,6 +647,7 @@ const LargeBoardBacklogModal = ({
                         onCommentChange={setNewComment}
                         onAddComment={handleAddComment}
                         onRemoveComment={handleRemoveComment}
+                        onLikeComment={handleLikeComment}
                         title="댓글"
                     />
                 </div>

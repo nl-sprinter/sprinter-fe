@@ -9,7 +9,7 @@ import BacklogTaskCompleteIndicator from "./BacklogTaskCompleteIndicator";
  * @param weight
  * @param isFinished
  * @param onClick
- * @param progress
+ * @param completeRate
  */
 const BacklogCard = (props) => {
     const handleClick = () => {
@@ -39,7 +39,7 @@ const BacklogCard = (props) => {
                 {props.backlogName}
             </span>
             <div className="flex items-center gap-3 relative">
-                <BacklogTaskCompleteIndicator progress={props.progress} showLabel={false} size="small"/>
+                <BacklogTaskCompleteIndicator completeRate={props.completeRate} showLabel={false} size="small"/>
                 <WeightIndicator weight={props.weight} showLabel={false} size="small"/>
                 <span className={`px-2 py-1 rounded text-xs ${
                     props.isFinished
