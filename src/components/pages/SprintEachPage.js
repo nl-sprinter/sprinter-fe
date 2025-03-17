@@ -1,6 +1,6 @@
 import MainLayout from '../layouts/MainLayout';
 import {useState, useEffect, useRef} from 'react';
-import {useParams, useNavigate, useLocation} from 'react-router-dom';
+import {useParams, useNavigate } from 'react-router-dom';
 import {getSprintBacklogList, addBacklogToSprint, getDailyScrumList, addDailyScrumToSprint} from '../../api/projectApi';
 import {IoMdAdd} from 'react-icons/io';
 import PanelBox from "../layouts/PanelBox";
@@ -14,12 +14,13 @@ import SmallInfoModal from '../modals/info/SmallInfoModal';
 import LargeBoardBacklogModal from '../modals/board/LargeBoardBacklogModal';
 import LargeBoardDailyScrumModal from '../modals/board/LargeBoardDailyScrumModal';
 import SmallFormBacklogCreateEditModal from "../modals/form/SmallFormBacklogCreateEditModal";
+import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
+import { getSprintList } from '../../api/projectApi';
 
 const SprintEachPage = () => {
     const {projectId, sprintId, backlogId, dailyScrumId} = useParams();
     const navigate = useNavigate();
-    const location = useLocation();
-    
+
     // API 호출 중복 방지를 위한 ref
     const isLoadingBacklogs = useRef(false);
     const isLoadingDailyScrums = useRef(false);
@@ -35,6 +36,37 @@ const SprintEachPage = () => {
     const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
     const [infoMessage, setInfoMessage] = useState('');
     const [infoType, setInfoType] = useState('success');
+    const [sprintOrder, setSprintOrder] = useState(null);
+
+    // 스프린트 정보 가져오기
+    useEffect(() => {
+        if (projectId && sprintId) {
+            // 프로젝트 네비게이션 스토어에서 스프린트 목록 가져오기
+            const { sprints } = useProjectNavigationStore.getState();
+            
+            // 현재 스프린트 ID에 해당하는 스프린트 찾기
+            const currentSprint = sprints.find(sprint => sprint.sprintId === parseInt(sprintId));
+            
+            if (currentSprint) {
+                setSprintOrder(currentSprint.sprintOrder);
+            } else {
+                // 스토어에 스프린트 정보가 없으면 다시 불러오기
+                const fetchSprintInfo = async () => {
+                    try {
+                        const sprintList = await getSprintList(projectId);
+                        const sprint = sprintList.find(s => s.sprintId === parseInt(sprintId));
+                        if (sprint) {
+                            setSprintOrder(sprint.sprintOrder);
+                        }
+                    } catch (error) {
+                        console.error('스프린트 정보를 불러오는데 실패했습니다:', error);
+                    }
+                };
+                
+                fetchSprintInfo();
+            }
+        }
+    }, [projectId, sprintId]);
 
     // 백로그 데이터 로드
     const fetchBacklogs = async () => {
@@ -222,7 +254,7 @@ const SprintEachPage = () => {
 
     return (
         <MainLayout showFunctions showSidebar>
-            <PageTitle title="스프린트 상세" />
+            <PageTitle title={`Sprint ${sprintOrder || ''} 상세`} />
             <PanelBox>
                 <W2H1Panel
                     title="Sprint Backlog"

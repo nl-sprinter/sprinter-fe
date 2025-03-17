@@ -47,7 +47,7 @@ const ProductBacklogPage = () => {
                         return (
                             <W1H2PanelForProductBacklog
                                 key={sprint.sprintId}
-                                title={`Sprint ${sprint.sprintOrder} - ${sprint.sprintName}`}
+                                title={`Sprint ${sprint.sprintOrder}`}
                             >
                                 <div className="space-y-3">
                                     {sprintBacklogs.length > 0 ? (

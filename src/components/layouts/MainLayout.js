@@ -1,10 +1,14 @@
 import Header from './Header';
 import ProjectSidebar from './ProjectSidebar';
 
-const MainLayout = ({children, showSidebar = false, showFunctions = false}) => {
+const MainLayout = ({children, showSidebar = false, showFunctions = false, showSearchBar = true}) => {
     return (
         <div className="h-screen flex flex-col overflow-hidden">
-            <Header showSidebar={showSidebar} showFunctions={showFunctions}/>
+            <Header
+                showSidebar={showSidebar}
+                showFunctions={showFunctions}
+                showSearchBar={showSearchBar}
+            />
             <div className="flex flex-1 mt-16 overflow-hidden relative">
                 {showSidebar && <ProjectSidebar/>}
                 <main 

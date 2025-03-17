@@ -54,7 +54,7 @@ const HomePage = () => {
     };
 
     return (
-        <MainLayout showFunctions>
+        <MainLayout showFunctions showSearchBar={false}>
             <div className="p-8">
                 <h1 className="text-2xl font-bold mb-8">
                     안녕하세요, {user?.nickname}님!

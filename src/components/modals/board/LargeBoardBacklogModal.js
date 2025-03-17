@@ -282,7 +282,20 @@ const LargeBoardBacklogModal = ({
             // API 호출하여 서버에 상태 업데이트
             await updateTaskChecked(projectId, sprintId, backlogId, taskId, task.isChecked);
 
+            // 태스크 목록 다시 로드
             await fetchBacklogTasks(projectId, sprintId, backlogId);
+            
+            // 백로그 데이터 다시 로드하여 completeRate 업데이트
+            await reloadBacklog();
+            
+            // 부모 컴포넌트에 변경 알림 (백로그 목록 업데이트를 위해)
+            if (onSubmit) {
+                onSubmit({
+                    title,
+                    weight,
+                    isFinished: finished
+                });
+            }
         } catch (error) {
             console.error('태스크 상태 변경 실패:', error);
             // 실패 시 원래 상태로 되돌리기
@@ -546,7 +559,17 @@ const LargeBoardBacklogModal = ({
         <>
             <LargeBoardModal
                 isOpen={isOpen}
-                onClose={onClose}
+                onClose={() => {
+                    // 모달이 닫힐 때 부모 컴포넌트에 변경 사항 알림
+                    if (onSubmit) {
+                        onSubmit({
+                            title,
+                            weight,
+                            isFinished: finished
+                        });
+                    }
+                    onClose();
+                }}
                 title={
                     <div className="flex items-center gap-3">
                         <span>{backlog ? title : '새 Backlog'}</span>
