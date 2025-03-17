@@ -12,7 +12,7 @@ const customStyles = {
         right: '0',
         bottom: '0',
         left: 'auto',
-        width: '288px', // w-72, 필요에 따라 props로 조정 가능
+        width: '360px', // 288px에서 360px로 증가
         margin: '0',
         padding: '20px',
         border: '0px solid',
@@ -30,6 +30,7 @@ const customStyles = {
  * @param {React.ReactNode} children - 모달 내용
  * @param {string} contentLabel - 모달 접근성 라벨
  * @param {object} customContentStyle - 추가 스타일 (너비 등 조정)
+ * @param {React.ReactNode} extraHeaderContent - 헤더에 추가할 컨텐츠
  */
 const RightSideModal = ({ 
     isOpen, 
@@ -37,7 +38,8 @@ const RightSideModal = ({
     title, 
     children, 
     contentLabel = "Side Modal",
-    customContentStyle = {}
+    customContentStyle = {},
+    extraHeaderContent
 }) => {
     // 기본 스타일과 사용자 정의 스타일 병합
     const mergedStyles = {
@@ -58,12 +60,15 @@ const RightSideModal = ({
         >
             <div className="flex justify-between items-center mb-3">
                 <h2 className="text-lg font-semibold">{title}</h2>
-                <button 
-                    onClick={onClose}
-                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                    <FiX className="text-xl text-gray-600" />
-                </button>
+                <div className="flex items-center gap-2">
+                    {extraHeaderContent}
+                    <button 
+                        onClick={onClose}
+                        className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                        <FiX className="text-xl text-gray-600" />
+                    </button>
+                </div>
             </div>
             <div className="modal-content">
                 {children}

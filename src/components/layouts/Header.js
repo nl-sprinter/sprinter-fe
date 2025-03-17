@@ -5,6 +5,7 @@ import RightSideTodoModal from '../modals/rightside/RightSideTodoModal';
 import RightSideChatModal from '../modals/rightside/RightSideChatModal';
 import UserAccountModal from '../modals/UserAccountModal';
 import RightSideNotificationModal from '../modals/rightside/RightSideNotificationModal';
+import { getNotificationCount } from '../../api/notificationApi';
 
 const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) => {
     const navigate = useNavigate();
@@ -16,7 +17,11 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     const [userModalOpen, setUserModalOpen] = useState(false);
     const [notificationModalOpen, setNotificationModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [notificationCount, setNotificationCount] = useState(0);
     const searchRef = useRef(null);
+    const intervalRef = useRef(null);
+    const isInitialMount = useRef(true);
+    const prevModalState = useRef(false); // 이전 모달 상태 추적
     
     // URL에서 검색어 가져오기
     useEffect(() => {
@@ -27,6 +32,58 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
         }
     }, [location]);
     
+    // 알림 카운트 가져오기
+    const fetchNotificationCount = async () => {
+        try {
+            const count = await getNotificationCount();
+            setNotificationCount(count);
+        } catch (error) {
+            console.error('알림 카운트 조회 실패:', error);
+            setNotificationCount(0);
+        }
+    };
+    
+    // 컴포넌트 마운트 시 및 주기적으로 알림 카운트 가져오기
+    useEffect(() => {
+        // 초기 마운트 시에만 알림 카운트 가져오기
+        if (isInitialMount.current) {
+            console.log('초기 알림 카운트 로드');
+            fetchNotificationCount();
+            isInitialMount.current = false;
+        }
+        
+        // 이전 인터벌 정리
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+        
+        // 30초마다 알림 카운트 갱신
+        intervalRef.current = setInterval(() => {
+            console.log('주기적 알림 카운트 갱신');
+            fetchNotificationCount();
+        }, 30000);
+        
+        // 컴포넌트 언마운트 시 인터벌 정리
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+    }, [projectId]); // projectId가 변경될 때만 실행
+    
+    // 알림 모달 상태 변경 감지 및 처리
+    useEffect(() => {
+        // 모달이 열려 있다가 닫힌 경우에만 알림 카운트 갱신
+        if (prevModalState.current && !notificationModalOpen) {
+            console.log('모달 닫힘 후 알림 카운트 갱신');
+            fetchNotificationCount();
+        }
+        
+        // 현재 모달 상태 저장
+        prevModalState.current = notificationModalOpen;
+    }, [notificationModalOpen]);
+    
     const handleLogoClick = () => {
         navigate('/');
     };
@@ -36,6 +93,10 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
         if (projectId && searchQuery.trim()) {
             navigate(`/projects/${projectId}/search?query=${encodeURIComponent(searchQuery)}`);
         }
+    };
+    
+    const handleNotificationClick = () => {
+        setNotificationModalOpen(true);
     };
 
     return (
@@ -77,12 +138,19 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
                             >
                                 <FiMessageSquare className="text-xl"/>
                             </button>
-                            <button 
-                                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
-                                onClick={() => setNotificationModalOpen(true)}
-                            >
-                                <FiBell className="text-xl" />
-                            </button>
+                            <div className="relative">
+                                <button 
+                                    className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
+                                    onClick={handleNotificationClick}
+                                >
+                                    <FiBell className="text-xl" />
+                                </button>
+                                {notificationCount > 0 && (
+                                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-green-500 rounded-full">
+                                        {notificationCount > 9 ? '9+' : notificationCount}
+                                    </span>
+                                )}
+                            </div>
                             <button 
                                 className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
                                 onClick={() => setUserModalOpen(true)}

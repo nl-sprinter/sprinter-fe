@@ -192,7 +192,7 @@ export const CalendarContainer = ({schedule = [], currentDate, setCurrentDate, o
                             return (
                                 <div
                                     key={schedule.id}
-                                    className="text-xs p-1 rounded-md cursor-pointer text-[11px]"
+                                    className="text-xxs p-0.5  cursor-pointer text-[9px]"
                                     style={{
                                         backgroundColor: colorStyle.bg,
                                         color: colorStyle.text

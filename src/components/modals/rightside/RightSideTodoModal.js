@@ -14,7 +14,6 @@ const RightSideTodoModal = ({ open, onClose }) => {
             onClose={onClose}
             title="Todo List"
             contentLabel="Todo Modal"
-            customContentStyle={{ width: '300px' }}
         >
             <ul>
                 {todos.map((todo, index) => (

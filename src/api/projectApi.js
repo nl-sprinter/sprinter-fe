@@ -521,6 +521,7 @@ export const deleteSchedule = async (projectId, scheduleId) => {
 
 /////////// 검색 Search ////////////
 
+// 검색 (백엔드 미완성)
 export const search = async (projectId, query) => {
     try {
         // 실제 API 호출 (백엔드 완성 후 사용)
