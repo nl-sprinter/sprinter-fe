@@ -6,6 +6,7 @@ import RightSideChatModal from '../modals/rightside/RightSideChatModal';
 import UserAccountModal from '../modals/UserAccountModal';
 import RightSideNotificationModal from '../modals/rightside/RightSideNotificationModal';
 import { getNotificationCount } from '../../api/notificationApi';
+import { getTodoCount } from '../../api/todoApi';
 
 const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) => {
     const navigate = useNavigate();
@@ -18,10 +19,13 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     const [notificationModalOpen, setNotificationModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [notificationCount, setNotificationCount] = useState(0);
+    const [todoCount, setTodoCount] = useState(0);
     const searchRef = useRef(null);
     const intervalRef = useRef(null);
+    const todoIntervalRef = useRef(null);
     const isInitialMount = useRef(true);
-    const prevModalState = useRef(false); // 이전 모달 상태 추적
+    const prevNotificationModalState = useRef(false);
+    const prevTodoModalState = useRef(false);
     
     // URL에서 검색어 가져오기
     useEffect(() => {
@@ -43,18 +47,40 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
         }
     };
     
+    // Todo 카운트 가져오기
+    const fetchTodoCount = async () => {
+        try {
+            // 실제 API 호출 (백엔드 완성 후 사용)
+            // const count = await getTodoCount();
+            // setTodoCount(count);
+            
+            // 더미 데이터 (백엔드 완성 전 임시 사용)
+            const count = Math.floor(Math.random() * 10); // 0~9 사이 랜덤 숫자
+            console.log(`[API] todoApi.getTodoCount 더미 데이터 반환: ${count}`);
+            setTodoCount(count);
+        } catch (error) {
+            console.error('Todo 카운트 조회 실패:', error);
+            setTodoCount(0);
+        }
+    };
+    
     // 컴포넌트 마운트 시 및 주기적으로 알림 카운트 가져오기
     useEffect(() => {
         // 초기 마운트 시에만 알림 카운트 가져오기
         if (isInitialMount.current) {
             console.log('초기 알림 카운트 로드');
             fetchNotificationCount();
+            console.log('초기 Todo 카운트 로드');
+            fetchTodoCount();
             isInitialMount.current = false;
         }
         
         // 이전 인터벌 정리
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
+        }
+        if (todoIntervalRef.current) {
+            clearInterval(todoIntervalRef.current);
         }
         
         // 30초마다 알림 카운트 갱신
@@ -63,11 +89,21 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
             fetchNotificationCount();
         }, 30000);
         
+        // 30초마다 Todo 카운트 갱신
+        todoIntervalRef.current = setInterval(() => {
+            console.log('주기적 Todo 카운트 갱신');
+            fetchTodoCount();
+        }, 30000);
+        
         // 컴포넌트 언마운트 시 인터벌 정리
         return () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
                 intervalRef.current = null;
+            }
+            if (todoIntervalRef.current) {
+                clearInterval(todoIntervalRef.current);
+                todoIntervalRef.current = null;
             }
         };
     }, [projectId]); // projectId가 변경될 때만 실행
@@ -75,14 +111,26 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     // 알림 모달 상태 변경 감지 및 처리
     useEffect(() => {
         // 모달이 열려 있다가 닫힌 경우에만 알림 카운트 갱신
-        if (prevModalState.current && !notificationModalOpen) {
-            console.log('모달 닫힘 후 알림 카운트 갱신');
+        if (prevNotificationModalState.current && !notificationModalOpen) {
+            console.log('알림 모달 닫힘 후 알림 카운트 갱신');
             fetchNotificationCount();
         }
         
         // 현재 모달 상태 저장
-        prevModalState.current = notificationModalOpen;
+        prevNotificationModalState.current = notificationModalOpen;
     }, [notificationModalOpen]);
+    
+    // Todo 모달 상태 변경 감지 및 처리
+    useEffect(() => {
+        // 모달이 열려 있다가 닫힌 경우에만 Todo 카운트 갱신
+        if (prevTodoModalState.current && !todoModalOpen) {
+            console.log('Todo 모달 닫힘 후 Todo 카운트 갱신');
+            fetchTodoCount();
+        }
+        
+        // 현재 모달 상태 저장
+        prevTodoModalState.current = todoModalOpen;
+    }, [todoModalOpen]);
     
     const handleLogoClick = () => {
         navigate('/');
@@ -97,6 +145,10 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     
     const handleNotificationClick = () => {
         setNotificationModalOpen(true);
+    };
+    
+    const handleTodoClick = () => {
+        setTodoModalOpen(true);
     };
 
     return (
@@ -126,12 +178,19 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
                                     </button>
                                 </form>
                             )}
-                            <button
-                                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
-                                onClick={() => setTodoModalOpen(true)}
-                            >
-                                <FiMenu className="text-xl"/>
-                            </button>
+                            <div className="relative">
+                                <button
+                                    className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
+                                    onClick={handleTodoClick}
+                                >
+                                    <FiMenu className="text-xl"/>
+                                </button>
+                                {todoCount > 0 && (
+                                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-blue-500 rounded-full">
+                                        {todoCount > 9 ? '9+' : todoCount}
+                                    </span>
+                                )}
+                            </div>
                             <button
                                 className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-full"
                                 onClick={() => setChatModalOpen(true)}
