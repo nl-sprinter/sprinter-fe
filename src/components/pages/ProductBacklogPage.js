@@ -29,17 +29,6 @@ const ProductBacklogPage = () => {
         fetchBacklogs();
     }, [projectId]);
 
-    const groupedBacklogs = backlogs.reduce((acc, backlog) => {
-        const sprintOrder = backlog.sprintOrder;
-        if (!acc[sprintOrder]) {
-            acc[sprintOrder] = {
-                sprintName: backlog.sprintName,
-                backlogs: []
-            };
-        }
-        acc[sprintOrder].backlogs.push(backlog);
-        return acc;
-    }, {});
 
     const handleBacklogClick = (backlog) => {
         setSelectedBacklog(backlog);
@@ -69,6 +58,7 @@ const ProductBacklogPage = () => {
                                                 sprintOrder={backlog.sprintOrder}
                                                 backlogName={backlog.title}
                                                 weight={backlog.weight}
+                                                completeRate={backlog.completeRate}
                                                 isFinished={backlog.isFinished}
                                                 onClick={() => handleBacklogClick(backlog)}
                                             />

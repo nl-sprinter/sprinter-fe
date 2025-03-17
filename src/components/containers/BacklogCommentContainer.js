@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiCornerDownRight, FiX, FiSend, FiTrash2, FiHeart } from 'react-icons/fi';
+import { FiCornerDownRight, FiSend, FiTrash2, FiHeart } from 'react-icons/fi';
 import { FaHeart } from 'react-icons/fa';
 import { useUserStore } from '../../store/useUserStore'; // 유저 스토어 임포트
 
@@ -142,27 +142,34 @@ const BacklogCommentContainer = ({
     
     // 좋아요 핸들러
     const handleLike = (commentId, isLiked) => {
-        onLikeComment && onLikeComment(commentId, !isLiked);
+        // 이미 좋아요를 누른 경우 함수 실행 방지
+        if (isLiked) return;
+        
+        onLikeComment && onLikeComment(commentId);
     };
 
     // 좋아요 버튼 렌더링 함수
     const renderLikeButton = (comment) => {
-        console.log(`aaaaaaaaasdasdasdcomment = ${JSON.stringify(comment)}`);
-        console.log(`renderLikeButton comment.backlogCommentId=${comment.backlogCommentId}, comment.isLiked=${comment.isLiked}`);
-
+        console.log(`BacklogCommentContainer 에 전달된 comment = ${JSON.stringify(comment)}`);
+        
+        // 서버에서 오는 liked 속성 사용 (isLiked 대신)
+        const isLiked = comment.liked === true;
+        
         if (comment.isDeleted) return null;
         
         return (
             <div className="flex items-center gap-1">
                 <button 
-                    onClick={() => handleLike(comment.backlogCommentId, comment.isLiked)}
+                    onClick={() => !isLiked && handleLike(comment.backlogCommentId, isLiked)}
                     className={`p-1 rounded-full transition-all duration-200 ${
-                        comment.isLiked 
-                            ? 'text-red-500 hover:bg-red-50' 
-                            : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'
+                        isLiked 
+                            ? 'text-red-500 cursor-default' 
+                            : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600 cursor-pointer'
                     }`}
+                    disabled={isLiked}
+                    title={isLiked ? "이미 좋아요를 눌렀습니다" : "좋아요"}
                 >
-                    {comment.isLiked ? (
+                    {isLiked ? (
                         <FaHeart size={14} className="fill-current" />
                     ) : (
                         <FiHeart size={14} className="stroke-current" />
@@ -170,7 +177,7 @@ const BacklogCommentContainer = ({
                 </button>
                 {comment.likeCount > 0 && (
                     <span className={`text-xs font-medium ${
-                        comment.isLiked ? 'text-red-500' : 'text-gray-500'
+                        isLiked ? 'text-red-500' : 'text-gray-500'
                     }`}>
                         {comment.likeCount}
                     </span>

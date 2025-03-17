@@ -12,16 +12,13 @@ import {
     deleteSchedule,
     getScheduleByScheduleId 
 } from '../../api/projectApi';
-import { useUserStore } from '../../store/useUserStore';
 import {MyScheduleContainer} from "../containers/MyScheduleContainer";
 import W2H2Panel from "../panels/W2H2Panel";
 import W1H2Panel from "../panels/W1H2Panel";
 import {CalendarContainer} from "../containers/CalendarContainer";
 
 const CalendarPage = () => {
-    // URL에서 projectId 가져오기
     const { projectId } = useParams();
-    const { user, fetchUserInfo } = useUserStore();
 
     // 캘린더 상태
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -46,17 +43,10 @@ const CalendarPage = () => {
         }
     }, [projectId, currentDate]); // user 의존성 제거
 
-    // 컴포넌트 마운트 시 사용자 정보 로드
-    useEffect(() => {
-        fetchUserInfo();
-    }, [fetchUserInfo]);
-
     // currentDate나 projectId가 변경될 때만 일정 조회
     useEffect(() => {
-        if (user) {
-            fetchSchedules();
-        }
-    }, [user, currentDate, projectId]); // fetchSchedules 의존성 제거
+        fetchSchedules();
+    }, [ currentDate, projectId]); // fetchSchedules 의존성 제거
 
     // 일정 추가 모달 열기
     const openAddScheduleModal = useCallback(() => {

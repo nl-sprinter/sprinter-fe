@@ -2,9 +2,6 @@ import React, { memo } from 'react';
 import {ScheduleCard} from "../common/ScheduleCard";
 
 export const MyScheduleContainer = memo(({ schedule = [], onScheduleClick }) => {
-
-    console.log(`MyScheduleContainer  -  schedule = ${JSON.stringify(schedule)}`);
-
     // 스케줄 클릭 핸들러 - SPRINT 타입인 경우 무시
     const handleScheduleClick = (schedule) => {
         // SPRINT 타입이면 클릭 이벤트를 처리하지 않음

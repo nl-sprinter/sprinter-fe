@@ -1,10 +1,6 @@
 import React from 'react';
 
 const BacklogTaskCompleteIndicator = ({ completeRate, showLabel = true, size = 'medium' }) => {
-
-    console.log(`Backlog task complete: ${completeRate}%`);
-
-
     // null 값 처리
     const safeProgress = completeRate === null ? 0 : completeRate;
     

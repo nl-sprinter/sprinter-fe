@@ -26,17 +26,18 @@ const UserAttendanceContainer = ({
         user => !attendedUsers.some(u => u.userId === user.userId)
     );
     
-    const openUserListModal = (e) => {
-        // if (e) e.stopPropagation();
+    const openUserListModal = () => {
         setIsUserListModalOpen(true);
     };
     
-    const closeUserListModal = (e) => {
-        // if (e) e.stopPropagation();
+    const closeUserListModal = () => {
+        console.log(`UserAttendanceContainer.closeUserListModal 호출`);
         setIsUserListModalOpen(false);
     };
     
-    const handleItemSelect = (user) => {
+    // 직접 사용자를 선택하는 함수
+    const selectUser = (user) => {
+        console.log(`UserAttendanceContainer.selectUser = ${user.userId}`);
         onUserToggle && onUserToggle(user);
         closeUserListModal();
     };
@@ -95,7 +96,7 @@ const UserAttendanceContainer = ({
                     onClose={closeUserListModal}
                     title='팀원 선택'
                     items={availableUsers}
-                    onItemSelect={handleItemSelect}
+                    onItemSelect={selectUser}
                     renderItem={(user, onClick) => (
                         <div 
                             key={user.userId}

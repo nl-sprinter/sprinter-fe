@@ -28,6 +28,8 @@ import SprintSettingsPage from '../components/pages/SprintSettingsPage';
 // 캘린더
 import CalendarPage from '../components/pages/CalendarPage';
 import ProjectSettingsPage from '../components/pages/ProjectSettingsPage';
+// 검색
+import SearchPage from '../components/pages/SearchPage';
 
 // 로그아웃
 import Logout from "../components/auth/Logout";
@@ -139,6 +141,13 @@ const AppRoutes = () => {
                 <Route path="/projects/:projectId/calendar" element={
                     <PrivateRoute>
                         <CalendarPage showSidebar/>
+                    </PrivateRoute>
+                }/>
+
+                {/* 검색 */}
+                <Route path="/projects/:projectId/search" element={
+                    <PrivateRoute>
+                        <SearchPage showSidebar/>
                     </PrivateRoute>
                 }/>
 

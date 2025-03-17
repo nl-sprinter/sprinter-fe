@@ -42,7 +42,10 @@ const SmallListModal = ({
 }) => {
     
     const handleItemClick = (item) => {
-        onItemSelect && onItemSelect(item);
+        console.log("SmallListModal.handleItemClick 호출", item);
+        if (onItemSelect) {
+            onItemSelect(item);
+        }
     };
     
     const handleClose = (e) => {
@@ -52,13 +55,38 @@ const SmallListModal = ({
     // 기본 항목 렌더링 함수
     const defaultRenderItem = (item) => (
         <div 
-            key={item.id || item.backlogId}
+            key={item.id || item.backlogId || item.userId}
             className="flex items-center justify-between p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
             onClick={() => handleItemClick(item)}
         >
-            <span>{item.title || item.name}</span>
+            <span>{item.title || item.name || item.nickname}</span>
         </div>
     );
+
+    // 사용자 정의 렌더링 함수를 사용하는 경우 직접 항목을 렌더링
+    const renderListItems = () => {
+        if (items.length === 0) {
+            return (
+                <div className="p-4 text-center text-gray-500">
+                    표시할 항목이 없습니다.
+                </div>
+            );
+        }
+
+        return items.map((item, index) => {
+            if (renderItem) {
+                // 사용자 정의 렌더링 함수 사용
+                return (
+                    <React.Fragment key={item.id || item.backlogId || item.userId || index}>
+                        {renderItem(item, handleItemClick)}
+                    </React.Fragment>
+                );
+            } else {
+                // 기본 렌더링 함수 사용
+                return defaultRenderItem(item);
+            }
+        });
+    };
 
     return (
         <Modal
@@ -78,15 +106,7 @@ const SmallListModal = ({
 
                 {/* 리스트 */}
                 <div className="overflow-y-auto max-h-[350px]">
-                    {items.length > 0 ? (
-                        items.map(item => (
-                            renderItem ? renderItem(item, handleItemClick) : defaultRenderItem(item)
-                        ))
-                    ) : (
-                        <div className="p-4 text-center text-gray-500">
-                            표시할 항목이 없습니다.
-                        </div>
-                    )}
+                    {renderListItems()}
                 </div>
             </div>
         </Modal>
