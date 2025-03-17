@@ -13,14 +13,13 @@ const RightSideNotificationModal = ({ open, onClose }) => {
     const [notifications, setNotifications] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    // 알림 목록 가져오기
     const fetchNotifications = async () => {
         setIsLoading(true);
         try {
             const results = await getNotifications();
             setNotifications(results || []);
             
-            // 알림 모달을 열면 알림 카운트를 0으로 설정
+            // 알림 모달을 열면 알림 카운트를 0으로 설정 (읽었으니까)
             if (open) {
                 await setNotificationCountToZero();
             }
@@ -86,15 +85,15 @@ const RightSideNotificationModal = ({ open, onClose }) => {
                 </div>
             ) : notifications.length > 0 ? (
                 <div className="space-y-3 py-2">
-                    {notifications.map((notification) => (
+                    {notifications.map((n) => (
                         <NotificationCard
-                            key={notification.id}
-                            notificationType={notification.notificationType}
-                            content={notification.content}
-                            time={notification.time}
-                            navigable={notification.navigable}
-                            url={notification.url}
-                            onDelete={() => handleDeleteNotification(notification.id)}
+                            key={n.id}
+                            notificationType={n.notificationType}
+                            content={n.content}
+                            time={n.time}
+                            navigable={n.navigable}
+                            url={n.url}
+                            onDelete={() => handleDeleteNotification(n.id)}
                         />
                     ))}
                 </div>
