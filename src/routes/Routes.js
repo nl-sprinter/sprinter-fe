@@ -137,8 +137,29 @@ const AppRoutes = () => {
                     </PrivateRoute>
                 }/>
 
+                {/* 백로그 모달을 위한 라우트 */}
+                <Route path="/projects/:projectId/sprints/:sprintId/backlogs/:backlogId" element={
+                    <PrivateRoute>
+                        <SprintEachPage showSidebar/>
+                    </PrivateRoute>
+                }/>
+
+                {/* 데일리 스크럼 모달을 위한 라우트 */}
+                <Route path="/projects/:projectId/sprints/:sprintId/dailyscrums/:dailyScrumId" element={
+                    <PrivateRoute>
+                        <SprintEachPage showSidebar/>
+                    </PrivateRoute>
+                }/>
+
                 {/* 캘린더 */}
                 <Route path="/projects/:projectId/calendar" element={
+                    <PrivateRoute>
+                        <CalendarPage showSidebar/>
+                    </PrivateRoute>
+                }/>
+
+                {/* 캘린더 스케줄 모달을 위한 라우트 */}
+                <Route path="/projects/:projectId/calendar/schedule/:scheduleId" element={
                     <PrivateRoute>
                         <CalendarPage showSidebar/>
                     </PrivateRoute>

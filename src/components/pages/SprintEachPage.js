@@ -1,6 +1,6 @@
 import MainLayout from '../layouts/MainLayout';
-import {useState, useEffect} from 'react';
-import {useParams} from 'react-router-dom';
+import {useState, useEffect, useRef} from 'react';
+import {useParams, useNavigate, useLocation} from 'react-router-dom';
 import {getSprintBacklogList, addBacklogToSprint, getDailyScrumList, addDailyScrumToSprint} from '../../api/projectApi';
 import {IoMdAdd} from 'react-icons/io';
 import PanelBox from "../layouts/PanelBox";
@@ -16,7 +16,14 @@ import LargeBoardDailyScrumModal from '../modals/board/LargeBoardDailyScrumModal
 import SmallFormBacklogCreateEditModal from "../modals/form/SmallFormBacklogCreateEditModal";
 
 const SprintEachPage = () => {
-    const {projectId, sprintId} = useParams();
+    const {projectId, sprintId, backlogId, dailyScrumId} = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    
+    // API 호출 중복 방지를 위한 ref
+    const isLoadingBacklogs = useRef(false);
+    const isLoadingDailyScrums = useRef(false);
+    
     const [backlogs, setBacklogs] = useState([]);
     const [dailyScrums, setDailyScrums] = useState([]);
     const [selectedBacklog, setSelectedBacklog] = useState(null);
@@ -29,49 +36,115 @@ const SprintEachPage = () => {
     const [infoMessage, setInfoMessage] = useState('');
     const [infoType, setInfoType] = useState('success');
 
+    // 백로그 데이터 로드
     const fetchBacklogs = async () => {
+        // 이미 로딩 중이면 중복 호출 방지
+        if (isLoadingBacklogs.current) return;
+        
         try {
+            isLoadingBacklogs.current = true;
+            console.log('백로그 목록 로드 시작');
+            
             const data = await getSprintBacklogList(projectId, sprintId);
             setBacklogs(data);
-
-            // 현재 선택된 백로그가 있으면 최신 정보로 업데이트
-            if (selectedBacklog) {
-                const updatedBacklog = data.find(backlog => backlog.backlogId === selectedBacklog.backlogId);
-                if (updatedBacklog) {
-                    setSelectedBacklog(updatedBacklog);
-                }
-            }
+            
+            console.log('백로그 목록 로드 완료');
         } catch (err) {
             console.error('스프린트 백로그 목록을 불러오는데 실패했습니다:', err);
+        } finally {
+            isLoadingBacklogs.current = false;
         }
     };
 
+    // 데일리 스크럼 데이터 로드
     const fetchDailyScrums = async () => {
+        // 이미 로딩 중이면 중복 호출 방지
+        if (isLoadingDailyScrums.current) return;
+        
         try {
+            isLoadingDailyScrums.current = true;
+            console.log('데일리 스크럼 목록 로드 시작');
+            
             const data = await getDailyScrumList(projectId, sprintId);
             setDailyScrums(data);
+            
+            console.log('데일리 스크럼 목록 로드 완료');
         } catch (err) {
             console.error('데일리 스크럼 목록을 불러오는데 실패했습니다:', err);
+        } finally {
+            isLoadingDailyScrums.current = false;
         }
     };
 
+    // 초기 데이터 로드
     useEffect(() => {
-        fetchBacklogs();
-        fetchDailyScrums();
+        if (projectId && sprintId) {
+            fetchBacklogs();
+            fetchDailyScrums();
+        }
     }, [projectId, sprintId]);
+
+    // URL에서 backlogId가 변경될 때 모달 상태 업데이트
+    useEffect(() => {
+        if (backlogId && backlogs.length > 0) {
+            const backlogIdInt = parseInt(backlogId);
+            const backlog = backlogs.find(item => item.backlogId === backlogIdInt);
+            
+            if (backlog) {
+                console.log(`백로그 ID ${backlogId}에 해당하는 모달 열기`);
+                setSelectedBacklog(backlog);
+                setIsBacklogModalOpen(true);
+            } else {
+                console.log(`백로그 ID ${backlogId}를 찾을 수 없음`);
+                // 존재하지 않는 백로그 ID인 경우 기본 URL로 리다이렉트
+                navigate(`/projects/${projectId}/sprints/${sprintId}`, { replace: true });
+            }
+        } else if (!backlogId) {
+            console.log('백로그 모달 닫기');
+            setIsBacklogModalOpen(false);
+        }
+    }, [backlogId, backlogs, projectId, sprintId, navigate]);
+
+    // URL에서 dailyScrumId가 변경될 때 모달 상태 업데이트
+    useEffect(() => {
+        if (dailyScrumId && dailyScrums.length > 0) {
+            const dailyScrumIdInt = parseInt(dailyScrumId);
+            const dailyScrum = dailyScrums.find(item => item.dailyScrumId === dailyScrumIdInt);
+            
+            if (dailyScrum) {
+                console.log(`데일리 스크럼 ID ${dailyScrumId}에 해당하는 모달 열기`);
+                setSelectedDailyScrum(dailyScrum);
+                setIsDailyScrumModalOpen(true);
+            } else {
+                console.log(`데일리 스크럼 ID ${dailyScrumId}를 찾을 수 없음`);
+                // 존재하지 않는 데일리 스크럼 ID인 경우 기본 URL로 리다이렉트
+                navigate(`/projects/${projectId}/sprints/${sprintId}`, { replace: true });
+            }
+        } else if (!dailyScrumId) {
+            console.log('데일리 스크럼 모달 닫기');
+            setIsDailyScrumModalOpen(false);
+        }
+    }, [dailyScrumId, dailyScrums, projectId, sprintId, navigate]);
+
+    // 선택된 백로그 업데이트
+    useEffect(() => {
+        if (selectedBacklog && backlogs.length > 0) {
+            const updatedBacklog = backlogs.find(backlog => backlog.backlogId === selectedBacklog.backlogId);
+            if (updatedBacklog && JSON.stringify(updatedBacklog) !== JSON.stringify(selectedBacklog)) {
+                console.log('선택된 백로그 정보 업데이트');
+                setSelectedBacklog(updatedBacklog);
+            }
+        }
+    }, [backlogs, selectedBacklog]);
 
     const handleBacklogClick = (backlogId) => {
         console.log('백로그 클릭:', backlogId);
-        const backlog = backlogs.find(item => item.backlogId === backlogId);
-        setSelectedBacklog(backlog);
-        setIsBacklogModalOpen(true);
+        navigate(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}`);
     };
 
     const handleDailyScrumClick = (dailyScrumId) => {
         console.log('데일리 스크럼 클릭:', dailyScrumId);
-        const dailyScrum = dailyScrums.find(item => item.dailyScrumId === dailyScrumId);
-        setSelectedDailyScrum(dailyScrum);
-        setIsDailyScrumModalOpen(true);
+        navigate(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}`);
     };
 
     const handleAddBacklogClick = () => {
@@ -79,26 +152,18 @@ const SprintEachPage = () => {
     };
 
     const handleAddDailyScrumClick = () => {
-        // 데일리 스크럼 생성 모달 열기
         setIsDailyScrumCreateModalOpen(true);
     };
 
     const handleCreateDailyScrum = async () => {
         try {
-            // 데일리 스크럼 생성 API 호출
             await addDailyScrumToSprint(projectId, sprintId);
-            
-            // 생성 모달 닫기
             setIsDailyScrumCreateModalOpen(false);
-            
-            // 성공 메시지 표시
             setInfoMessage('데일리 스크럼이 생성되었습니다.');
             setInfoType('success');
             setIsInfoModalOpen(true);
         } catch (error) {
             console.error('데일리 스크럼 생성 중 오류가 발생했습니다:', error);
-            
-            // 오류 메시지 표시
             setInfoMessage('데일리 스크럼 생성에 실패했습니다.');
             setInfoType('error');
             setIsInfoModalOpen(true);
@@ -107,7 +172,6 @@ const SprintEachPage = () => {
 
     const handleInfoModalClose = () => {
         setIsInfoModalOpen(false);
-        // 데일리 스크럼 목록 새로고침
         fetchDailyScrums();
     };
 
@@ -115,27 +179,32 @@ const SprintEachPage = () => {
         try {
             await addBacklogToSprint(projectId, sprintId, data.title, data.weight);
             setIsCreateModalOpen(false);
-            fetchBacklogs(); // 백로그 목록 새로고침
+            fetchBacklogs();
         } catch (error) {
             console.error('백로그 추가 중 오류가 발생했습니다:', error);
         }
     };
 
     const handleDailyScrumModalSubmit = (data) => {
-        // 여기에 데일리 스크럼 모달 제출 시 로직 추가
         console.log('데일리 스크럼 데이터 저장:', data);
-        setIsDailyScrumModalOpen(false);
-        fetchDailyScrums(); // 데일리 스크럼 목록 새로고침
+        fetchDailyScrums();
     };
 
-    // 백로그 모달 제출 시 처리 함수
     const handleBacklogModalSubmit = (data) => {
         console.log('백로그 데이터 제출:', data);
-        // 모달을 닫지 않고 백로그 목록만 새로고침
         fetchBacklogs();
     };
 
-    // 날짜 포맷 함수
+    const handleCloseBacklogModal = () => {
+        console.log('백로그 모달 닫기 요청');
+        navigate(`/projects/${projectId}/sprints/${sprintId}`);
+    };
+
+    const handleCloseDailyScrumModal = () => {
+        console.log('데일리 스크럼 모달 닫기 요청');
+        navigate(`/projects/${projectId}/sprints/${sprintId}`);
+    };
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('ko-KR', {
@@ -144,6 +213,12 @@ const SprintEachPage = () => {
             day: '2-digit'
         }).replace(/\. /g, '.').replace(/\.$/, '');
     };
+
+    // 백로그 모달 렌더링 조건
+    const shouldRenderBacklogModal = backlogId && selectedBacklog && isBacklogModalOpen;
+    
+    // 데일리 스크럼 모달 렌더링 조건
+    const shouldRenderDailyScrumModal = dailyScrumId && selectedDailyScrum && isDailyScrumModalOpen;
 
     return (
         <MainLayout showFunctions showSidebar>
@@ -197,6 +272,7 @@ const SprintEachPage = () => {
                     <div className="space-y-3">
                         {dailyScrums.map((scrum) => (
                             <DailyScrumCard
+                                key={scrum.dailyScrumId}
                                 dailyScrumId={scrum.dailyScrumId}
                                 createdAt={formatDate(scrum.createdAt)}
                                 userCount={scrum.userCount}
@@ -233,27 +309,30 @@ const SprintEachPage = () => {
                 type={infoType}
             />
 
-            <LargeBoardBacklogModal
-                isOpen={isBacklogModalOpen}
-                onClose={() => {
-                    setIsBacklogModalOpen(false);
-                    fetchBacklogs(); // 모달이 닫힐 때도 백로그 목록 새로고침
-                }}
-                backlog={selectedBacklog}
-                projectId={projectId}
-                sprintId={sprintId}
-                backlogId={selectedBacklog?.backlogId}
-                onSubmit={handleBacklogModalSubmit}
-            />
+            {/* 백로그 모달은 조건을 더 엄격하게 검사 */}
+            {shouldRenderBacklogModal && (
+                <LargeBoardBacklogModal
+                    isOpen={true}
+                    onClose={handleCloseBacklogModal}
+                    backlog={selectedBacklog}
+                    projectId={projectId}
+                    sprintId={sprintId}
+                    backlogId={selectedBacklog.backlogId}
+                    onSubmit={handleBacklogModalSubmit}
+                />
+            )}
 
-            <LargeBoardDailyScrumModal
-                isOpen={isDailyScrumModalOpen}
-                onClose={() => setIsDailyScrumModalOpen(false)}
-                dailyScrum={selectedDailyScrum}
-                projectId={projectId}
-                sprintId={sprintId}
-                onSubmit={handleDailyScrumModalSubmit}
-            />
+            {/* 데일리 스크럼 모달도 조건을 엄격하게 검사 */}
+            {shouldRenderDailyScrumModal && (
+                <LargeBoardDailyScrumModal
+                    isOpen={true}
+                    onClose={handleCloseDailyScrumModal}
+                    dailyScrum={selectedDailyScrum}
+                    projectId={projectId}
+                    sprintId={sprintId}
+                    onSubmit={handleDailyScrumModalSubmit}
+                />
+            )}
         </MainLayout>
     );
 };
