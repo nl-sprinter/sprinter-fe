@@ -91,6 +91,8 @@ const MiddleFormScheduleCreateEditModal = ({
     // 저장 성공 상태 추가
     const [isSaveSuccessOpen, setIsSaveSuccessOpen] = useState(false);
 
+    const [formError, setFormError] = useState('');
+
     // 프로젝트 유저 로드 (이 useEffect를 별도로 분리)
     useEffect(() => {
         if (isOpen && projectId) {
@@ -185,16 +187,82 @@ const MiddleFormScheduleCreateEditModal = ({
         }
     };
     
-    // 입력 필드 변경 처리
+    // 입력 필드 변경 처리 - 시작일/시간 변경 시 종료일/시간 자동 설정 추가
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        
+        // 새로운 폼 데이터 생성
+        const newFormData = { ...formData, [name]: value };
+        
+        // 시작일 또는 시작 시간이 변경된 경우
+        if (name === 'startDate' || name === 'startTime') {
+            // 시작일/시간 기준으로 종료일/시간 설정
+            const startDate = name === 'startDate' ? value : formData.startDate;
+            const startTime = name === 'startTime' ? value : formData.startTime;
+            
+            // 시작 날짜/시간 객체 생성
+            const startDateTime = new Date(`${startDate}T${startTime}`);
+            
+            // 종료 시간은 시작 시간 + 1시간으로 설정
+            const endDateTime = new Date(startDateTime.getTime());
+            endDateTime.setHours(endDateTime.getHours() + 1);
+            
+            // 종료일/시간 포맷팅
+            const endDate = endDateTime.toISOString().split('T')[0];
+            const endHours = endDateTime.getHours().toString().padStart(2, '0');
+            const endMinutes = endDateTime.getMinutes().toString().padStart(2, '0');
+            const endTime = `${endHours}:${endMinutes}`;
+            
+            // 종료일/시간이 시작일/시간보다 이전인 경우에만 업데이트
+            const currentEndDateTime = new Date(`${formData.endDate}T${formData.endTime}`);
+            if (currentEndDateTime < startDateTime) {
+                newFormData.endDate = endDate;
+                newFormData.endTime = endTime;
+            }
+        }
+        
+        // 폼 데이터 업데이트
+        setFormData(newFormData);
+        
+        // 폼 유효성 검사
+        validateForm(newFormData);
     };
     
-    // 체크박스/라디오 변경 처리
+    // 폼 유효성 검사 함수
+    const validateForm = (data = formData) => {
+        // 시작일/시간과 종료일/시간 비교
+        const startDateTime = new Date(`${data.startDate}T${data.isAllDay ? '00:00' : data.startTime}`);
+        const endDateTime = new Date(`${data.endDate}T${data.isAllDay ? '23:59' : data.endTime}`);
+        
+        if (endDateTime < startDateTime) {
+            setFormError('종료일(시간)은 시작일(시간)보다 이후여야 합니다.');
+            return false;
+        }
+        
+        setFormError('');
+        return true;
+    };
+    
+    // 체크박스/라디오 변경 처리 - 종일 설정 시 시간 자동 조정
     const handleCheckboxChange = (e) => {
         const { name, checked } = e.target;
-        setFormData(prev => ({ ...prev, [name]: checked }));
+        const newFormData = { ...formData, [name]: checked };
+        
+        // 종일 설정이 변경된 경우
+        if (name === 'isAllDay') {
+            if (checked) {
+                // 종일로 변경 시 시작 시간은 00:00, 종료 시간은 23:59로 설정
+                newFormData.startTime = '00:00';
+                newFormData.endTime = '23:59';
+            } else {
+                // 시간 지정으로 변경 시 기본 시간 설정
+                newFormData.startTime = '09:00';
+                newFormData.endTime = '10:00';
+            }
+        }
+        
+        setFormData(newFormData);
+        validateForm(newFormData);
     };
     
     // 색상 선택 처리
@@ -239,8 +307,13 @@ const MiddleFormScheduleCreateEditModal = ({
         onClose(); // 스케줄 모달도 함께 닫기
     };
     
-    // 폼 제출 처리 수정
+    // 폼 제출 처리 수정 - 유효성 검사 추가
     const handleSubmit = () => {
+        // 폼 유효성 검사
+        if (!validateForm()) {
+            return;
+        }
+        
         // 날짜 및 시간 포맷팅
         const startDateTime = formData.isAllDay 
             ? `${formData.startDate}T00:00:00` 
@@ -290,11 +363,11 @@ const MiddleFormScheduleCreateEditModal = ({
                 submitText="저장"
                 cancelText="취소"
                 onSubmit={handleSubmit}
-                isSubmitDisabled={!formData.title}
+                isSubmitDisabled={!formData.title || !!formError}
                 extraHeaderContent={
                     schedule && (
                         <button
-                            className="mr-2 p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                            className="text-red-500 hover:bg-red-50 rounded-full transition-colors"
                             title="스케줄 삭제"
                             onClick={handleDelete}
                         >
@@ -427,6 +500,13 @@ const MiddleFormScheduleCreateEditModal = ({
                     selectedColor={formData.color}
                     onSelectColor={handleColorSelect}
                 />
+
+                {/* 오류 메시지 표시 */}
+                {formError && (
+                    <div className="p-2 bg-red-50 text-red-600 rounded-md text-sm">
+                        {formError}
+                    </div>
+                )}
             </MiddleFormModal>
             
             {/* 삭제 확인 모달 */}

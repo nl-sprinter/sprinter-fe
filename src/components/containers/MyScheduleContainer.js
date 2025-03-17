@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {ScheduleCard} from "../common/ScheduleCard";
 
-export const MyScheduleContainer = ({ schedule = [], onScheduleClick }) => {
+export const MyScheduleContainer = memo(({ schedule = [], onScheduleClick }) => {
 
     console.log(`MyScheduleContainer  -  schedule = ${JSON.stringify(schedule)}`);
 
@@ -34,4 +34,4 @@ export const MyScheduleContainer = ({ schedule = [], onScheduleClick }) => {
             </div>
         </div>
     );
-}
+});

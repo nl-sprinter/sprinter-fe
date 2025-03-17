@@ -22,7 +22,6 @@ const CalendarPage = () => {
     // URL에서 projectId 가져오기
     const { projectId } = useParams();
     const { user, fetchUserInfo } = useUserStore();
-    console.log(`user=${JSON.stringify(user)}`);
 
     // 캘린더 상태
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -34,11 +33,9 @@ const CalendarPage = () => {
 
     // useCallback으로 fetchSchedules 함수 메모이제이션
     const fetchSchedules = useCallback(async () => {
-        console.log("Fetch Schedules 호출됨");
         try {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth() + 1; // JavaScript는 0부터 시작하므로 +1
-            console.log(`year = ${year}, month = ${month}`);
             const scheduleData = await getScheduleList(projectId, year, month);
 
             // API 응답이 null 또는 undefined인 경우 빈 배열로 처리
@@ -47,52 +44,48 @@ const CalendarPage = () => {
             console.error('일정 조회 실패:', error);
             setSchedule([]); // 오류 발생 시 빈 배열로 초기화
         }
-    }, [projectId, user, currentDate]);
+    }, [projectId, currentDate]); // user 의존성 제거
 
-    // 컴포넌트 마운트 시 일정 조회
+    // 컴포넌트 마운트 시 사용자 정보 로드
     useEffect(() => {
-        console.log('CalendarPage 마운트 또는 의존성 변경');
-        fetchSchedules();
-    }, [fetchSchedules]); // fetchSchedules만 의존성으로 추가
+        fetchUserInfo();
+    }, [fetchUserInfo]);
 
-    // 추가로 컴포넌트 마운트 시 한 번만 실행되는 useEffect 추가
+    // currentDate나 projectId가 변경될 때만 일정 조회
     useEffect(() => {
-        console.log('CalendarPage 최초 마운트');
-        fetchSchedules();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // 빈 의존성 배열로 컴포넌트 마운트 시 한 번만 실행
+        if (user) {
+            fetchSchedules();
+        }
+    }, [user, currentDate, projectId]); // fetchSchedules 의존성 제거
 
     // 일정 추가 모달 열기
-    const openAddScheduleModal = async () => {
+    const openAddScheduleModal = useCallback(() => {
         setSelectedSchedule(null);
         setIsAddModalOpen(true);
-    };
+    }, []);
     
-    // 스케줄 클릭 처리 - 단일 스케줄 조회 API 호출 추가
-    const handleScheduleClick = async (schedule) => {
+    // 스케줄 클릭 처리
+    const handleScheduleClick = useCallback(async (schedule) => {
         try {
-            // API를 통해 상세 정보 조회
-            console.log(`스케줄 ID ${schedule.id} 상세 정보 조회 중...`);
             const detailedSchedule = await getScheduleByScheduleId(schedule.id);
-            console.log('스케줄 상세 정보:', detailedSchedule);
-            
-            // 조회된 상세 정보에 ID 추가 (API에서 ID를 반환하지 않는 경우)
             const completeSchedule = {
                 ...detailedSchedule,
                 id: schedule.id
             };
-            
-            // 상세 정보를 상태에 저장하고 모달 열기
             setSelectedSchedule(completeSchedule);
             setIsAddModalOpen(true);
         } catch (error) {
             console.error('스케줄 상세 정보 조회 실패:', error);
-            // 오류 발생 시 기본 정보로 모달 열기
             setSelectedSchedule(schedule);
             setIsAddModalOpen(true);
         }
-    };
+    }, []);
     
+    // currentDate 설정 함수 메모이제이션
+    const handleSetCurrentDate = useCallback((date) => {
+        setCurrentDate(date);
+    }, []);
+
     // 스케줄 수정 처리
     const handleAddEditSchedule = async (scheduleData) => {
         try {
@@ -138,19 +131,6 @@ const CalendarPage = () => {
         fetchSchedules();
     };
 
-    // 컴포넌트 마운트 시 사용자 정보 로드
-    useEffect(() => {
-        console.log('사용자 정보 로드 시작');
-        fetchUserInfo();
-    }, [fetchUserInfo]);
-
-    // user 정보가 로드된 후 일정 조회
-    useEffect(() => {
-        if (user) {
-            fetchSchedules();
-        }
-    }, [user, fetchSchedules]);
-
     return (
         <MainLayout showFunctions showSidebar>
             <PageTitle 
@@ -170,7 +150,8 @@ const CalendarPage = () => {
                     <CalendarContainer
                         schedule={schedule}
                         currentDate={currentDate}
-                        setCurrentDate={setCurrentDate}
+                        setCurrentDate={handleSetCurrentDate}
+                        onScheduleClick={handleScheduleClick}
                     />
 
                 </W2H2Panel>
@@ -178,12 +159,12 @@ const CalendarPage = () => {
                     headerRight={
                         <button
                             className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
-                            onClick={() => openAddScheduleModal()}
+                            onClick={openAddScheduleModal}
                         >
                             <IoMdAdd size={20} />
                         </button>
                     }
-                    title={'내 스케줄'}
+                    title={'스케줄'}
                 >
                     <MyScheduleContainer 
                         schedule={schedule} 
