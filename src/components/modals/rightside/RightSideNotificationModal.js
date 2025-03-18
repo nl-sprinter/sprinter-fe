@@ -94,6 +94,8 @@ const RightSideNotificationModal = ({ open, onClose }) => {
                             navigable={n.navigable}
                             url={n.url}
                             onDelete={() => handleDeleteNotification(n.id)}
+                            projectId={n.projectId}
+                            projectName={n.projectName}
                         />
                     ))}
                 </div>

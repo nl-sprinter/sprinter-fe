@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {FiCalendar, FiCheckSquare, FiFileText} from 'react-icons/fi';
 
-export const TodoCard = ({ todoType, content, url }) => {
+export const TodoCard = ({ key, todoType, content, url, projectId, projectName }) => {
     const navigate = useNavigate();
 
     // 알림 타입에 따른 아이콘 및 색상 설정
@@ -50,10 +50,15 @@ export const TodoCard = ({ todoType, content, url }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800 mb-1">{content}</p>
+                    {projectName && (
+                        <p className="text-xs text-gray-500 truncate">
+                            {projectName}
+                        </p>
+                    )}
                 </div>
             </div>
 
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </div>
     );
 };

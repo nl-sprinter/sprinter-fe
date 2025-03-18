@@ -7,6 +7,8 @@ export const getTodos = async () => {
      * private TodoType todoType (enum)->(TASK, SCHEDULE)
      * private String content
      * private String url
+     * private Long projectId
+     * private String projectName
      *
      * <백엔드에서 보내줘야 할 URL>
      * TASK: /projects/:projectId/sprints/:sprintId/backlogs/:backlogId
@@ -24,19 +26,25 @@ export const getTodos = async () => {
                 id: 1,
                 todoType: 'TASK',
                 content: '로그인 기능 구현',
-                url: '/projects/1/sprints/1/backlogs/1'
+                url: '/projects/1/sprints/1/backlogs/1',
+                projectId: 1,
+                projectName: "카카오톡"
             },
             {
                 id: 2,
                 todoType: 'SCHEDULE',
                 content: '스프린트 계획 회의',
-                url: '/projects/1/calendar/schedule/3'
+                url: '/projects/1/calendar/schedule/3',
+                projectId: 1,
+                projectName: "카카오톡"
             },
             {
                 id: 3,
                 todoType: 'TASK',
                 content: '회원가입 페이지 개발',
-                url: '/projects/1/sprints/1/backlogs/1'
+                url: '/projects/1/sprints/1/backlogs/1',
+                projectId: 1,
+                projectName: "카카오톡"
             }
         ];
         console.log(`[API] todoApi.getTodos 더미 데이터 반환`);

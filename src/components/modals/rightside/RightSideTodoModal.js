@@ -49,6 +49,8 @@ const RightSideTodoModal = ({ open, onClose }) => {
                             todoType={t.todoType}
                             content={t.content}
                             url={t.url}
+                            projectId={t.projectId}
+                            projectName={t.projectName}
                         />
                     ))}
                 </div>

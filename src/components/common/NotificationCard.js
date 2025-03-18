@@ -4,7 +4,7 @@ import { FiMessageSquare, FiAlertTriangle, FiUsers, FiCalendar, FiMessageCircle,
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
-export const NotificationCard = ({ notificationType, content, time, navigable, url, onDelete }) => {
+export const NotificationCard = ({ key, notificationType, content, time, navigable, url, onDelete, projectId, projectName }) => {
     const navigate = useNavigate();
     
     // 알림 타입에 따른 아이콘 및 색상 설정
@@ -88,7 +88,15 @@ export const NotificationCard = ({ notificationType, content, time, navigable, u
                 </div>
                 <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800 mb-1">{content}</p>
-                    <p className="text-xs text-gray-500">{formatTime(time)}</p>
+                    <div className="flex flex-wrap items-center gap-x-2">
+                        <p className="text-xs text-gray-500">{formatTime(time)}</p>
+                        {projectName && (
+                            <p className="text-xs text-gray-500">
+                                <span className="inline-block mx-1">•</span>
+                                {projectName}
+                            </p>
+                        )}
+                    </div>
                 </div>
                 {onDelete && (
                     <button 

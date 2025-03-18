@@ -9,6 +9,8 @@ export const getNotifications = async () => {
      * private LocalDateTime time
      * private boolean navigable (url 이 있는가? 에 대한 flag)
      * private String url (없으면 null)
+     * private Long projectId
+     * private String projectName
      *
      * <백엔드에서 보내줘야 할 URL>
      * COMMENT: /projects/:projectId/sprints/:sprintId/backlogs/:backlogId
@@ -31,7 +33,9 @@ export const getNotifications = async () => {
                 content: '홍길동님이 "로그인 기능 구현" 백로그에 댓글을 남겼습니다.',
                 time: new Date(Date.now() - 1000 * 60 * 5).toISOString(), // 5분 전
                 navigable: true,
-                url: '/projects/1/sprints/1/backlogs/1'
+                url: '/projects/1/sprints/1/backlogs/1',
+                projectId: 1,
+                projectName: "카카오톡"
             },
             {
                 id: 2,
@@ -39,7 +43,9 @@ export const getNotifications = async () => {
                 content: '김철수님이 "회원가입 페이지" 백로그에 새로운 이슈를 등록했습니다.',
                 time: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30분 전
                 navigable: true,
-                url: '/projects/1/sprints/1/backlogs/11'
+                url: '/projects/1/sprints/1/backlogs/11',
+                projectId: 1,
+                projectName: "카카오톡"
             },
             {
                 id: 3,
@@ -47,7 +53,9 @@ export const getNotifications = async () => {
                 content: '오늘 오전 10시에 데일리 스크럼이 예정되어 있습니다.',
                 time: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2시간 전
                 navigable: true,
-                url: '/projects/1/sprints/1/dailyscrums/2'
+                url: '/projects/1/sprints/1/dailyscrums/2',
+                projectId: 1,
+                projectName: "카카오톡"
             },
             {
                 id: 4,
@@ -55,7 +63,9 @@ export const getNotifications = async () => {
                 content: '이영희님이 프로젝트에 참여했습니다.',
                 time: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5시간 전
                 navigable: false,
-                url: null
+                url: null,
+                projectId: 1,
+                projectName: "카카오톡"
             },
             {
                 id: 5,
@@ -63,7 +73,9 @@ export const getNotifications = async () => {
                 content: '내일 오후 2시에 "스프린트 계획 회의"가 예정되어 있습니다.',
                 time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1일 전
                 navigable: true,
-                url: '/projects/1/calendar/schedule/3'
+                url: '/projects/1/calendar/schedule/3',
+                projectId: 1,
+                projectName: "카카오톡"
             },
             {
                 id: 6,
@@ -71,7 +83,9 @@ export const getNotifications = async () => {
                 content: '박지민님이 새로운 메시지를 보냈습니다: "회의 자료 확인해주세요"',
                 time: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2일 전
                 navigable: false,
-                url: null
+                url: null,
+                projectId: 1,
+                projectName: "카카오톡"
             }
         ];
         
