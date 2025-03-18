@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
-import { checkUserIsProjectLeader } from '../api/projectApi';
+import { checkUserIsProjectLeader } from '../../api/projectApi';
 
 const ProjectLeaderRoute = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);

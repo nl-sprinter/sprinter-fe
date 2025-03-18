@@ -1,9 +1,9 @@
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import PrivateRoute from '../components/auth/PrivateRoute';
 import PublicRoute from '../components/auth/PublicRoute';
-import ProjectLeaderRoute from './ProjectLeaderRoute';
+import ProjectLeaderRoute from '../components/auth/ProjectLeaderRoute';
 import NotFoundPage from '../components/pages/NotFoundPage';
-
+import AdminRoute from '../components/auth/AdminRoute';
 
 // 로그인 전 페이지
 import LandingPage from '../components/pages/LandingPage';
@@ -15,6 +15,7 @@ import AccountPage from '../components/pages/AccountPage';
 import HomePage from '../components/pages/HomePage';
 import StartingFormPage from '../components/pages/StartingFormPage';
 import BacklogConfirmPage from '../components/pages/BacklogConfirmPage';
+
 
 // 프로젝트 내부 페이지
 // 오버뷰
@@ -33,6 +34,9 @@ import SearchPage from '../components/pages/SearchPage';
 
 // 로그아웃
 import Logout from "../components/auth/Logout";
+
+// 관리자 페이지
+import AdminPage from '../components/pages/AdminPage';
 
 const AppRoutes = () => {
     return (
@@ -177,6 +181,14 @@ const AppRoutes = () => {
                     <PrivateRoute>
                         <Logout/>
                     </PrivateRoute>
+                }/>
+
+
+                {/* 관리자 페이지 */}
+                <Route path="/admin/userlist" element={
+                    <AdminRoute>
+                        <AdminPage/>
+                    </AdminRoute>
                 }/>
 
 

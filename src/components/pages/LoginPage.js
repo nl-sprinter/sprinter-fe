@@ -1,7 +1,7 @@
 import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { login } from '../../api/authApi';
 import { useUserStore } from '../../store/useUserStore';
 
@@ -12,7 +12,8 @@ const LoginPage = () => {
         password: ''
     });
     const [error, setError] = useState('');
-    const { fetchUserInfo } = useUserStore();
+    const [loginSuccess, setLoginSuccess] = useState(false);
+    const { user, fetchUserInfo } = useUserStore();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,15 +24,36 @@ const LoginPage = () => {
         setError('');
     };
 
+    useEffect(() => {
+        if (loginSuccess && user) {
+            if (user.role === 'ROLE_ADMIN') {
+                navigate('/admin/userlist');
+            } else {
+                navigate('/home');
+            }
+        }
+    }, [user, loginSuccess, navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await login(formData.email, formData.password);
+            
             if (response.status === 200) {
+                setLoginSuccess(true);
+                
                 await fetchUserInfo();
-                navigate('/home');
+                
+                if (response.data && response.data.role) {
+                    if (response.data.role === 'ROLE_ADMIN') {
+                        navigate('/admin/userlist');
+                    } else {
+                        navigate('/home');
+                    }
+                }
             }
         } catch (error) {
+            console.error('로그인 에러:', error);
             if (!error.response) {
                 setError('서버와의 통신에 실패했습니다.');
             } else if (error.response.status !== 200) {

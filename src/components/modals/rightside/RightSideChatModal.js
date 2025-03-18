@@ -2,7 +2,6 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import RightSideModal from './RightSideModal';
 import {getUserProjects} from '../../../api/userApi';
 import {
-    getChatMessages,
     getPagedChatMessages,
     getChatSubscriptionTopic,
     getChatSendDestination,
