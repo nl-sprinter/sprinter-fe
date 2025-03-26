@@ -38,6 +38,8 @@ import Logout from "../components/auth/Logout";
 // 관리자 페이지
 import AdminPage from '../components/pages/AdminPage';
 
+import OAuth2RedirectHandler from '../components/auth/OAuth2RedirectHandler';
+
 const AppRoutes = () => {
     return (
         <BrowserRouter>
@@ -191,6 +193,12 @@ const AppRoutes = () => {
                     </AdminRoute>
                 }/>
 
+                {/* oauth2 로그인 후 리다이렉트 페이지 */}
+                <Route path="/refresh" element={
+                    <PublicRoute>
+                        <OAuth2RedirectHandler />
+                    </PublicRoute>
+                }/>
 
                 {/* // 404 페이지 - 항상 마지막에 위치해야 함 */}
                 <Route path="*" element={<NotFoundPage/>}/>
