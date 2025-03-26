@@ -7,11 +7,13 @@ import UserAccountModal from '../modals/UserAccountModal';
 import RightSideNotificationModal from '../modals/rightside/RightSideNotificationModal';
 import { getNotificationCount } from '../../api/notificationApi';
 import { getTodoCount } from '../../api/todoApi';
+import { useUserStore } from '../../store/useUserStore';
 
 const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) => {
     const navigate = useNavigate();
     const { projectId } = useParams();
     const location = useLocation();
+    const { user } = useUserStore();
     
     const [todoModalOpen, setTodoModalOpen] = useState(false);
     const [chatModalOpen, setChatModalOpen] = useState(false);
@@ -50,13 +52,7 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     // Todo 카운트 가져오기
     const fetchTodoCount = async () => {
         try {
-            // 실제 API 호출 (백엔드 완성 후 사용)
-            // const count = await getTodoCount();
-            // setTodoCount(count);
-            
-            // 더미 데이터 (백엔드 완성 전 임시 사용)
-            const count = Math.floor(Math.random() * 10); // 0~9 사이 랜덤 숫자
-            console.log(`[API] todoApi.getTodoCount 더미 데이터 반환: ${count}`);
+            const count = await getTodoCount();
             setTodoCount(count);
         } catch (error) {
             console.error('Todo 카운트 조회 실패:', error);
@@ -70,17 +66,12 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
         if (isInitialMount.current) {
             console.log('초기 알림 카운트 로드');
             fetchNotificationCount();
-            console.log('초기 Todo 카운트 로드');
-            fetchTodoCount();
             isInitialMount.current = false;
         }
         
         // 이전 인터벌 정리
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
-        }
-        if (todoIntervalRef.current) {
-            clearInterval(todoIntervalRef.current);
         }
         
         // 30초마다 알림 카운트 갱신
@@ -89,24 +80,22 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
             fetchNotificationCount();
         }, 30000);
         
-        // 30초마다 Todo 카운트 갱신
-        todoIntervalRef.current = setInterval(() => {
-            console.log('주기적 Todo 카운트 갱신');
-            fetchTodoCount();
-        }, 30000);
-        
         // 컴포넌트 언마운트 시 인터벌 정리
         return () => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
                 intervalRef.current = null;
             }
-            if (todoIntervalRef.current) {
-                clearInterval(todoIntervalRef.current);
-                todoIntervalRef.current = null;
-            }
         };
     }, [projectId]); // projectId가 변경될 때만 실행
+
+    // 로그인 상태와 라우트 변경 감지하여 Todo 카운트 가져오기
+    useEffect(() => {
+        if (user && location.pathname !== '/login') {
+            console.log('Todo 카운트 로드');
+            fetchTodoCount();
+        }
+    }, [user, location.pathname]);
     
     // 알림 모달 상태 변경 감지 및 처리
     useEffect(() => {

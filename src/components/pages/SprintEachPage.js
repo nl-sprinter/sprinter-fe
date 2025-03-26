@@ -75,12 +75,10 @@ const SprintEachPage = () => {
         
         try {
             isLoadingBacklogs.current = true;
-            console.log('백로그 목록 로드 시작');
-            
+
             const data = await getSprintBacklogList(projectId, sprintId);
             setBacklogs(data);
             
-            console.log('백로그 목록 로드 완료');
         } catch (err) {
             console.error('스프린트 백로그 목록을 불러오는데 실패했습니다:', err);
         } finally {
@@ -95,12 +93,10 @@ const SprintEachPage = () => {
         
         try {
             isLoadingDailyScrums.current = true;
-            console.log('데일리 스크럼 목록 로드 시작');
-            
+
             const data = await getDailyScrumList(projectId, sprintId);
             setDailyScrums(data);
             
-            console.log('데일리 스크럼 목록 로드 완료');
         } catch (err) {
             console.error('데일리 스크럼 목록을 불러오는데 실패했습니다:', err);
         } finally {
@@ -123,7 +119,6 @@ const SprintEachPage = () => {
             const backlog = backlogs.find(item => item.backlogId === backlogIdInt);
             
             if (backlog) {
-                console.log(`백로그 ID ${backlogId}에 해당하는 모달 열기`);
                 setSelectedBacklog(backlog);
                 setIsBacklogModalOpen(true);
             } else {
@@ -132,7 +127,6 @@ const SprintEachPage = () => {
                 navigate(`/projects/${projectId}/sprints/${sprintId}`, { replace: true });
             }
         } else if (!backlogId) {
-            console.log('백로그 모달 닫기');
             setIsBacklogModalOpen(false);
         }
     }, [backlogId, backlogs, projectId, sprintId, navigate]);
@@ -144,7 +138,6 @@ const SprintEachPage = () => {
             const dailyScrum = dailyScrums.find(item => item.dailyScrumId === dailyScrumIdInt);
             
             if (dailyScrum) {
-                console.log(`데일리 스크럼 ID ${dailyScrumId}에 해당하는 모달 열기`);
                 setSelectedDailyScrum(dailyScrum);
                 setIsDailyScrumModalOpen(true);
             } else {
@@ -153,7 +146,6 @@ const SprintEachPage = () => {
                 navigate(`/projects/${projectId}/sprints/${sprintId}`, { replace: true });
             }
         } else if (!dailyScrumId) {
-            console.log('데일리 스크럼 모달 닫기');
             setIsDailyScrumModalOpen(false);
         }
     }, [dailyScrumId, dailyScrums, projectId, sprintId, navigate]);
@@ -163,19 +155,16 @@ const SprintEachPage = () => {
         if (selectedBacklog && backlogs.length > 0) {
             const updatedBacklog = backlogs.find(backlog => backlog.backlogId === selectedBacklog.backlogId);
             if (updatedBacklog && JSON.stringify(updatedBacklog) !== JSON.stringify(selectedBacklog)) {
-                console.log('선택된 백로그 정보 업데이트');
                 setSelectedBacklog(updatedBacklog);
             }
         }
     }, [backlogs, selectedBacklog]);
 
     const handleBacklogClick = (backlogId) => {
-        console.log('백로그 클릭:', backlogId);
         navigate(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}`);
     };
 
     const handleDailyScrumClick = (dailyScrumId) => {
-        console.log('데일리 스크럼 클릭:', dailyScrumId);
         navigate(`/projects/${projectId}/sprints/${sprintId}/dailyscrums/${dailyScrumId}`);
     };
 
@@ -218,22 +207,18 @@ const SprintEachPage = () => {
     };
 
     const handleDailyScrumModalSubmit = (data) => {
-        console.log('데일리 스크럼 데이터 저장:', data);
         fetchDailyScrums();
     };
 
     const handleBacklogModalSubmit = (data) => {
-        console.log('백로그 데이터 제출:', data);
         fetchBacklogs();
     };
 
     const handleCloseBacklogModal = () => {
-        console.log('백로그 모달 닫기 요청');
         navigate(`/projects/${projectId}/sprints/${sprintId}`);
     };
 
     const handleCloseDailyScrumModal = () => {
-        console.log('데일리 스크럼 모달 닫기 요청');
         navigate(`/projects/${projectId}/sprints/${sprintId}`);
     };
 

@@ -18,6 +18,7 @@ const axiosInstance = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    // withCredentials: true  // 모든 요청에 대해 credentials 포함
 });
 
 // 요청 인터셉터 (서버로 요청을 보내기 전에 인터셉트)

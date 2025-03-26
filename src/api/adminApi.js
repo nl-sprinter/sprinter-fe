@@ -114,22 +114,6 @@ export const sendAlertToSelectedUsers = async (userIds, message) => {
     }
 };
 
-// 모든 유저에게 알림 보내기
-export const sendAlertToAllUsers = async (message) => {
-    try {
-        // 백엔드 완성 시 사용할 코드
-        // const response = await axiosInstance.post('/admin/users/message', { message });
-        // return response.data;
-        
-        // 더미 응답 반환
-        console.log(`[API] adminApi.sendAlertToAllUsers 호출 - message: ${message}`);
-        return { success: true, message: "모든 사용자에게 알림을 보냈습니다." };
-    } catch (error) {
-        console.error('[API] adminApi.sendAlertToAllUsers 에러:', error);
-        throw error;
-    }
-};
-
 // 특정 유저 삭제
 export const deleteUser = async (userId) => {
     try {

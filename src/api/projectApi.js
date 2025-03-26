@@ -525,75 +525,75 @@ export const deleteSchedule = async (projectId, scheduleId) => {
 export const search = async (projectId, query) => {
     try {
         // 실제 API 호출 (백엔드 완성 후 사용)
-        // const response = await axiosInstance.get(`/projects/${projectId}/search?query=${query}`);
-        // console.log(`[API] projectApi.search 호출, data=${JSON.stringify(response.data)}`)
-        // return response.data;
+        const response = await axiosInstance.get(`/projects/${projectId}/search?query=${query}`);
+        console.log(`[API] projectApi.search 호출, data=${JSON.stringify(response.data)}`)
+        return response.data;
         
-        // 더미 데이터
-        const dummyData = [
-            // 백로그 검색 결과
-            {
-                type: "BACKLOG",
-                title: "백로그 title 더미데이터",
-                content: "사용자 로그인 기능을 구현하고 세션 관리 로직 추가",
-                url: `/projects/${projectId}/sprints/1/backlogs/1`
-            },
-            // 태스크 검색 결과
-            {
-                type: "TASK",
-                title: "태스크 title 더미데이터",
-                content: "백엔드 API와 프론트엔드 연동 작업",
-                url: `/projects/${projectId}/sprints/1/backlogs/1`
-            },
-            // 이슈 검색 결과
-            {
-                type: "ISSUE",
-                title: "이슈 title 더미데이터",
-                content: "로그인 실패 시 적절한 에러 메시지 표시 안됨",
-                url: `/projects/${projectId}/sprints/1/backlogs/1`
-            },
-            // 스케줄 검색 결과
-            {
-                type: "SCHEDULE",
-                title: "스프린트 title 더미데이터",
-                content: "다음 스프린트 계획 및 일정 조율을 위한 회의",
-                url: `/projects/${projectId}/calendar/schedule/1`
-            },
-            // 데일리 스크럼 검색 결과
-            {
-                type: "DAILYSCRUM",
-                title: "데일리스크럼 title 더미데이터",
-                content: "로그인 기능 구현 진행 상황 및 이슈 공유",
-                url: `/projects/${projectId}/sprints/1/dailyscrums/1`
-            },
-            {
-                type: "DAILYSCRUM",
-                title: "데일리스크럼 title 더미데이터",
-                content: "로그인 기능 구현 진행 상황 및 이슈 공유",
-                url: `/projects/${projectId}/sprints/1/dailyscrums/1`
-            },
-            {
-                type: "DAILYSCRUM",
-                title: "데일리스크럼 title 더미데이터",
-                content: "로그인 기능 구현 진행 상황 및 이슈 공유",
-                url: `/projects/${projectId}/sprints/1/dailyscrums/1`
-            },
-            {
-                type: "DAILYSCRUM",
-                title: "데일리스크럼 title 더미데이터",
-                content: "로그인 기능 구현 진행 상황 및 이슈 공유",
-                url: `/projects/${projectId}/sprints/1/dailyscrums/1`
-            },
-            {
-                type: "DAILYSCRUM",
-                title: "데일리스크럼 title 더미데이터",
-                content: "로그인 기능 구현 진행 상황 및 이슈 공유",
-                url: `/projects/${projectId}/sprints/1/dailyscrums/1`
-            },
-        ];
+        // // 더미 데이터
+        // const dummyData = [
+        //     // 백로그 검색 결과
+        //     {
+        //         type: "BACKLOG",
+        //         title: "백로그 title 더미데이터",
+        //         content: "사용자 로그인 기능을 구현하고 세션 관리 로직 추가",
+        //         url: `/projects/${projectId}/sprints/1/backlogs/1`
+        //     },
+        //     // 태스크 검색 결과
+        //     {
+        //         type: "TASK",
+        //         title: "태스크 title 더미데이터",
+        //         content: "백엔드 API와 프론트엔드 연동 작업",
+        //         url: `/projects/${projectId}/sprints/1/backlogs/1`
+        //     },
+        //     // 이슈 검색 결과
+        //     {
+        //         type: "ISSUE",
+        //         title: "이슈 title 더미데이터",
+        //         content: "로그인 실패 시 적절한 에러 메시지 표시 안됨",
+        //         url: `/projects/${projectId}/sprints/1/backlogs/1`
+        //     },
+        //     // 스케줄 검색 결과
+        //     {
+        //         type: "SCHEDULE",
+        //         title: "스프린트 title 더미데이터",
+        //         content: "다음 스프린트 계획 및 일정 조율을 위한 회의",
+        //         url: `/projects/${projectId}/calendar/schedule/1`
+        //     },
+        //     // 데일리 스크럼 검색 결과
+        //     {
+        //         type: "DAILYSCRUM",
+        //         title: "데일리스크럼 title 더미데이터",
+        //         content: "로그인 기능 구현 진행 상황 및 이슈 공유",
+        //         url: `/projects/${projectId}/sprints/1/dailyscrums/1`
+        //     },
+        //     {
+        //         type: "DAILYSCRUM",
+        //         title: "데일리스크럼 title 더미데이터",
+        //         content: "로그인 기능 구현 진행 상황 및 이슈 공유",
+        //         url: `/projects/${projectId}/sprints/1/dailyscrums/1`
+        //     },
+        //     {
+        //         type: "DAILYSCRUM",
+        //         title: "데일리스크럼 title 더미데이터",
+        //         content: "로그인 기능 구현 진행 상황 및 이슈 공유",
+        //         url: `/projects/${projectId}/sprints/1/dailyscrums/1`
+        //     },
+        //     {
+        //         type: "DAILYSCRUM",
+        //         title: "데일리스크럼 title 더미데이터",
+        //         content: "로그인 기능 구현 진행 상황 및 이슈 공유",
+        //         url: `/projects/${projectId}/sprints/1/dailyscrums/1`
+        //     },
+        //     {
+        //         type: "DAILYSCRUM",
+        //         title: "데일리스크럼 title 더미데이터",
+        //         content: "로그인 기능 구현 진행 상황 및 이슈 공유",
+        //         url: `/projects/${projectId}/sprints/1/dailyscrums/1`
+        //     },
+        // ];
         
-        console.log(`[API] projectApi.search 더미 데이터 반환, query=${query}`);
-        return dummyData;
+        // console.log(`[API] projectApi.search 더미 데이터 반환, query=${query}`);
+        // return dummyData;
     } catch (error) {
         console.log(`[API] projectApi.search 호출 error = ${error.message}`);
         return [];

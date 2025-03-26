@@ -51,7 +51,7 @@ const SearchCard = ({ result }) => {
         }
     };
 
-    const { icon, label, bgColor, textColor } = getTypeInfo(result.type);
+    const { icon, label, bgColor, textColor } = getTypeInfo(result.searchType);
 
     return (
         <Link to={result.url} className="block">
