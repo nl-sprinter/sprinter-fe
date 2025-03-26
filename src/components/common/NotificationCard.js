@@ -47,6 +47,12 @@ export const NotificationCard = ({ key, notificationType, content, time, navigab
                     bgColor: 'bg-indigo-100', 
                     textColor: 'text-indigo-700' 
                 };
+            case 'ADMIN_NOTICE':
+                return {
+                    icon: <FiAlertTriangle size={18} />,
+                    bgColor: 'bg-yellow-100',
+                    textColor: 'text-yellow-700'
+                }
             default:
                 return { 
                     icon: <FiMessageCircle size={18} />, 
@@ -88,7 +94,7 @@ export const NotificationCard = ({ key, notificationType, content, time, navigab
                     {icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-800 mb-1">{content}</p>
+                    <p className="text-sm text-gray-800 mb-1">{notificationType==='ADMIN_NOTICE' && '관리자의 메세지입니다 : '}{content}</p>
                     <div className="flex flex-wrap items-center gap-x-2">
                         <p className="text-xs text-gray-500">{formatTime(time)}</p>
                         {projectName && (
