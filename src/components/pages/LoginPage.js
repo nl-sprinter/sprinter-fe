@@ -4,6 +4,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { useState, useEffect } from 'react';
 import {googleOauth2FirstStep, login} from '../../api/authApi';
 import { useUserStore } from '../../store/useUserStore';
+import oauthAxiosInstance from '../../api/oauthAxiosInstance';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -64,9 +65,26 @@ const LoginPage = () => {
         }
     };
 
-    const handleGoogleLogin = () => {
-        // axios를 사용한 API 호출 대신 직접 리다이렉션
-        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    const handleGoogleLogin = async () => {
+        try {
+            const response = await oauthAxiosInstance.get('/oauth2/authorization/google', {
+                headers: {
+                    'Accept': 'application/json',
+                }
+            });
+            
+            if (response.data && response.data.authorizationUrl) {
+                window.location.href = response.data.authorizationUrl;
+            } else {
+                // 기본 URL로 폴백
+                window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+            }
+        } catch (error) {
+            console.error('구글 로그인 오류:', error);
+            setError('구글 로그인 연동 중 오류가 발생했습니다.');
+            // 에러 발생시 기본 URL로 폴백
+            window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+        }
     };
 
     return (
