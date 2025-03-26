@@ -4,7 +4,6 @@ import { NotificationCard } from "../../common/NotificationCard";
 import { FiTrash2 } from 'react-icons/fi';
 import {
     getNotifications,
-    setNotificationCountToZero,
     deleteNotification,
     deleteAllNotifications
 } from '../../../api/notificationApi';
@@ -18,14 +17,10 @@ const RightSideNotificationModal = ({ open, onClose }) => {
         try {
             const results = await getNotifications();
             setNotifications(results || []);
-            
-            // 알림 모달을 열면 알림 카운트를 0으로 설정 (읽었으니까)
-            if (open) {
-                await setNotificationCountToZero();
-            }
+
         } catch (error) {
             console.error('RightSideNotificationModal.fetchNotifications 에러: ', error);
-            setNotifications([]);
+            // setNotifications([]);
         } finally {
             setIsLoading(false);
         }
@@ -37,6 +32,10 @@ const RightSideNotificationModal = ({ open, onClose }) => {
             fetchNotifications();
         }
     }, [open]);
+
+    useEffect(() => {
+        console.log(`notifications 변화, notifications=${JSON.stringify(notifications)}`);
+    }, [notifications]);
     
     // 알림 삭제 처리
     const handleDeleteNotification = async (notificationId) => {

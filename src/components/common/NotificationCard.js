@@ -6,7 +6,8 @@ import { ko } from 'date-fns/locale';
 
 export const NotificationCard = ({ key, notificationType, content, time, navigable, url, onDelete, projectId, projectName }) => {
     const navigate = useNavigate();
-    
+
+
     // 알림 타입에 따른 아이콘 및 색상 설정
     const getTypeInfo = () => {
         switch (notificationType) {

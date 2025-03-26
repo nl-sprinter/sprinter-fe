@@ -23,8 +23,6 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     const [notificationCount, setNotificationCount] = useState(0);
     const [todoCount, setTodoCount] = useState(0);
     const searchRef = useRef(null);
-    const intervalRef = useRef(null);
-    const todoIntervalRef = useRef(null);
     const isInitialMount = useRef(true);
     const prevNotificationModalState = useRef(false);
     const prevTodoModalState = useRef(false);
@@ -42,7 +40,7 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     const fetchNotificationCount = async () => {
         try {
             const count = await getNotificationCount();
-            setNotificationCount(count);
+            setNotificationCount(count.count);
         } catch (error) {
             console.error('알림 카운트 조회 실패:', error);
             setNotificationCount(0);
@@ -59,41 +57,14 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
             setTodoCount(0);
         }
     };
-    
-    // 컴포넌트 마운트 시 및 주기적으로 알림 카운트 가져오기
-    useEffect(() => {
-        // 초기 마운트 시에만 알림 카운트 가져오기
-        if (isInitialMount.current) {
-            console.log('초기 알림 카운트 로드');
-            fetchNotificationCount();
-            isInitialMount.current = false;
-        }
-        
-        // 이전 인터벌 정리
-        if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-        }
-        
-        // 30초마다 알림 카운트 갱신
-        intervalRef.current = setInterval(() => {
-            console.log('주기적 알림 카운트 갱신');
-            fetchNotificationCount();
-        }, 30000);
-        
-        // 컴포넌트 언마운트 시 인터벌 정리
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
-            }
-        };
-    }, [projectId]); // projectId가 변경될 때만 실행
 
-    // 로그인 상태와 라우트 변경 감지하여 Todo 카운트 가져오기
+    // 로그인 상태와 라우트 변경 감지하여 Todo 카운트와 알림 카운트 가져오기
     useEffect(() => {
         if (user && location.pathname !== '/login') {
             console.log('Todo 카운트 로드');
             fetchTodoCount();
+            console.log('알림 카운트 로드');
+            fetchNotificationCount();
         }
     }, [user, location.pathname]);
     
