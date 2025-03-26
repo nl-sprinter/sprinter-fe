@@ -64,22 +64,9 @@ const LoginPage = () => {
         }
     };
 
-    const handleGoogleLogin = async () => {
-        try {
-            // const response = await googleOauth2FirstStep();
-            
-            // // 서버에서 리다이렉트 URL을 반환하는 경우
-            // if (response.data && response.data.redirectUrl) {
-            //     window.location.href = response.data.redirectUrl;
-            // } else {
-            //     // 서버에서 직접 리다이렉트하는 경우, 아무 처리도 하지 않음
-            //     // 리다이렉트는 자동으로 이루어질 것임
-            // }
-            window.location.href='http://localhost:8080/oauth2/authorization/google';
-        } catch (error) {
-            console.error('구글 로그인 첫 번째 단계 오류:', error);
-            setError('구글 로그인 연동 중 오류가 발생했습니다.');
-        }
+    const handleGoogleLogin = () => {
+        // axios를 사용한 API 호출 대신 직접 리다이렉션
+        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
     };
 
     return (

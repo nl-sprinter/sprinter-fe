@@ -49,15 +49,6 @@ export const logout = () => { ////////TODO.로그아웃하려면 /logout하면 �
 };
 
 
-export const googleOauth2FirstStep = async () => {
-    try {
-        const response = await oauthAxiosInstance.get('/oauth2/authorization/google');
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-
 export const refresh = async () => {
     try {
         const response = await axiosInstance.get('/auth/refresh');
