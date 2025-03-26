@@ -47,11 +47,30 @@ export const logout = () => { ////////TODO.로그아웃하려면 /logout하면 �
     localStorage.removeItem('accessToken');
 };
 
-// export const checkAuth = async () => {
-//     try {
-//         const response = await axiosInstance.get('/auth/check');
-//         return response.data;
-//     } catch (error) {
-//         throw error;
-//     }
-// };
+// 추가
+export const refresh = async () => {
+    try {
+        const response = await axiosInstance.get('/auth/refresh', {
+            withCredentials: true
+        });
+
+        console.log(`[API] authApi.refresh 호출, headers=${Object.keys(response.headers)}`);
+
+        // 헤더에서 accessToken 추출
+        const accessToken = response.headers['authorization']?.split(' ')[1];
+        if (!accessToken) {
+            throw new Error('accessToken 실종');
+        }
+
+        console.log(`accessToken: ${accessToken}`);
+        // localStorage에 accessToken 저장
+        localStorage.setItem('accessToken', accessToken);
+
+        // refreshToken은 HttpOnly 쿠키로 자동 처리됨
+
+        return response;
+    } catch (error) {
+        console.error('리프레시 토큰 요청 실패:', error);
+        throw error;
+    }
+};

@@ -4,6 +4,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { useState, useEffect } from 'react';
 import { login } from '../../api/authApi';
 import { useUserStore } from '../../store/useUserStore';
+import oauthAxiosInstance from "../../api/oauthAxiosInstance";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -64,6 +65,28 @@ const LoginPage = () => {
         }
     };
 
+    const handleGoogleLogin = async () => {
+        try {
+            const response = await oauthAxiosInstance.get('/oauth2/authorization/google', {
+                headers: {
+                    'Accept': 'application/json',
+                }
+            });
+
+            if (response.data && response.data.authorizationUrl) {
+                window.location.href = response.data.authorizationUrl;
+            } else {
+                // 기본 URL로 폴백
+                window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+            }
+        } catch (error) {
+            console.error('구글 로그인 오류:', error);
+            setError('구글 로그인 연동 중 오류가 발생했습니다.');
+            // 에러 발생시 기본 URL로 폴백
+            window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+        }
+    };
+
     return (
         <MainLayout>
             <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-blue-900 overflow-hidden">
@@ -118,6 +141,7 @@ const LoginPage = () => {
                     
                     <button
                         type="button"
+                        onClick={handleGoogleLogin}
                         className="w-full py-2 border border-gray-600 text-gray-600 rounded hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                     >
                         <FcGoogle className="text-xl" />
