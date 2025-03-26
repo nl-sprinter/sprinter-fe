@@ -55,3 +55,14 @@ export const logout = () => { ////////TODO.로그아웃하려면 /logout하면 �
 //         throw error;
 //     }
 // };
+
+
+
+export const googleOauth2FirstStep = async () => {
+    try {
+        const response = await axiosInstance.get('/oauth2/authorization/google');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
