@@ -2,7 +2,7 @@ import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { useState, useEffect } from 'react';
-import { login } from '../../api/authApi';
+import {googleOauth2FirstStep, login} from '../../api/authApi';
 import { useUserStore } from '../../store/useUserStore';
 import oauthAxiosInstance from "../../api/oauthAxiosInstance";
 

@@ -1,4 +1,5 @@
 import axiosInstance from './axiosInstance';
+import oauthAxiosInstance from "./oauthAxiosInstance";
 
 export const login = async (email, password) => {
     try {
@@ -64,10 +65,10 @@ export const saveAccessTokenAndRefreshTokenFromOAuth2 = async () => {
         localStorage.setItem('accessToken', accessToken);
 
         // refreshToken은 HttpOnly 쿠키로 자동 처리됨
-
         return response;
     } catch (error) {
         console.error('리프레시 토큰 요청 실패:', error);
         throw error;
     }
 };
+

@@ -17,8 +17,10 @@ const axiosInstance = axios.create({
     baseURL: 'http://localhost:8080/api/v1', // axios 할 때 기본 URL을 여기서 설정
     headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Credentials': 'true',
+        'Accept': 'application/json'
     },
-    // withCredentials: true  // 모든 요청에 대해 credentials 포함
+    withCredentials: true
 });
 
 // 요청 인터셉터 (서버로 요청을 보내기 전에 인터셉트)

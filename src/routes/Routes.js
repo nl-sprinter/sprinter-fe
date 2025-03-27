@@ -39,6 +39,8 @@ import Logout from "../components/auth/Logout";
 import AdminPage from '../components/pages/AdminPage';
 import OAuth2RedirectHandler from "../components/auth/OAuth2RedirectHandler";
 
+import OAuth2RedirectHandler from '../components/auth/OAuth2RedirectHandler';
+
 const AppRoutes = () => {
     return (
         <BrowserRouter>
@@ -198,8 +200,6 @@ const AppRoutes = () => {
                         <OAuth2RedirectHandler />
                     </PublicRoute>
                 }/>
-
-
 
                 {/* // 404 페이지 - 항상 마지막에 위치해야 함 */}
                 <Route path="*" element={<NotFoundPage/>}/>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveAccessTokenAndRefreshTokenFromOAuth2 } from '../../api/authApi';
+
 import { useUserStore } from '../../store/useUserStore';
 
 const OAuth2RedirectHandler = () => {
