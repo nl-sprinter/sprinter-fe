@@ -43,12 +43,12 @@ export const signup = async (email, password, nickname) => {
     }
 };
 
-export const logout = () => { ////////TODO.로그아웃하려면 /logout하면 됨 일단
+export const logout = () => {
     localStorage.removeItem('accessToken');
 };
 
 // 추가
-export const refresh = async () => {
+export const saveAccessTokenAndRefreshTokenFromOAuth2 = async () => {
     try {
         const response = await axiosInstance.get('/auth/refresh', {
             withCredentials: true
@@ -61,9 +61,6 @@ export const refresh = async () => {
         if (!accessToken) {
             throw new Error('accessToken 실종');
         }
-
-        console.log(`accessToken: ${accessToken}`);
-        // localStorage에 accessToken 저장
         localStorage.setItem('accessToken', accessToken);
 
         // refreshToken은 HttpOnly 쿠키로 자동 처리됨

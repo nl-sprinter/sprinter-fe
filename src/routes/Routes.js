@@ -192,7 +192,7 @@ const AppRoutes = () => {
                     </AdminRoute>
                 }/>
 
-                {/* oauth2 로그인 후 리다이렉트 페이지 */}
+                {/* oauth2 로그인 후 리다이렉트 핸들러 */}
                 <Route path="/refresh" element={
                     <PublicRoute>
                         <OAuth2RedirectHandler />

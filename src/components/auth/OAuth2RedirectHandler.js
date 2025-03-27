@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { refresh } from '../../api/authApi';
+import { saveAccessTokenAndRefreshTokenFromOAuth2 } from '../../api/authApi';
 import { useUserStore } from '../../store/useUserStore';
 
 const OAuth2RedirectHandler = () => {
@@ -10,7 +10,7 @@ const OAuth2RedirectHandler = () => {
     useEffect(() => {
         const handleRefresh = async () => {
             try {
-                await refresh();
+                await saveAccessTokenAndRefreshTokenFromOAuth2();
                 await fetchUserInfo();
                 navigate('/home');
             } catch (error) {
@@ -23,9 +23,7 @@ const OAuth2RedirectHandler = () => {
     }, [navigate, fetchUserInfo]);
 
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="text-gray-600">로그인 처리 중...</div>
-        </div>
+        <></>
     );
 };
 
