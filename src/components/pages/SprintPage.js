@@ -185,9 +185,9 @@ const SprintPage = () => {
                 }
             />
             <PanelBox>
-                <W2H1Panel title="더미패널"></W2H1Panel>
+                <W2H1Panel title="Product Burn-Down Chart (예정)"></W2H1Panel>
 
-                <W1H1Panel title="나의 달성 현황(더미패널)">
+                <W1H1Panel title="Sprint Velocity (예정)">
                     <div className="flex items-center justify-center h-full">
                         <div className="w-28 h-28">
                             <PieChart

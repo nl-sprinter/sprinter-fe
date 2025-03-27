@@ -241,6 +241,9 @@ const SprintEachPage = () => {
         <MainLayout showFunctions showSidebar>
             <PageTitle title={`Sprint ${sprintOrder || ''} 상세`} />
             <PanelBox>
+                <W1H1Panel title="미정"></W1H1Panel>
+                <W2H1Panel title="개인별 기여도 Chart (예정)"></W2H1Panel>
+
                 <W2H1Panel
                     title="Sprint Backlog"
                     headerRight={

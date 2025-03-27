@@ -3,6 +3,7 @@ import PanelBox from '../layouts/PanelBox';
 import PageTitle from '../common/PageTitle';
 import { FiSettings, FiLogOut } from 'react-icons/fi';
 import W1H1Panel from "../panels/W1H1Panel";
+import W1H2Panel from "../panels/W1H2Panel";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getUsersInProject, checkUserIsProjectLeader, goOutUserInProject } from '../../api/projectApi';
@@ -143,6 +144,8 @@ const OverviewPage = () => {
                         </div>
                     </div>
                 </W1H1Panel>
+
+                <W1H2Panel title="ChatBot"></W1H2Panel>
 
                 <W1H1Panel title="백로그 현황">
                     <div className="space-y-4">
