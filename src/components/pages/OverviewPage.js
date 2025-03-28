@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { getUsersInProject, checkUserIsProjectLeader, goOutUserInProject } from '../../api/projectApi';
 import SmallInfoModal from '../modals/info/SmallInfoModal';
 import SmallFormModal from '../modals/form/SmallFormModal';
-import LadderGame from '../games/LadderGame';
+import RouletteGame from '../games/Roulette';
 import W2H1Panel from "../panels/W2H1Panel";
 
 const OverviewPage = () => {
@@ -137,7 +137,7 @@ const OverviewPage = () => {
                 <W1H2Panel title="자유발언대"></W1H2Panel>
 
                 <W1H2Panel title="룰렛게임">
-                    <LadderGame users={users} />
+                    <RouletteGame users={users} />
                 </W1H2Panel>
 
 
