@@ -20,6 +20,8 @@ import LargeBoardDailyScrumModal from '../modals/board/LargeBoardDailyScrumModal
 import LargeBoardBacklogModal from '../modals/board/LargeBoardBacklogModal';
 import SmallInfoModal from '../modals/info/SmallInfoModal';
 import SmallFormModal from '../modals/form/SmallFormModal';
+import BurnDownChartContainer from '../containers/BurnDownChartContainer';
+import VelocityChartContainer from '../containers/VelocityChartContainer';
 
 const SprintPage = () => {
     const navigate = useNavigate();
@@ -185,23 +187,12 @@ const SprintPage = () => {
                 }
             />
             <PanelBox>
-                <W2H1Panel title="Product Burn-Down Chart (예정)"></W2H1Panel>
+                <W2H1Panel title="Product Burn-Down Chart">
+                    <BurnDownChartContainer />
+                </W2H1Panel>
 
-                <W1H1Panel title="Sprint Velocity (예정)">
-                    <div className="flex items-center justify-center h-full">
-                        <div className="w-28 h-28">
-                            <PieChart
-                                data={[
-                                    {title: '완료', value: 60, color: '#22c55e'},
-                                    {title: '진행중', value: 30, color: '#3b82f6'},
-                                    {title: '예정', value: 10, color: '#e5e7eb'},
-                                ]}
-                                lineWidth={40}
-                                paddingAngle={2}
-                                rounded
-                            />
-                        </div>
-                    </div>
+                <W1H1Panel title="Sprint Velocity">
+                    <VelocityChartContainer />
                 </W1H1Panel>
 
                 <W1H1Panel title="오늘의 Daily Scrum">

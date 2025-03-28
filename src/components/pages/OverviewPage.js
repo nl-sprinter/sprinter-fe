@@ -11,6 +11,9 @@ import SmallInfoModal from '../modals/info/SmallInfoModal';
 import SmallFormModal from '../modals/form/SmallFormModal';
 import RouletteGame from '../games/Roulette';
 import W2H1Panel from "../panels/W2H1Panel";
+import DiceGame from '../games/Dice';
+import FreeSpeechContainer from '../containers/FreeSpeechContainer';
+import ProjectProgressContainer from '../containers/ProjectProgressContainer';
 
 const OverviewPage = () => {
     const navigate = useNavigate();
@@ -25,6 +28,8 @@ const OverviewPage = () => {
         message: '',
         type: 'success'
     });
+
+    const [selectedGame, setSelectedGame] = useState('roulette');
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -134,15 +139,46 @@ const OverviewPage = () => {
                     </div>
                 </W1H1Panel>
 
-                <W1H2Panel title="자유발언대"></W1H2Panel>
-
-                <W1H2Panel title="룰렛게임">
-                    <RouletteGame users={users} />
+                <W1H2Panel title="자유 발언대">
+                    <FreeSpeechContainer />
                 </W1H2Panel>
 
+                <W1H2Panel 
+                    title="미니게임" 
+                    headerRight={
+                        <div className="flex gap-1">
+                            <button
+                                onClick={() => setSelectedGame('roulette')}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                                    selectedGame === 'roulette'
+                                        ? 'bg-green-500 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                            >
+                                룰렛
+                            </button>
+                            <button
+                                onClick={() => setSelectedGame('dice')}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                                    selectedGame === 'dice'
+                                        ? 'bg-green-500 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                            >
+                                주사위
+                            </button>
+                        </div>
+                    }
+                >
+                    {selectedGame === 'roulette' ? (
+                        <RouletteGame users={users} />
+                    ) : (
+                        <DiceGame />
+                    )}
+                </W1H2Panel>
 
-                <W1H1Panel title="프로젝트 진행 퍼센테이지 piechart">
-
+                <W1H1Panel title="프로젝트 완성도">
+                    <ProjectProgressContainer />
                 </W1H1Panel>
             </PanelBox>
 
