@@ -9,11 +9,9 @@ export const login = async (email, password) => {
         console.log(`[API] authApi.login 호출, data=${Object.keys(response.headers)}`);
 
         const accessToken = response.headers['authorization']?.split(' ')[1];
-        console.log(accessToken);
         if (!accessToken) {
             throw new Error('accessToken 실종');
         }
-        console.log(`accessToken: ${accessToken}`);
         localStorage.setItem('accessToken', accessToken);
 
         // refreshToken은 HttpOnly로 되어있어서 리액트에서 접근불가 -> localStorage에 못넣음

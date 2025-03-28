@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react';
 import { getUsersInProject, checkUserIsProjectLeader, goOutUserInProject } from '../../api/projectApi';
 import SmallInfoModal from '../modals/info/SmallInfoModal';
 import SmallFormModal from '../modals/form/SmallFormModal';
+import LadderGame from '../games/LadderGame';
+import W2H1Panel from "../panels/W2H1Panel";
 
 const OverviewPage = () => {
     const navigate = useNavigate();
@@ -132,45 +134,15 @@ const OverviewPage = () => {
                     </div>
                 </W1H1Panel>
 
-                <W1H1Panel title="스프린트 현황">
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="text-gray-600">진행중인 스프린트</span>
-                            <span className="font-medium">2개</span>
-                        </div>
-                        <div className="flex justify-between items-center py-2">
-                            <span className="text-gray-600">완료된 스프린트</span>
-                            <span className="font-medium">3개</span>
-                        </div>
-                    </div>
-                </W1H1Panel>
+                <W1H2Panel title="자유발언대"></W1H2Panel>
 
-                <W1H2Panel title="ChatBot"></W1H2Panel>
+                <W1H2Panel title="룰렛게임">
+                    <LadderGame users={users} />
+                </W1H2Panel>
 
-                <W1H1Panel title="백로그 현황">
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="text-gray-600">전체 백로그</span>
-                            <span className="font-medium">15개</span>
-                        </div>
-                        <div className="flex justify-between items-center py-2">
-                            <span className="text-gray-600">완료된 백로그</span>
-                            <span className="font-medium">8개</span>
-                        </div>
-                    </div>
-                </W1H1Panel>
 
-                <W1H1Panel title="일정 현황">
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="text-gray-600">시작일</span>
-                            <span className="font-medium">2024.03.01</span>
-                        </div>
-                        <div className="flex justify-between items-center py-2">
-                            <span className="text-gray-600">종료 예정일</span>
-                            <span className="font-medium">2024.06.30</span>
-                        </div>
-                    </div>
+                <W1H1Panel title="프로젝트 진행 퍼센테이지 piechart">
+
                 </W1H1Panel>
             </PanelBox>
 

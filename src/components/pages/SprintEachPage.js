@@ -16,6 +16,7 @@ import LargeBoardDailyScrumModal from '../modals/board/LargeBoardDailyScrumModal
 import SmallFormBacklogCreateEditModal from "../modals/form/SmallFormBacklogCreateEditModal";
 import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
 import { getSprintList } from '../../api/projectApi';
+import W3H1Panel from "../panels/W3H1Panel";
 
 const SprintEachPage = () => {
     const {projectId, sprintId, backlogId, dailyScrumId} = useParams();
@@ -241,7 +242,8 @@ const SprintEachPage = () => {
         <MainLayout showFunctions showSidebar>
             <PageTitle title={`Sprint ${sprintOrder || ''} 상세`} />
             <PanelBox>
-                <W1H1Panel title="미정"></W1H1Panel>
+                <W1H1Panel title="이 스프린트의 백로그 진행도 piechart"></W1H1Panel>
+
                 <W2H1Panel title="개인별 기여도 Chart (예정)"></W2H1Panel>
 
                 <W2H1Panel
