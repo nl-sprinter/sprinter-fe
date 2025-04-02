@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import { getUserList, sendAlertToSelectedUsers, deleteSelectedUsers } from "../../api/adminApi";
 import SmallInfoModal from "../modals/info/SmallInfoModal";
 import { useNavigate } from "react-router-dom";
-import { useUserStore } from "../../store/useUserStore";
 import { FiChevronLeft, FiChevronRight, FiHome, FiLogOut, FiSearch } from 'react-icons/fi';
 
 const AdminPage = () => {
     const navigate = useNavigate();
-    const { clearUser } = useUserStore();
     const [users, setUsers] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [alertMessage, setAlertMessage] = useState("");

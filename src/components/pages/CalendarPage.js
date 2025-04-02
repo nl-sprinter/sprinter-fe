@@ -1,6 +1,6 @@
 import MainLayout from '../layouts/MainLayout';
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import PageTitle from '../common/PageTitle';
 import PanelBox from '../layouts/PanelBox';
 import { IoMdAdd } from 'react-icons/io';
@@ -20,7 +20,6 @@ import {CalendarContainer} from "../containers/CalendarContainer";
 const CalendarPage = () => {
     const { projectId, scheduleId } = useParams();
     const navigate = useNavigate();
-    const location = useLocation();
 
     // 캘린더 상태
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -57,15 +56,12 @@ const CalendarPage = () => {
             const foundSchedule = schedule.find(item => item.id === scheduleIdInt);
             
             if (foundSchedule) {
-                console.log(`스케줄 ID ${scheduleId}에 해당하는 모달 열기`);
                 handleScheduleClick(foundSchedule);
             } else {
-                console.log(`스케줄 ID ${scheduleId}를 찾을 수 없음, 상세 정보 조회 시도`);
                 // 현재 로드된 스케줄 목록에 없는 경우 API로 직접 조회 시도
                 fetchScheduleById(scheduleIdInt);
             }
         } else if (!scheduleId) {
-            console.log('스케줄 모달 닫기');
             setIsAddModalOpen(false);
         }
     }, [scheduleId, schedule, projectId]);

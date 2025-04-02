@@ -4,7 +4,6 @@ import { FcGoogle } from 'react-icons/fc';
 import { useState, useEffect } from 'react';
 import { login } from '../../api/authApi';
 import { useUserStore } from '../../store/useUserStore';
-import oauthAxiosInstance from "../../api/oauthAxiosInstance";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -71,7 +70,7 @@ const LoginPage = () => {
 
     return (
         <MainLayout>
-            <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-blue-900 overflow-hidden">
+            <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-[#3F5F8F] overflow-hidden">
                 <form onSubmit={handleSubmit} className="w-full max-w-[400px] p-10 bg-white rounded-xl shadow-md flex flex-col gap-5 mx-5">
                     <h1 className="text-2xl font-bold text-center mb-6">
                         로그인

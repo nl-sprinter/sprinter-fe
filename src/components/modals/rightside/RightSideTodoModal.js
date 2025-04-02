@@ -3,7 +3,6 @@ import RightSideModal from './RightSideModal';
 import {
     getTodos
 } from '../../../api/todoApi';
-import {NotificationCard} from "../../common/NotificationCard";
 import {TodoCard} from "../../common/TodoCard";
 
 const RightSideTodoModal = ({ open, onClose }) => {

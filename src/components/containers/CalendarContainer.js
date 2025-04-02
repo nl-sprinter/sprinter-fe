@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState} from 'react';
 import {IoChevronBack, IoChevronForward, IoToday} from "react-icons/io5";
 
 // 파스텔 색상 배열 정의

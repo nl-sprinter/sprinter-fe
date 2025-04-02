@@ -541,25 +541,6 @@ export const getFreeSpeechList = async (projectId) => {
     const response = await axiosInstance.get(`/projects/${projectId}/freespeech`);
     console.log(`[API] projectApi.getFreeSpeechList 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
-    // 더미데이터
-    // const dummyData = [
-    //     {
-    //         postId: 1,
-    //         content: "오늘 날씨 좋네요1",
-    //         createdAt: "2025-03-27 10:00:00"
-    //     },
-    //     {
-    //         postId: 2,
-    //         content: "오늘 날씨 좋네요2",
-    //         createdAt: "2025-03-27 11:00:00"
-    //     },
-    //     {
-    //         postId: 3,
-    //         content: "오늘 날씨 좋네요3",
-    //         createdAt: "2025-03-27 12:00:00"
-    //     }
-    // ]
-    // return dummyData;
 }
 
 // post 등록
@@ -581,15 +562,9 @@ export const deleteFreeSpeech = async (projectId, postId) => {
 
 // 프로젝트 진행 Percent 조회
 export const getProjectProgressPercent = async (projectId) => {
-    // const response = await axiosInstance.get(`/projects/${projectId}/progress-percent`);
-    // console.log(`[API] projectApi.getProjectProgressPercent 호출, data=${JSON.stringify(response.data)}`);
-    // return response.data;
-
-    // 더미데이터
-    const dummyData = {
-        percent: 50
-    }
-    return dummyData;
+    const response = await axiosInstance.get(`/projects/${projectId}/progress-percent`);
+    console.log(`[API] projectApi.getProjectProgressPercent 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
 }
 
 
@@ -597,35 +572,9 @@ export const getProjectProgressPercent = async (projectId) => {
 
 // 소프트웨어 공학적 요소 통합 조회
 export const getBurnDownChartAndVelocityChartData = async (projectId) => {
-    // const response = await axiosInstance.get(`/projects/${projectId}/software-engineering-elements`);
-    // console.log(`[API] projectApi.getBurnDownChartAndVelocityChartData 호출, data=${JSON.stringify(response.data)}`);
-    // return response.data;
-
-    // 더미데이터
-    const dummyData = [
-        {
-            "sprintId": 1,
-            "sprintOrder": 1,
-            "estimatedBurndownPoint" : 30,
-            "realBurndownPoint" : 30,
-            "velocity" : 8
-        },
-        {
-            "sprintId": 2,
-            "sprintOrder": 2,
-            "estimatedBurndownPoint" : 25,
-            "realBurndownPoint" : 23,
-            "velocity" : 6
-        },
-        {
-            "sprintId": 3,
-            "sprintOrder": 3,
-            "estimatedBurndownPoint" : 20,
-            "realBurndownPoint" : 22,
-            "velocity" : 12
-        }
-    ];
-    return dummyData;
+    const response = await axiosInstance.get(`/projects/${projectId}/software-engineering-elements`);
+    console.log(`[API] projectApi.getBurnDownChartAndVelocityChartData 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
 }
 
 
@@ -633,37 +582,7 @@ export const getBurnDownChartAndVelocityChartData = async (projectId) => {
 
 // 개인별 기여도 차트 조회
 export const getIndividualContributionChartData = async (projectId, sprintId) => {
-    const response = await axiosInstance.get(`/projects/${projectId}/sprint/${sprintId}/individual-contribution-chart`);
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/individual-contribution-chart`);
     console.log(`[API] projectApi.getIndividualContributionChartData 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
-    // console.log(`------------------------[API] projectApi.getIndividualContributionChartData 호출 dummy`);
-    //
-    // const dummyData = [
-    //     {
-    //         "userId": 1,
-    //         "nickname": "A",
-    //         "contribution": 25
-    //     },
-    //     {
-    //         "userId": 2,
-    //         "nickname": "B",
-    //         "contribution": 20
-    //     },
-    //     {
-    //         "userId": 3,
-    //         "nickname": "C",
-    //         "contribution": 15
-    //     },
-    //     {
-    //         "userId": 4,
-    //         "nickname": "D",
-    //         "contribution": 0
-    //     },
-    //     {
-    //         "userId": 5,
-    //         "nickname": "E",
-    //         "contribution": 10
-    //     }
-    // ]
-    // return dummyData;
 }

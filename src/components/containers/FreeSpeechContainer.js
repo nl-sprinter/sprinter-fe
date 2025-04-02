@@ -12,7 +12,6 @@ const FreeSpeechContainer = () => {
     const fetchPosts = async () => {
         try {
             const data = await getFreeSpeechList(projectId);
-            console.log(`data=${data}`);
             setPosts(data || []);
         } catch (error) {
             console.error('자유발언 목록 조회 실패:', error);

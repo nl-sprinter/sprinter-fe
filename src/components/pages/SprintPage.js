@@ -7,8 +7,6 @@ import {
     goOutUserInProject,
     getUsersBacklogs
 } from '../../api/projectApi';
-import {useUserStore} from '../../store/useUserStore';
-import {PieChart} from 'react-minimal-pie-chart';
 import PanelBox from "../layouts/PanelBox";
 import PageTitle from "../common/PageTitle";
 import BacklogCard from "../common/BacklogCard";
@@ -27,7 +25,6 @@ const SprintPage = () => {
     const navigate = useNavigate();
     const {projectId} = useParams();
     const [backlogs, setBacklogs] = useState([]);
-    const {user} = useUserStore();
     const [isProjectLeader, setIsProjectLeader] = useState(false);
     
     const [todayDailyScrums, setTodayDailyScrums] = useState([]);

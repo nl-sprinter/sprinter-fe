@@ -34,7 +34,6 @@ const RightSideNotificationModal = ({ open, onClose }) => {
     }, [open]);
 
     useEffect(() => {
-        console.log(`notifications 변화, notifications=${JSON.stringify(notifications)}`);
     }, [notifications]);
     
     // 알림 삭제 처리

@@ -28,7 +28,8 @@ const IndividualContributionChartContainer = ({sprintId}) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                console.log("individualContributionChartData  호출전");
+                if (!projectId || !sprintId) return; // projectId와 sprintId가 모두 있을 때만 실행
+
                 const data = await getIndividualContributionChartData(projectId, sprintId);
                 
                 const labels = data.map(item => item.nickname);
@@ -38,9 +39,9 @@ const IndividualContributionChartContainer = ({sprintId}) => {
                     labels,
                     datasets: [
                         {
-                            label: '개인별 기여도',
+                            label: '기여도',
                             data: contributions,
-                            backgroundColor: '#3B82F6', // 파란색 계열
+                            backgroundColor: '#33CC33', // 파란색 계열
                         }
                     ]
                 });
@@ -50,7 +51,7 @@ const IndividualContributionChartContainer = ({sprintId}) => {
         };
 
         fetchData();
-    }, [projectId]);
+    }, [projectId, sprintId]);
 
     const options = {
         responsive: true,

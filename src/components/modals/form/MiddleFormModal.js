@@ -1,5 +1,4 @@
 import Modal from 'react-modal';
-import { IoMdClose } from 'react-icons/io';
 
 const customStyles = {
     overlay: {

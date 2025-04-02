@@ -23,7 +23,6 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     const [notificationCount, setNotificationCount] = useState(0);
     const [todoCount, setTodoCount] = useState(0);
     const searchRef = useRef(null);
-    const isInitialMount = useRef(true);
     const prevNotificationModalState = useRef(false);
     const prevTodoModalState = useRef(false);
     
@@ -61,9 +60,7 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     // 로그인 상태와 라우트 변경 감지하여 Todo 카운트와 알림 카운트 가져오기
     useEffect(() => {
         if (user && location.pathname !== '/login') {
-            console.log('Todo 카운트 로드');
             fetchTodoCount();
-            console.log('알림 카운트 로드');
             fetchNotificationCount();
         }
     }, [user, location.pathname]);
@@ -72,7 +69,6 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     useEffect(() => {
         // 모달이 열려 있다가 닫힌 경우에만 알림 카운트 갱신
         if (prevNotificationModalState.current && !notificationModalOpen) {
-            console.log('알림 모달 닫힘 후 알림 카운트 갱신');
             fetchNotificationCount();
         }
         
@@ -84,7 +80,6 @@ const Header = ({ showSidebar = false, showFunctions = false, showSearchBar }) =
     useEffect(() => {
         // 모달이 열려 있다가 닫힌 경우에만 Todo 카운트 갱신
         if (prevTodoModalState.current && !todoModalOpen) {
-            console.log('Todo 모달 닫힘 후 Todo 카운트 갱신');
             fetchTodoCount();
         }
         

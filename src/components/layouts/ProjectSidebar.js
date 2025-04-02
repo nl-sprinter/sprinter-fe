@@ -43,7 +43,6 @@ const ProjectSidebar = () => {
     // URL이 /sprints로 끝날 때 드롭다운 메뉴 열기
     useEffect(() => {
         if (location.pathname.endsWith('/sprints')) {
-            console.log(`[DEBUG] URL이 /sprints로 끝날 때 드롭다운 메뉴 열기, isSprintOpen = ${isSprintOpen}`)
             setIsSprintOpen(true);
         }
     }, [location.pathname]); // isSprintOpen 의존성 제거
@@ -72,11 +71,6 @@ const ProjectSidebar = () => {
         const projectRoot = `/projects/${projectId}/overview`;
         // 정확히 프로젝트 루트 경로일 때만 활성화
         return currentPath.startsWith(projectRoot);
-    };
-
-    // Settings 페이지 여부 확인
-    const isSettingsPage = () => {
-        return isExactPath('/settings');
     };
 
     const menuItems = [

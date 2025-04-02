@@ -10,7 +10,6 @@ import { getUsersInProject, checkUserIsProjectLeader, goOutUserInProject } from 
 import SmallInfoModal from '../modals/info/SmallInfoModal';
 import SmallFormModal from '../modals/form/SmallFormModal';
 import RouletteGame from '../games/Roulette';
-import W2H1Panel from "../panels/W2H1Panel";
 import DiceGame from '../games/Dice';
 import FreeSpeechContainer from '../containers/FreeSpeechContainer';
 import ProjectProgressContainer from '../containers/ProjectProgressContainer';

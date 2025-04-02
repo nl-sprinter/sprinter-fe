@@ -103,8 +103,6 @@ const MiddleFormScheduleCreateEditModal = ({
     // 스케줄 데이터 로드 (projectUsers 의존성 제거)
     useEffect(() => {
         if (isOpen && schedule) {
-            console.log('수정 모드 - 스케줄 데이터:', schedule);
-            
             // API 응답 형식에 맞춰 startDate, startTime, endDate, endTime 추출
             const startDateTime = schedule.startTime ? new Date(schedule.startTime) : new Date();
             const endDateTime = schedule.endTime ? new Date(schedule.endTime) : new Date();
@@ -345,7 +343,6 @@ const MiddleFormScheduleCreateEditModal = ({
             preNotificationHours: formData.notifyBefore ? formData.notifyHours : 0,
             color: colorMap[formData.color] || 'GREEN'
         };
-        console.log(`scheduleData: ${JSON.stringify(scheduleData)}`);
 
         // 부모 컴포넌트의 onSubmit 호출
         onSubmit(scheduleData);

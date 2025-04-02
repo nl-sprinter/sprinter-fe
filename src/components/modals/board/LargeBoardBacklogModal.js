@@ -41,7 +41,6 @@ import {
     deleteBacklogComment,
     updateBacklogFinished,
     onLikeToBacklogComment,
-    offLikeToBacklogComment
 } from '../../../api/projectApi';
 import UserAttendanceContainer from '../../containers/UserAttendanceContainer';
 import BacklogTaskContainer from '../../containers/BacklogTaskContainer';

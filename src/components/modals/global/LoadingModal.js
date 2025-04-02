@@ -9,7 +9,7 @@ export const LoadingModal = ({ children }) => {
         <LoadingContext.Provider value={{ setIsLoading }}>
             {children}
             {isLoading && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"> {/*TODO: 배포시 bg-black 없앨 것*/}
+                <div className="fixed inset-0 flex items-center justify-center z-50"> {/*TODO: 배포시 bg-black 없앨 것*/}
                     <div className="bg-white p-6 rounded-lg shadow-lg">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
                     </div>
