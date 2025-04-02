@@ -16,7 +16,6 @@ import LargeBoardDailyScrumModal from '../modals/board/LargeBoardDailyScrumModal
 import SmallFormBacklogCreateEditModal from "../modals/form/SmallFormBacklogCreateEditModal";
 import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
 import { getSprintList } from '../../api/projectApi';
-import W3H1Panel from "../panels/W3H1Panel";
 import SprintBacklogProgressContainer from '../containers/SprintBacklogProgressContainer';
 import IndividualContributionChartContainer from '../containers/IndividualContributionChartContainer';
 
@@ -249,7 +248,7 @@ const SprintEachPage = () => {
                 </W1H1Panel>
 
                 <W2H1Panel title="개인별 기여도">
-                    <IndividualContributionChartContainer />
+                    <IndividualContributionChartContainer sprintId={sprintId} />
                 </W2H1Panel>
 
                 <W2H1Panel

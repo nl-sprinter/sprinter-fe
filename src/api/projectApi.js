@@ -538,28 +538,28 @@ export const search = async (projectId, query) => {
 
 // post 조회
 export const getFreeSpeechList = async (projectId) => {
-    // const response = await axiosInstance.get(`/projects/${projectId}/freespeech`);
-    // console.log(`[API] projectApi.getFreeSpeechList 호출, data=${JSON.stringify(response.data)}`);
-
+    const response = await axiosInstance.get(`/projects/${projectId}/freespeech`);
+    console.log(`[API] projectApi.getFreeSpeechList 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
     // 더미데이터
-    const dummyData = [
-        {
-            postId: 1,
-            content: "오늘 날씨 좋네요1",
-            createdAt: "2025-03-27 10:00:00"
-        },
-        {
-            postId: 2,
-            content: "오늘 날씨 좋네요2",
-            createdAt: "2025-03-27 11:00:00"
-        },
-        {
-            postId: 3,
-            content: "오늘 날씨 좋네요3",
-            createdAt: "2025-03-27 12:00:00"
-        }
-    ]
-    return dummyData;
+    // const dummyData = [
+    //     {
+    //         postId: 1,
+    //         content: "오늘 날씨 좋네요1",
+    //         createdAt: "2025-03-27 10:00:00"
+    //     },
+    //     {
+    //         postId: 2,
+    //         content: "오늘 날씨 좋네요2",
+    //         createdAt: "2025-03-27 11:00:00"
+    //     },
+    //     {
+    //         postId: 3,
+    //         content: "오늘 날씨 좋네요3",
+    //         createdAt: "2025-03-27 12:00:00"
+    //     }
+    // ]
+    // return dummyData;
 }
 
 // post 등록
@@ -632,38 +632,38 @@ export const getBurnDownChartAndVelocityChartData = async (projectId) => {
 //////////////////// 개인별 기여도 차트 /////////////////////////
 
 // 개인별 기여도 차트 조회
-export const getIndividualContributionChartData = async (projectId) => {
-    // const response = await axiosInstance.get(`/projects/${projectId}/individual-contribution-chart`);
-    // console.log(`[API] projectApi.getIndividualContributionChartData 호출, data=${JSON.stringify(response.data)}`);
-    // return response.data;
-    
-    // 더미데이터
-    const dummyData = [
-        {
-            "userId": 1,
-            "nickname": "A",
-            "contribution": 25
-        },
-        {
-            "userId": 2,
-            "nickname": "B",
-            "contribution": 20
-        },
-        {
-            "userId": 3,
-            "nickname": "C",
-            "contribution": 15
-        },
-        {
-            "userId": 4,
-            "nickname": "D",
-            "contribution": 0
-        },
-        {
-            "userId": 5,
-            "nickname": "E",
-            "contribution": 10
-        }
-    ]
-    return dummyData;
+export const getIndividualContributionChartData = async (projectId, sprintId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprint/${sprintId}/individual-contribution-chart`);
+    console.log(`[API] projectApi.getIndividualContributionChartData 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+    // console.log(`------------------------[API] projectApi.getIndividualContributionChartData 호출 dummy`);
+    //
+    // const dummyData = [
+    //     {
+    //         "userId": 1,
+    //         "nickname": "A",
+    //         "contribution": 25
+    //     },
+    //     {
+    //         "userId": 2,
+    //         "nickname": "B",
+    //         "contribution": 20
+    //     },
+    //     {
+    //         "userId": 3,
+    //         "nickname": "C",
+    //         "contribution": 15
+    //     },
+    //     {
+    //         "userId": 4,
+    //         "nickname": "D",
+    //         "contribution": 0
+    //     },
+    //     {
+    //         "userId": 5,
+    //         "nickname": "E",
+    //         "contribution": 10
+    //     }
+    // ]
+    // return dummyData;
 }

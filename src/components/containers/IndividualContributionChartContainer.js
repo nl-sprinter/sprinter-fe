@@ -21,14 +21,15 @@ ChartJS.register(
     Legend
 );
 
-const IndividualContributionChartContainer = () => {
+const IndividualContributionChartContainer = ({sprintId}) => {
     const { projectId } = useParams();
     const [chartData, setChartData] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await getIndividualContributionChartData(projectId);
+                console.log("individualContributionChartData  호출전");
+                const data = await getIndividualContributionChartData(projectId, sprintId);
                 
                 const labels = data.map(item => item.nickname);
                 const contributions = data.map(item => item.contribution);

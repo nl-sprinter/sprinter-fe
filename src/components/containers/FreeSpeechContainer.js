@@ -12,9 +12,11 @@ const FreeSpeechContainer = () => {
     const fetchPosts = async () => {
         try {
             const data = await getFreeSpeechList(projectId);
-            setPosts(data);
+            console.log(`data=${data}`);
+            setPosts(data || []);
         } catch (error) {
             console.error('자유발언 목록 조회 실패:', error);
+            setPosts([]);
         }
     };
 
@@ -38,9 +40,9 @@ const FreeSpeechContainer = () => {
     };
 
     // 글 삭제
-    const handleDelete = async (postId) => {
+    const handleDelete = async (id) => {
         try {
-            await deleteFreeSpeech(projectId, postId);
+            await deleteFreeSpeech(projectId, id);
             fetchPosts(); // 목록 새로고침
         } catch (error) {
             console.error('자유발언 삭제 실패:', error);
@@ -73,16 +75,16 @@ const FreeSpeechContainer = () => {
 
             {/* 글 목록 */}
             <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
-                {posts.map(post => (
+                {Array.isArray(posts) && posts.map(p => (
                     <div 
-                        key={post.id} 
+                        key={p.id}
                         className="bg-white rounded-lg p-2 flex justify-between items-start group"
                     >
                         <p className="text-sm text-gray-600 whitespace-pre-wrap break-words flex-1 px-1">
-                            {post.content}
+                            {p.content}
                         </p>
                         <button
-                            onClick={() => handleDelete(post.id)}
+                            onClick={() => handleDelete(p.id)}
                             className="text-gray-400 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                             <FiX size={16} />
