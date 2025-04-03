@@ -3,16 +3,28 @@ import axiosInstance from './axiosInstance';
 
 // 유저 정보 조회 (useUserStore에 저장)
 export const getUserInfo = async () => {
-    const response = await axiosInstance.get('/user/info');
-    console.log(`[API] userApi.getUserInfo 호출, data=${JSON.stringify(response.data)}`);
-    return response.data;
-    // const dummyData = {
-    //     id: 1,
-    //     nickname: 'dummyuser',
-    //     email: 'dummyuser@gmail.com',
-    //     role: 'USER',
-    // };
-    // return dummyData;
+    try {
+        const response = await axiosInstance.get('/user/info');
+        console.log(`[API] userApi.getUserInfo 호출 성공, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.error(`[API] userApi.getUserInfo 호출 실패:`, {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            headers: error.response?.headers,
+            config: {
+                url: error.config?.url,
+                method: error.config?.method,
+                headers: error.config?.headers
+            }
+        });
+        
+        if (error.response?.status === 400) {
+            throw new Error(`사용자 정보를 가져오는데 실패했습니다. (${error.response?.data?.message || '알 수 없는 오류'})`);
+        }
+        throw error;
+    }
 };
 
 // 유저가 속한 프로젝트 조회

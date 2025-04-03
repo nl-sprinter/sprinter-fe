@@ -14,11 +14,10 @@ export const setErrorHandler = (callback) => {
 
 // axios 기본 설정
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080/api/v1', // axios 할 때 기본 URL을 여기서 설정
+    baseURL: '/api/v1', // axios 할 때 기본 URL을 여기서 설정 // TODO
     headers: {
         'Content-Type': 'application/json',
-    },
-    // withCredentials: true  // 모든 요청에 대해 credentials 포함
+    }
 });
 
 // 요청 인터셉터 (서버로 요청을 보내기 전에 인터셉트)
@@ -68,7 +67,10 @@ axiosInstance.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const refreshResponse = await axiosInstance.post('/auth/refresh', {}, {withCredentials: true});
+                // refresh 요청에만 withCredentials: true 적용
+                const refreshResponse = await axiosInstance.post('/auth/refresh', {}, {
+                    withCredentials: true
+                });
 
                 // 새로운 accessToken을 localStorage에 저장
                 const newAccessToken = refreshResponse.data.accessToken;

@@ -5,7 +5,9 @@ export const login = async (email, password) => {
         const response = await axiosInstance.post('/auth/login', {
             email,
             password
-        }, {withCredentials: true});
+        }, {
+            withCredentials: true // 로그인 요청에만 withCredentials: true 적용
+        });
         console.log(`[API] authApi.login 호출, data=${Object.keys(response.headers)}`);
 
         const accessToken = response.headers['authorization']?.split(' ')[1];

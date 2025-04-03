@@ -38,14 +38,15 @@ const LoginPage = () => {
         e.preventDefault();
         try {
             const response = await login(formData.email, formData.password);
-            
+            console.log(`response:${JSON.stringify(response)}`);
             if (response.status === 200) {
                 setLoginSuccess(true);
                 
-                await fetchUserInfo();
-                
-                if (response.data && response.data.role) {
-                    if (response.data.role === 'ROLE_ADMIN') {
+                const user = await fetchUserInfo();
+                console.log(`user:${JSON.stringify(user)}`);
+
+                if (user && user.role) {
+                    if (user.role === 'ROLE_ADMIN') {
                         navigate('/admin/userlist');
                     } else {
                         navigate('/home');
