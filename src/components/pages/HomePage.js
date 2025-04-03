@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import { FiPlus } from 'react-icons/fi';
+import { FiPlus, FiHelpCircle } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useUserProjectStore } from '../../store/useUserProjectStore';
 import { useUserStore } from '../../store/useUserStore';
 import { useProjectNavigationStore } from '../../store/useProjectNavigationStore';
-import {getUserProjects} from "../../api/userApi";
+import { getUserProjects } from "../../api/userApi";
+import LargeBoardHelpModal from '../modals/board/LargeBoardHelpModal';
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -13,13 +14,11 @@ const HomePage = () => {
     const { fetchProjects } = useUserProjectStore();
     const { setProjectId } = useProjectNavigationStore();
     const { user, fetchUserInfo } = useUserStore();
+    const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
     useEffect(() => {
         if (!user) {
-            console.log('Homepage - user가 없습니다. fetchUserInfo 호출');
             fetchUserInfo();
-        } else {
-            console.log('Homepage - user가 있습니다. fetchUserInfo 호출 안함');
         }
     }, [user, fetchUserInfo]);
 
@@ -54,8 +53,8 @@ const HomePage = () => {
     };
 
     return (
-        <MainLayout showFunctions>
-            <div className="p-8">
+        <MainLayout showFunctions showSearchBar={false}>
+            <div className="p-8 relative">
                 <h1 className="text-2xl font-bold mb-8">
                     안녕하세요, {user?.nickname}님!
                 </h1>
@@ -83,13 +82,23 @@ const HomePage = () => {
                                 </span>
                             </div>
                             <span className="text-white">{project.projectName}</span>
-                            <span className="text-white text-sm mt-2 opacity-75">
-                                ID: {project.projectId}
-                            </span>
                         </div>
                     ))}
                 </div>
+
+                <button
+                    onClick={() => setIsHelpModalOpen(true)}
+                    className="fixed bottom-8 right-8 w-12 h-12 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-colors flex items-center justify-center"
+                    aria-label="도움말"
+                >
+                    <FiHelpCircle size={24} />
+                </button>
             </div>
+
+            <LargeBoardHelpModal
+                isOpen={isHelpModalOpen}
+                onClose={() => setIsHelpModalOpen(false)}
+            />
         </MainLayout>
     );
 };

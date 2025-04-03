@@ -1,7 +1,7 @@
 import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { login } from '../../api/authApi';
 import { useUserStore } from '../../store/useUserStore';
 
@@ -12,7 +12,8 @@ const LoginPage = () => {
         password: ''
     });
     const [error, setError] = useState('');
-    const { fetchUserInfo } = useUserStore();
+    const [loginSuccess, setLoginSuccess] = useState(false);
+    const { user, fetchUserInfo } = useUserStore();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,15 +24,37 @@ const LoginPage = () => {
         setError('');
     };
 
+    useEffect(() => {
+        if (loginSuccess && user) {
+            if (user.role === 'ROLE_ADMIN') {
+                navigate('/admin/userlist');
+            } else {
+                navigate('/home');
+            }
+        }
+    }, [user, loginSuccess, navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await login(formData.email, formData.password);
+            console.log(`response:${JSON.stringify(response)}`);
             if (response.status === 200) {
-                await fetchUserInfo();
-                navigate('/home');
+                setLoginSuccess(true);
+                
+                const user = await fetchUserInfo();
+                console.log(`user:${JSON.stringify(user)}`);
+
+                if (user && user.role) {
+                    if (user.role === 'ROLE_ADMIN') {
+                        navigate('/admin/userlist');
+                    } else {
+                        navigate('/home');
+                    }
+                }
             }
         } catch (error) {
+            console.error('로그인 에러:', error);
             if (!error.response) {
                 setError('서버와의 통신에 실패했습니다.');
             } else if (error.response.status !== 200) {
@@ -42,9 +65,13 @@ const LoginPage = () => {
         }
     };
 
+    const handleGoogleLogin = async () => {
+        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    };
+
     return (
         <MainLayout>
-            <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-blue-900 overflow-hidden">
+            <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-[#3F5F8F] overflow-hidden">
                 <form onSubmit={handleSubmit} className="w-full max-w-[400px] p-10 bg-white rounded-xl shadow-md flex flex-col gap-5 mx-5">
                     <h1 className="text-2xl font-bold text-center mb-6">
                         로그인
@@ -96,6 +123,7 @@ const LoginPage = () => {
                     
                     <button
                         type="button"
+                        onClick={handleGoogleLogin}
                         className="w-full py-2 border border-gray-600 text-gray-600 rounded hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                     >
                         <FcGoogle className="text-xl" />

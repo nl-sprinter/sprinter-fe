@@ -1,102 +1,172 @@
 import MainLayout from '../layouts/MainLayout';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import PageTitle from '../common/PageTitle';
 import PanelBox from '../layouts/PanelBox';
-import W3H2Panel from '../panels/W3H2Panel';
 import { IoMdAdd } from 'react-icons/io';
-
-const ScheduleItem = ({ title, date, type }) => {
-    return (
-        <div className="flex items-center justify-between p-2 rounded-lg transition-all duration-300
-            border border-gray-200 relative overflow-hidden
-            border-l-4 border-l-green-500 hover:bg-green-50"
-        >
-            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-green-50/80 to-transparent" />
-            <div className="flex flex-col gap-1 relative flex-1">
-                <span className="text-sm">{title}</span>
-                <span className="text-xs text-gray-500">{date}</span>
-            </div>
-            <span className={`px-2 py-1 rounded text-xs relative ${
-                type === 'sprint' 
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-blue-100 text-blue-700'
-            }`}>
-                {type === 'sprint' ? '스프린트' : '미팅'}
-            </span>
-        </div>
-    );
-};
+import MiddleFormScheduleCreateEditModal from '../modals/form/MiddleFormScheduleCreateEditModal';
+import { 
+    getScheduleList, 
+    addSchedule, 
+    updateSchedule, 
+    deleteSchedule,
+    getScheduleByScheduleId 
+} from '../../api/projectApi';
+import {MyScheduleContainer} from "../containers/MyScheduleContainer";
+import W2H2Panel from "../panels/W2H2Panel";
+import W1H2Panel from "../panels/W1H2Panel";
+import {CalendarContainer} from "../containers/CalendarContainer";
 
 const CalendarPage = () => {
-    const [currentDate] = useState(new Date());
-    const [events] = useState([
-        {
-            date: '2024-03-15',
-            title: '스프린트 1 종료',
-            type: 'sprint',
-        },
-        {
-            date: '2024-03-16',
-            title: '스프린트 2 시작',
-            type: 'sprint',
-        },
-        {
-            date: '2024-03-20',
-            title: '백로그 검토',
-            type: 'meeting',
-        }
-    ]);
+    const { projectId, scheduleId } = useParams();
+    const navigate = useNavigate();
 
-    const getDaysInMonth = (date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        return new Date(year, month + 1, 0).getDate();
+    // 캘린더 상태
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const [schedule, setSchedule] = useState([]);
+    
+    // 선택된 이벤트 상태
+    const [selectedSchedule, setSelectedSchedule] = useState(null);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+    // useCallback으로 fetchSchedules 함수 메모이제이션
+    const fetchSchedules = useCallback(async () => {
+        try {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1; // JavaScript는 0부터 시작하므로 +1
+            const scheduleData = await getScheduleList(projectId, year, month);
+
+            // API 응답이 null 또는 undefined인 경우 빈 배열로 처리
+            setSchedule(Array.isArray(scheduleData) ? scheduleData : []);
+        } catch (error) {
+            console.error('일정 조회 실패:', error);
+            setSchedule([]); // 오류 발생 시 빈 배열로 초기화
+        }
+    }, [projectId, currentDate]); // user 의존성 제거
+
+    // currentDate나 projectId가 변경될 때만 일정 조회
+    useEffect(() => {
+        fetchSchedules();
+    }, [fetchSchedules, currentDate, projectId]); // fetchSchedules 의존성 추가
+
+    // URL에서 scheduleId가 변경될 때 모달 상태 업데이트
+    useEffect(() => {
+        if (scheduleId && schedule.length > 0) {
+            const scheduleIdInt = parseInt(scheduleId);
+            const foundSchedule = schedule.find(item => item.id === scheduleIdInt);
+            
+            if (foundSchedule) {
+                handleScheduleClick(foundSchedule);
+            } else {
+                // 현재 로드된 스케줄 목록에 없는 경우 API로 직접 조회 시도
+                fetchScheduleById(scheduleIdInt);
+            }
+        } else if (!scheduleId) {
+            setIsAddModalOpen(false);
+        }
+    }, [scheduleId, schedule, projectId]);
+
+    // 스케줄 ID로 직접 조회하는 함수
+    const fetchScheduleById = async (id) => {
+        try {
+            const detailedSchedule = await getScheduleByScheduleId(id);
+            if (detailedSchedule) {
+                const completeSchedule = {
+                    ...detailedSchedule,
+                    id: id
+                };
+                setSelectedSchedule(completeSchedule);
+                setIsAddModalOpen(true);
+            } else {
+                // 존재하지 않는 스케줄 ID인 경우 기본 URL로 리다이렉트
+                navigate(`/projects/${projectId}/calendar`, { replace: true });
+            }
+        } catch (error) {
+            console.error('스케줄 상세 정보 조회 실패:', error);
+            navigate(`/projects/${projectId}/calendar`, { replace: true });
+        }
     };
 
-    const getFirstDayOfMonth = (date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        return new Date(year, month, 1).getDay();
+    // 일정 추가 모달 열기
+    const openAddScheduleModal = useCallback(() => {
+        setSelectedSchedule(null);
+        setIsAddModalOpen(true);
+    }, []);
+    
+    // 스케줄 클릭 처리
+    const handleScheduleClick = useCallback(async (schedule) => {
+        if (schedule.scheduleType === 'SPRINT') {
+            // 스프린트 타입은 클릭 처리하지 않음
+            return;
+        }
+        
+        // URL 변경
+        navigate(`/projects/${projectId}/calendar/schedule/${schedule.id}`);
+        
+        try {
+            const detailedSchedule = await getScheduleByScheduleId(schedule.id);
+            const completeSchedule = {
+                ...detailedSchedule,
+                id: schedule.id
+            };
+            setSelectedSchedule(completeSchedule);
+            setIsAddModalOpen(true);
+        } catch (error) {
+            console.error('스케줄 상세 정보 조회 실패:', error);
+            setSelectedSchedule(schedule);
+            setIsAddModalOpen(true);
+        }
+    }, [projectId, navigate]);
+    
+    // currentDate 설정 함수 메모이제이션
+    const handleSetCurrentDate = useCallback((date) => {
+        setCurrentDate(date);
+    }, []);
+
+    // 스케줄 수정 처리
+    const handleAddEditSchedule = async (scheduleData) => {
+        try {
+            if (selectedSchedule) {
+                // 수정 모드
+                await updateSchedule(projectId, selectedSchedule.id, scheduleData);
+            } else {
+                // 추가 모드
+                await addSchedule(scheduleData, projectId);
+            }
+            
+            // 모달 닫기
+            handleCloseModal();
+            
+            // 일정 목록 새로고침
+            fetchSchedules();
+        } catch (error) {
+            console.error('일정 저장 실패:', error);
+        }
+    };
+    
+    // 스케줄 삭제 처리
+    const handleDeleteSchedule = async () => {
+        if (!selectedSchedule) return;
+        
+        try {
+            await deleteSchedule(projectId, selectedSchedule.id);
+            
+            // 모달 닫기
+            handleCloseModal();
+            
+            // 일정 목록 새로고침
+            fetchSchedules();
+        } catch (error) {
+            console.error('일정 삭제 실패:', error);
+        }
     };
 
-    const renderCalendar = () => {
-        const daysInMonth = getDaysInMonth(currentDate);
-        const firstDay = getFirstDayOfMonth(currentDate);
-        const days = [];
-
-        // 이전 달의 날짜들
-        for (let i = 0; i < firstDay; i++) {
-            days.push(<div key={`empty-${i}`} className="p-2 text-gray-400" />);
-        }
-
-        // 현재 달의 날짜들
-        for (let day = 1; day <= daysInMonth; day++) {
-            const date = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const dayEvents = events.filter(event => event.date === date);
-            const isToday = new Date().getDate() === day && new Date().getMonth() === currentDate.getMonth();
-
-            days.push(
-                <div key={day} className={`p-2 min-h-[80px] border-t border-l border-gray-100 ${isToday ? 'bg-green-50/30' : ''}`}>
-                    <span className={`text-sm ${isToday ? 'text-green-600 font-medium' : 'text-gray-600'}`}>{day}</span>
-                    <div className="mt-1 space-y-1">
-                        {dayEvents.map((event, index) => (
-                            <div 
-                                key={index}
-                                className={`text-xs p-1.5 rounded-md ${
-                                    event.type === 'sprint' 
-                                        ? 'bg-green-100 text-green-800' 
-                                        : 'bg-blue-100 text-blue-800'
-                                }`}
-                            >
-                                {event.title}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
-
-        return days;
+    // 모달 닫기 함수 수정
+    const handleCloseModal = () => {
+        // URL 변경
+        navigate(`/projects/${projectId}/calendar`);
+        setIsAddModalOpen(false);
+        setSelectedSchedule(null); // 선택된 이벤트 초기화
     };
 
     return (
@@ -104,45 +174,52 @@ const CalendarPage = () => {
             <PageTitle 
                 title="캘린더" 
                 description="프로젝트의 주요 일정을 확인할 수 있습니다."
-                rightContent={
-                    <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-1">
-                        <IoMdAdd size={20} />
-                        일정 추가
-                    </button>
-                }
             />
-            
+
             <PanelBox>
-                <W3H2Panel
-                    title={`${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`}
+                <W2H2Panel
+                    title={'달력'}
+                    headerRight={
+                        <div className="w-8 h-8 opacity-0">
+                            <IoMdAdd size={20} />
+                        </div>
+                    }
                 >
-                    <div className="flex h-full gap-6">
-                        <div className="flex-1">
-                            <div className="grid grid-cols-7 border-r border-b border-gray-100">
-                                {['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                                    <div key={day} className="p-2 text-center font-medium text-gray-600 bg-gray-50/50 border-t border-l border-gray-100">
-                                        {day}
-                                    </div>
-                                ))}
-                                {renderCalendar()}
-                            </div>
-                        </div>
-                        <div className="w-80">
-                            <h3 className="text-lg font-medium mb-4">My Schedule</h3>
-                            <div className="space-y-2">
-                                {events.map((event, index) => (
-                                    <ScheduleItem
-                                        key={index}
-                                        title={event.title}
-                                        date={event.date}
-                                        type={event.type}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </W3H2Panel>
+                    <CalendarContainer
+                        schedule={schedule}
+                        currentDate={currentDate}
+                        setCurrentDate={handleSetCurrentDate}
+                        onScheduleClick={handleScheduleClick}
+                    />
+
+                </W2H2Panel>
+                <W1H2Panel
+                    headerRight={
+                        <button
+                            className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                            onClick={openAddScheduleModal}
+                        >
+                            <IoMdAdd size={20} />
+                        </button>
+                    }
+                    title={'스케줄'}
+                >
+                    <MyScheduleContainer 
+                        schedule={schedule} 
+                        onScheduleClick={handleScheduleClick}
+                    />
+                </W1H2Panel>
             </PanelBox>
+
+            {/* 일정 추가/편집 모달 수정 */}
+            <MiddleFormScheduleCreateEditModal
+                isOpen={isAddModalOpen}
+                onClose={handleCloseModal}
+                projectId={projectId}
+                schedule={selectedSchedule}
+                onSubmit={handleAddEditSchedule}
+                onDelete={handleDeleteSchedule}
+            />
         </MainLayout>
     );
 };

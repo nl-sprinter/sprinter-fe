@@ -190,6 +190,15 @@ export const updateBacklog = async (projectId, sprintId, backlogId, title, weigh
     return response.data;
 }
 
+// Backlog 완료 toggle
+export const updateBacklogFinished = async (backlogId, finish) => {
+    const response = await axiosInstance.patch(`/projects/0/sprints/0/backlogs/${backlogId}/finish`, {
+        finish: finish
+    });
+    console.log(`[API] projectApi.updateBacklogFinished 호출, data=${JSON.stringify(response.data)}`);
+    return response.data.finish;
+}
+
 export const getUsersInBacklog = async (projectId, sprintId, backlogId) => {
     const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/users`);
     console.log(`[API] projectApi.getUsersInBacklog 호출, data=${JSON.stringify(response.data)}`);
@@ -203,8 +212,17 @@ export const addUserInBacklog = async (projectId, sprintId, backlogId, userId) =
 }
 
 export const deleteUserInBacklog = async (projectId, sprintId, backlogId, userId) => {
-    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/users/${userId}`);
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/users?userId=${userId}`);
     console.log(`[API] projectApi.deleteUserInBacklog 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// 유저가 참여하는 백로그 조회
+export const getUsersBacklogs = async (projectId, token) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/user-backlogs`, {
+        headers: { Authorization: token }
+    });
+    console.log(`[API] projectApi.getUsersBacklogs 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 }
 
@@ -317,10 +335,24 @@ export const deleteIssue = async (projectId, sprintId, backlogId, issueId) => {
 }
 
 //////////////////// DailyScrum 관련 API ////////////////////
+
+// Sprint id 로 DailyScrum 리스트 조회
 export const getDailyScrumList = async (projectId, sprintId) => {
     const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/dailyscrums`);
     console.log(`[API] projectApi.getDailyScrumList 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
+}
+
+// 오늘 날짜의 DailyScrum 조회
+export const getDailyScrumInToday = async (projectId) => {
+    try {
+        const response = await axiosInstance.get(`/projects/${projectId}/sprints/0/dailyscrums/today`);
+        console.log(`[API] projectApi.getDailyScrumInToday 호출, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.log(`getDailyScrumInToday 예외터짐!ㅃ!! error=${error.message}`);
+    }
+
 }
 
 // Sprint 에 DailyScrum 생성
@@ -402,9 +434,6 @@ export const deleteDailyScrum = async (projectId, sprintId, dailyScrumId) => {
 //////////////////// Backlog Comment 관련 API ////////////////////
 // 백로그 댓글 조회
 export const getBacklogComments = async (projectId, sprintId, backlogId) => {
-    console.log(`projectId = ${projectId}`);
-    console.log(`sprintId = ${sprintId}`);
-    console.log(`backlogId = ${backlogId}`);
     const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments`);
     console.log(`[API] projectApi.getBacklogComments 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
@@ -412,12 +441,6 @@ export const getBacklogComments = async (projectId, sprintId, backlogId) => {
 
 // 백로그 댓글 생성
 export const createBacklogComment = async (projectId, sprintId, backlogId, parentCommentId, content) => {
-    console.log("=--=-=-=-=-=-=-=-=-=-=-=-=-=createBacklogComment 호출");
-    console.log(`projectId = ${projectId}`);
-    console.log(`sprintId = ${sprintId}`);
-    console.log(`backlogId = ${backlogId}`);
-    console.log(`parentCommentId = ${parentCommentId}`);
-    console.log(`content = ${content}`);
     const response = await axiosInstance.post(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments`, {
         parentCommentId: parentCommentId,
         content: content
@@ -431,5 +454,135 @@ export const createBacklogComment = async (projectId, sprintId, backlogId, paren
 export const deleteBacklogComment = async (projectId, sprintId, backlogId, backlogCommentId) => {
     const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments/${backlogCommentId}`);
     console.log(`[API] projectApi.deleteBacklogComment 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// 백로그 댓글 좋아요 누르기
+export const onLikeToBacklogComment = async (projectId, sprintId, backlogId, backlogCommentId) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments/${backlogCommentId}/likes`);
+    console.log(`[API] projectApi.onLikeToBacklogComment 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// 백로그 댓글 좋아요 취소
+export const offLikeToBacklogComment = async (projectId, sprintId, backlogId, backlogCommentId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/sprints/${sprintId}/backlogs/${backlogId}/backlogcomments/${backlogCommentId}/likes`);
+    console.log(`[API] projectApi.offLikeToBacklogComment 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+
+//////////////////// Schedule 관련 API ////////////////////
+
+// 프로젝트 내 특정 년/월 Sprint + Schedule list 조회
+export const getScheduleList = async (projectId, year, month) => {
+    console.log()
+    try {
+        const response = await axiosInstance.get(`/projects/${projectId}/schedule?year=${year}&month=${month}`);
+        console.log(`[API] projectApi.getSchedule 호출, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.log(`[API] projectApi.getSchedule 호출 error = ${error.message}`);
+    }
+
+}
+
+// scheduleId 로 Schedule 조회
+export const getScheduleByScheduleId = async (scheduleId) => {
+    const response = await axiosInstance.get(`/projects/0/schedule/${scheduleId}`);
+    console.log(`[API] projectApi.getScheduleByScheduleId 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// 캘린더 내 Schedule 생성
+export const addSchedule = async (scheduleAddRequest, projectId) => {
+    try {
+        const response = await axiosInstance.post(`/projects/${projectId}/schedule`, scheduleAddRequest);
+        console.log(`[API] projectApi.addMySchedule 호출, data=${JSON.stringify(response.data)}`);
+        return response.data;
+    } catch (error) {
+        console.log(`[API] projectApi.addSchedule 호출 error = ${error.message}`);
+    }
+}
+
+// Schedule 수정
+export const updateSchedule = async (projectId, scheduleId, scheduleRequest) => {
+    const response = await axiosInstance.patch(`/projects/${projectId}/schedule/${scheduleId}`, scheduleRequest);
+    console.log(`[API] projectApi.updateSchedule 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// Schedule 삭제
+export const deleteSchedule = async (projectId, scheduleId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/schedule/${scheduleId}`);
+    console.log(`[API] projectApi.deleteSchedule 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+/////////// 검색 Search ////////////
+
+// 검색
+export const search = async (projectId, query) => {
+    try {
+        const response = await axiosInstance.get(`/projects/${projectId}/search?query=${query}`);
+        console.log(`[API] projectApi.search 호출, data=${JSON.stringify(response.data)}`)
+        return response.data;
+    } catch (error) {
+        console.log(`[API] projectApi.search 호출 error = ${error.message}`);
+        return [];
+    }
+}
+
+
+//////////////////// 자유 발언대 ////////////////////
+
+// post 조회
+export const getFreeSpeechList = async (projectId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/freespeech`);
+    console.log(`[API] projectApi.getFreeSpeechList 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// post 등록
+export const addFreeSpeech = async (projectId, post) => {
+    const response = await axiosInstance.post(`/projects/${projectId}/freespeech`, post);
+    console.log(`[API] projectApi.addFreeSpeech 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+// post 삭제
+export const deleteFreeSpeech = async (projectId, postId) => {
+    const response = await axiosInstance.delete(`/projects/${projectId}/freespeech/${postId}`);
+    console.log(`[API] projectApi.deleteFreeSpeech 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+
+//////////////////// 프로젝트 진행 Percent Chart ////////////////////
+
+// 프로젝트 진행 Percent 조회
+export const getProjectProgressPercent = async (projectId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/progress-percent`);
+    console.log(`[API] projectApi.getProjectProgressPercent 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+
+///////////////////// 소프트웨어 공학적 요소 (스프린트 현황 페이지) /////////////////////////
+
+// 소프트웨어 공학적 요소 통합 조회
+export const getBurnDownChartAndVelocityChartData = async (projectId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/software-engineering-elements`);
+    console.log(`[API] projectApi.getBurnDownChartAndVelocityChartData 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
+
+
+//////////////////// 개인별 기여도 차트 /////////////////////////
+
+// 개인별 기여도 차트 조회
+export const getIndividualContributionChartData = async (projectId, sprintId) => {
+    const response = await axiosInstance.get(`/projects/${projectId}/sprints/${sprintId}/individual-contribution-chart`);
+    console.log(`[API] projectApi.getIndividualContributionChartData 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 }

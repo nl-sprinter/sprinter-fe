@@ -3,11 +3,16 @@ import PanelBox from '../layouts/PanelBox';
 import PageTitle from '../common/PageTitle';
 import { FiSettings, FiLogOut } from 'react-icons/fi';
 import W1H1Panel from "../panels/W1H1Panel";
+import W1H2Panel from "../panels/W1H2Panel";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getUsersInProject, checkUserIsProjectLeader, goOutUserInProject } from '../../api/projectApi';
 import SmallInfoModal from '../modals/info/SmallInfoModal';
 import SmallFormModal from '../modals/form/SmallFormModal';
+import RouletteGame from '../games/Roulette';
+import DiceGame from '../games/Dice';
+import FreeSpeechContainer from '../containers/FreeSpeechContainer';
+import ProjectProgressContainer from '../containers/ProjectProgressContainer';
 
 const OverviewPage = () => {
     const navigate = useNavigate();
@@ -22,6 +27,8 @@ const OverviewPage = () => {
         message: '',
         type: 'success'
     });
+
+    const [selectedGame, setSelectedGame] = useState('roulette');
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -131,43 +138,46 @@ const OverviewPage = () => {
                     </div>
                 </W1H1Panel>
 
-                <W1H1Panel title="스프린트 현황">
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="text-gray-600">진행중인 스프린트</span>
-                            <span className="font-medium">2개</span>
-                        </div>
-                        <div className="flex justify-between items-center py-2">
-                            <span className="text-gray-600">완료된 스프린트</span>
-                            <span className="font-medium">3개</span>
-                        </div>
-                    </div>
-                </W1H1Panel>
+                <W1H2Panel title="자유 발언대">
+                    <FreeSpeechContainer />
+                </W1H2Panel>
 
-                <W1H1Panel title="백로그 현황">
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="text-gray-600">전체 백로그</span>
-                            <span className="font-medium">15개</span>
+                <W1H2Panel 
+                    title="미니게임" 
+                    headerRight={
+                        <div className="flex gap-1">
+                            <button
+                                onClick={() => setSelectedGame('roulette')}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                                    selectedGame === 'roulette'
+                                        ? 'bg-green-500 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                            >
+                                룰렛
+                            </button>
+                            <button
+                                onClick={() => setSelectedGame('dice')}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                                    selectedGame === 'dice'
+                                        ? 'bg-green-500 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                            >
+                                주사위
+                            </button>
                         </div>
-                        <div className="flex justify-between items-center py-2">
-                            <span className="text-gray-600">완료된 백로그</span>
-                            <span className="font-medium">8개</span>
-                        </div>
-                    </div>
-                </W1H1Panel>
+                    }
+                >
+                    {selectedGame === 'roulette' ? (
+                        <RouletteGame users={users} />
+                    ) : (
+                        <DiceGame />
+                    )}
+                </W1H2Panel>
 
-                <W1H1Panel title="일정 현황">
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span className="text-gray-600">시작일</span>
-                            <span className="font-medium">2024.03.01</span>
-                        </div>
-                        <div className="flex justify-between items-center py-2">
-                            <span className="text-gray-600">종료 예정일</span>
-                            <span className="font-medium">2024.06.30</span>
-                        </div>
-                    </div>
+                <W1H1Panel title="프로젝트 완성도">
+                    <ProjectProgressContainer />
                 </W1H1Panel>
             </PanelBox>
 

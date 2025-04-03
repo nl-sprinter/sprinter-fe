@@ -5,15 +5,15 @@ export const login = async (email, password) => {
         const response = await axiosInstance.post('/auth/login', {
             email,
             password
-        }, {withCredentials: true});
+        }, {
+            withCredentials: true // 로그인 요청에만 withCredentials: true 적용
+        });
         console.log(`[API] authApi.login 호출, data=${Object.keys(response.headers)}`);
 
         const accessToken = response.headers['authorization']?.split(' ')[1];
-        console.log(accessToken);
         if (!accessToken) {
             throw new Error('accessToken 실종');
         }
-        console.log(`accessToken: ${accessToken}`);
         localStorage.setItem('accessToken', accessToken);
 
         // refreshToken은 HttpOnly로 되어있어서 리액트에서 접근불가 -> localStorage에 못넣음
@@ -43,15 +43,31 @@ export const signup = async (email, password, nickname) => {
     }
 };
 
-export const logout = () => { ////////TODO.로그아웃하려면 /logout하면 됨 일단
+export const logout = () => {
     localStorage.removeItem('accessToken');
 };
 
-// export const checkAuth = async () => {
-//     try {
-//         const response = await axiosInstance.get('/auth/check');
-//         return response.data;
-//     } catch (error) {
-//         throw error;
-//     }
-// };
+// 추가
+export const saveAccessTokenAndRefreshTokenFromOAuth2 = async () => {
+    try {
+        const response = await axiosInstance.get('/auth/refresh', {
+            withCredentials: true
+        });
+
+        console.log(`[API] authApi.refresh 호출, headers=${Object.keys(response.headers)}`);
+
+        // 헤더에서 accessToken 추출
+        const accessToken = response.headers['authorization']?.split(' ')[1];
+        if (!accessToken) {
+            throw new Error('accessToken 실종');
+        }
+        localStorage.setItem('accessToken', accessToken);
+
+        // refreshToken은 HttpOnly 쿠키로 자동 처리됨
+
+        return response;
+    } catch (error) {
+        console.error('리프레시 토큰 요청 실패:', error);
+        throw error;
+    }
+};

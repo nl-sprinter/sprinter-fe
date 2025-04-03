@@ -9,7 +9,6 @@ export const useUserProjectStore = create((set) => ({
 
     // 프로젝트 목록 가져오기
     fetchProjects: async () => {
-        console.log('useUserProjectStore.fetchProjects 호출');
         set({ isLoading: true, error: null });
         try {
             const projects = await getUserProjects();

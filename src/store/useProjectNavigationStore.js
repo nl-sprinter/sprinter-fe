@@ -12,7 +12,6 @@ export const useProjectNavigationStore = create((set, get) => ({
     isSprintOpen: false,
 
     setProjectId: async (projectId) => {
-        console.log(`projectId가 ${projectId}로 변경되었습니다.`);
         try {
             // projectId 설정과 동시에 해당 프로젝트의 스프린트 목록을 가져옴
             const sprintList = await getSprintList(projectId);

@@ -56,7 +56,7 @@ const SignUpPage = () => {
         if (!validateForm()) return;
 
         try {
-            const response = await signup(
+            await signup(
                 formData.email,
                 formData.password,
                 formData.nickname
@@ -97,7 +97,7 @@ const SignUpPage = () => {
 
     return (
         <MainLayout>
-            <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-blue-900 overflow-hidden">
+            <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-white to-[#3F5F8F] overflow-hidden">
                 <form onSubmit={handleSubmit} className="w-full max-w-[400px] p-10 bg-white rounded-xl shadow-md flex flex-col gap-5 mx-5">
                     <h1 className="text-2xl font-bold text-center mb-6">
                         회원가입

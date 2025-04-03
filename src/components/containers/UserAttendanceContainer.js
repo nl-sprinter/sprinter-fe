@@ -19,11 +19,28 @@ const UserAttendanceContainer = ({
 }) => {
     const [isUserListModalOpen, setIsUserListModalOpen] = useState(false);
     const [hoveredUserId, setHoveredUserId] = useState(null);
+    
 
     // 선택 가능한 유저 목록 (이미 선택된 유저 제외)
     const availableUsers = allUsers.filter(
         user => !attendedUsers.some(u => u.userId === user.userId)
     );
+    
+    const openUserListModal = () => {
+        setIsUserListModalOpen(true);
+    };
+    
+    const closeUserListModal = () => {
+        console.log(`UserAttendanceContainer.closeUserListModal 호출`);
+        setIsUserListModalOpen(false);
+    };
+    
+    // 직접 사용자를 선택하는 함수
+    const selectUser = (user) => {
+        console.log(`UserAttendanceContainer.selectUser = ${user.userId}`);
+        onUserToggle && onUserToggle(user);
+        closeUserListModal();
+    };
 
     return (
         <div className="bg-gray-50 p-3 rounded-lg h-[100px]">
@@ -31,7 +48,7 @@ const UserAttendanceContainer = ({
                 <h3 className="text-lg font-medium">{title}</h3>
                 <button 
                     className="p-1.5 text-green-600 hover:bg-green-50 rounded-full transition-colors"
-                    onClick={() => setIsUserListModalOpen(true)}
+                    onClick={openUserListModal}
                 >
                     <FiPlus size={18}/>
                 </button>
@@ -73,27 +90,27 @@ const UserAttendanceContainer = ({
             </div>
 
             {/* 유저 선택 모달 */}
-            <SmallListModal
-                isOpen={isUserListModalOpen}
-                onClose={() => setIsUserListModalOpen(false)}
-                title='팀원 선택'
-                items={availableUsers}
-                onItemSelect={(user) => {
-                    onUserToggle && onUserToggle(user);
-                }}
-                renderItem={(user, onClick) => (
-                    <div 
-                        key={user.userId}
-                        className="flex items-center gap-3 p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
-                        onClick={() => onClick(user)}
-                    >
-                        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-medium">
-                            {user.nickname.charAt(0).toUpperCase()}
+            <div className="relative z-[1200]">
+                <SmallListModal
+                    isOpen={isUserListModalOpen}
+                    onClose={closeUserListModal}
+                    title='팀원 선택'
+                    items={availableUsers}
+                    onItemSelect={selectUser}
+                    renderItem={(user, onClick) => (
+                        <div 
+                            key={user.userId}
+                            className="flex items-center gap-3 p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                            onClick={() => onClick(user)}
+                        >
+                            <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-medium">
+                                {user.nickname.charAt(0).toUpperCase()}
+                            </div>
+                            <span>{user.nickname}</span>
                         </div>
-                        <span>{user.nickname}</span>
-                    </div>
-                )}
-            />
+                    )}
+                />
+            </div>
         </div>
     );
 };

@@ -1,9 +1,9 @@
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import PrivateRoute from '../components/auth/PrivateRoute';
 import PublicRoute from '../components/auth/PublicRoute';
-import ProjectLeaderRoute from './ProjectLeaderRoute';
+import ProjectLeaderRoute from '../components/auth/ProjectLeaderRoute';
 import NotFoundPage from '../components/pages/NotFoundPage';
-
+import AdminRoute from '../components/auth/AdminRoute';
 
 // 로그인 전 페이지
 import LandingPage from '../components/pages/LandingPage';
@@ -15,6 +15,7 @@ import AccountPage from '../components/pages/AccountPage';
 import HomePage from '../components/pages/HomePage';
 import StartingFormPage from '../components/pages/StartingFormPage';
 import BacklogConfirmPage from '../components/pages/BacklogConfirmPage';
+
 
 // 프로젝트 내부 페이지
 // 오버뷰
@@ -28,9 +29,15 @@ import SprintSettingsPage from '../components/pages/SprintSettingsPage';
 // 캘린더
 import CalendarPage from '../components/pages/CalendarPage';
 import ProjectSettingsPage from '../components/pages/ProjectSettingsPage';
+// 검색
+import SearchPage from '../components/pages/SearchPage';
 
 // 로그아웃
 import Logout from "../components/auth/Logout";
+
+// 관리자 페이지
+import AdminPage from '../components/pages/AdminPage';
+import OAuth2RedirectHandler from "../components/auth/OAuth2RedirectHandler";
 
 const AppRoutes = () => {
     return (
@@ -135,10 +142,38 @@ const AppRoutes = () => {
                     </PrivateRoute>
                 }/>
 
+                {/* 백로그 모달을 위한 라우트 */}
+                <Route path="/projects/:projectId/sprints/:sprintId/backlogs/:backlogId" element={
+                    <PrivateRoute>
+                        <SprintEachPage showSidebar/>
+                    </PrivateRoute>
+                }/>
+
+                {/* 데일리 스크럼 모달을 위한 라우트 */}
+                <Route path="/projects/:projectId/sprints/:sprintId/dailyscrums/:dailyScrumId" element={
+                    <PrivateRoute>
+                        <SprintEachPage showSidebar/>
+                    </PrivateRoute>
+                }/>
+
                 {/* 캘린더 */}
                 <Route path="/projects/:projectId/calendar" element={
                     <PrivateRoute>
                         <CalendarPage showSidebar/>
+                    </PrivateRoute>
+                }/>
+
+                {/* 캘린더 스케줄 모달을 위한 라우트 */}
+                <Route path="/projects/:projectId/calendar/schedule/:scheduleId" element={
+                    <PrivateRoute>
+                        <CalendarPage showSidebar/>
+                    </PrivateRoute>
+                }/>
+
+                {/* 검색 */}
+                <Route path="/projects/:projectId/search" element={
+                    <PrivateRoute>
+                        <SearchPage showSidebar/>
                     </PrivateRoute>
                 }/>
 
@@ -148,6 +183,22 @@ const AppRoutes = () => {
                         <Logout/>
                     </PrivateRoute>
                 }/>
+
+
+                {/* 관리자 페이지 */}
+                <Route path="/admin/userlist" element={
+                    <AdminRoute>
+                        <AdminPage/>
+                    </AdminRoute>
+                }/>
+
+                {/* oauth2 로그인 후 리다이렉트 핸들러 */}
+                <Route path="/refresh" element={
+                    <PublicRoute>
+                        <OAuth2RedirectHandler />
+                    </PublicRoute>
+                }/>
+
 
 
                 {/* // 404 페이지 - 항상 마지막에 위치해야 함 */}

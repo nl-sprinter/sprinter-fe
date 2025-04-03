@@ -7,7 +7,7 @@ import ProductBacklogModal from '../modals/ProductBacklogModal';
 import SideScrollablePanelBox from '../layouts/SideScrollablePanelBox';
 import PageTitle from '../common/PageTitle';
 import BacklogCard from '../common/BacklogCard';
-import W1H2Panel from '../panels/W1H2Panel';
+import W1H2PanelForProductBacklog from '../panels/W1H2PanelForProductBacklog';
 
 const ProductBacklogPage = () => {
     const { projectId } = useParams();
@@ -29,17 +29,6 @@ const ProductBacklogPage = () => {
         fetchBacklogs();
     }, [projectId]);
 
-    const groupedBacklogs = backlogs.reduce((acc, backlog) => {
-        const sprintOrder = backlog.sprintOrder;
-        if (!acc[sprintOrder]) {
-            acc[sprintOrder] = {
-                sprintName: backlog.sprintName,
-                backlogs: []
-            };
-        }
-        acc[sprintOrder].backlogs.push(backlog);
-        return acc;
-    }, {});
 
     const handleBacklogClick = (backlog) => {
         setSelectedBacklog(backlog);
@@ -56,9 +45,9 @@ const ProductBacklogPage = () => {
                         const sprintBacklogs = backlogs.filter(backlog => backlog.sprintOrder === sprint.sprintOrder);
                         
                         return (
-                            <W1H2Panel
+                            <W1H2PanelForProductBacklog
                                 key={sprint.sprintId}
-                                title={`Sprint ${sprint.sprintOrder} - ${sprint.sprintName}`}
+                                title={`Sprint ${sprint.sprintOrder}`}
                             >
                                 <div className="space-y-3">
                                     {sprintBacklogs.length > 0 ? (
@@ -69,6 +58,7 @@ const ProductBacklogPage = () => {
                                                 sprintOrder={backlog.sprintOrder}
                                                 backlogName={backlog.title}
                                                 weight={backlog.weight}
+                                                completeRate={backlog.completeRate}
                                                 isFinished={backlog.isFinished}
                                                 onClick={() => handleBacklogClick(backlog)}
                                             />
@@ -79,7 +69,7 @@ const ProductBacklogPage = () => {
                                         </div>
                                     )}
                                 </div>
-                            </W1H2Panel>
+                            </W1H2PanelForProductBacklog>
                         );
                     })}
 
