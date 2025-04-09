@@ -14,7 +14,7 @@ export const setErrorHandler = (callback) => {
 
 // axios 기본 설정
 const axiosInstance = axios.create({
-    baseURL: '/api/v1', // axios 할 때 기본 URL을 여기서 설정 // TODO
+    baseURL: 'api/v1', // axios 할 때 기본 URL을 여기서 설정 // TODO
     headers: {
         'Content-Type': 'application/json',
     }

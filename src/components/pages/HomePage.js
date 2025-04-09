@@ -62,7 +62,7 @@ const HomePage = () => {
                 <div className="flex flex-wrap gap-4">
                     <div 
                         className="w-64 h-64 bg-gray-100 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors"
-                        onClick={() => navigate('/startingform')}
+                        onClick={() => navigate('/startingselect')}
                     >
                         <div className="w-16 h-16 bg-gray-300 rounded-lg flex items-center justify-center mb-4">
                             <FiPlus className="text-4xl text-gray-600" />

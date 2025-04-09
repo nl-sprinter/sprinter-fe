@@ -16,7 +16,6 @@ import HomePage from '../components/pages/HomePage';
 import StartingFormPage from '../components/pages/StartingFormPage';
 import BacklogConfirmPage from '../components/pages/BacklogConfirmPage';
 
-
 // 프로젝트 내부 페이지
 // 오버뷰
 import OverviewPage from '../components/pages/OverviewPage';
@@ -38,6 +37,9 @@ import Logout from "../components/auth/Logout";
 // 관리자 페이지
 import AdminPage from '../components/pages/AdminPage';
 import OAuth2RedirectHandler from "../components/auth/OAuth2RedirectHandler";
+
+import StartingSelectPage from '../components/pages/StartingSelectPage';
+import SimpleStartingFormPage from '../components/pages/SimpleStartingFormPage';
 
 const AppRoutes = () => {
     return (
@@ -74,10 +76,24 @@ const AppRoutes = () => {
                     </PrivateRoute>
                 }/>
 
+                {/* 프로젝트 시작 선택 페이지 */}
+                <Route path="/startingselect" element={
+                    <PrivateRoute>
+                        <StartingSelectPage/>
+                    </PrivateRoute>
+                }/>
+
                 {/* 프로젝트 시작 페이지 */}
                 <Route path="/startingform" element={
                     <PrivateRoute>
                         <StartingFormPage/>
+                    </PrivateRoute>
+                }/>
+
+                {/* 간단한 프로젝트 시작 페이지 */}
+                <Route path="/simplestartingform" element={
+                    <PrivateRoute>
+                        <SimpleStartingFormPage/>
                     </PrivateRoute>
                 }/>
 
