@@ -1,14 +1,24 @@
 import MainLayout from '../layouts/MainLayout';
 import { useNavigate } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
+import { createProjectWithoutAi } from "../../api/projectApi";
 
 const SimpleStartingFormPage = () => {
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        // TODO: API 연결
-        navigate('/home');
+        try {
+            const formData = new FormData(event.target);
+            const projectName = formData.get('projectName');
+            const sprintPeriod = formData.get('sprintPeriod');
+
+            await createProjectWithoutAi(projectName, sprintPeriod);
+            navigate('/home');
+        } catch (error) {
+            console.error('프로젝트 생성 중 오류 발생:', error);
+            alert('프로젝트 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
     };
 
     return (
@@ -41,12 +51,13 @@ const SimpleStartingFormPage = () => {
                     </div>
                     <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            스프린트 주기
+                            스프린트 주기 (단위: 일)
                         </label>
                         <input
-                            type="text"
-                            name="sprintCycle"
+                            type="number"
+                            name="sprintPeriod"
                             required
+                            min="1"
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                             placeholder="스프린트 주기를 입력하세요"
                         />

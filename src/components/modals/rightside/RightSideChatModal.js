@@ -25,7 +25,7 @@ const RightSideChatModal = ({open, onClose}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [connectionError, setConnectionError] = useState(null);
-    const [showReconnectModal, setShowReconnectModal] = useState(false);
+    const [isConnecting, setIsConnecting] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [hasMoreMessages, setHasMoreMessages] = useState(true);
     
@@ -145,91 +145,93 @@ const RightSideChatModal = ({open, onClose}) => {
             return;
         }
         setConnectionError(null);
+        setIsConnecting(true);
 
-        // 기존 구독 정리
-        if (subscription.current) {
+        return new Promise((resolve, reject) => {
+            // 기존 구독 정리
+            if (subscription.current) {
+                try {
+                    subscription.current.unsubscribe();
+                    subscription.current = null;
+                } catch (error) {
+                    console.error('RightSideChatModal.connectWebSocket 에러: 구독 해제 안됨.', error);
+                }
+            }
+
+            if (stompClient.current?.connected) {
+                try {
+                    stompClient.current.deactivate();
+                    stompClient.current = null;
+                } catch (error) {
+                    console.error('RightSideChatModal.connectWebSocket 에러: STOMP 비활성화 안됨.', error);
+                }
+            }
+
             try {
-                subscription.current.unsubscribe();
-                subscription.current = null;
-            } catch (error) {
-                console.error('RightSideChatModal.connectWebSocket 에러: 구독 해제 안됨.', error);
-            }
-        }
+                const socketUrl = getChatWebSocketEndpoint();
+                socketRef.current = new SockJS(socketUrl);
 
-        if (stompClient.current?.connected) {
-            try {
-                stompClient.current.deactivate();
-                stompClient.current = null;
-            } catch (error) {
-                console.error('RightSideChatModal.connectWebSocket 에러: STOMP 비활성화 안됨.', error);
-            }
-        }
+                const headers = {};
+                const token = localStorage.getItem('accessToken');
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
 
-        try {
-            const socketUrl = getChatWebSocketEndpoint();
-            // 소켓 생성 (헤더 추가)
-            socketRef.current = new SockJS(socketUrl);
-
-            // STOMP 헤더에 인증 토큰 추가
-            const headers = {};
-            const token = localStorage.getItem('accessToken');
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-
-            // STOMP 클라이언트 생성
-            stompClient.current = new Client({
-                webSocketFactory: () => socketRef.current,
-                connectHeaders: headers,
-                reconnectDelay: 5000,
-                heartbeatIncoming: 4000,
-                heartbeatOutgoing: 4000
-            });
-
-            // 연결 이벤트 핸들러
-            stompClient.current.onConnect = () => {
-                // 채팅방 구독
-                const topic = getChatSubscriptionTopic(selectedProject.projectId);
-                subscription.current = stompClient.current.subscribe(topic, (message) => {
-                    try {
-                        const msg = JSON.parse(message.body);
-                        // 새 메시지는 항상 가장 마지막에 추가 (시간순 유지)
-                        setMessages(prev => [...prev, msg]);
-                    } catch (error) {
-                        console.error('RightSideChatModal.connectWebSocket 에러: 메세지 파싱 에러', error);
-                    }
+                stompClient.current = new Client({
+                    webSocketFactory: () => socketRef.current,
+                    connectHeaders: headers,
+                    reconnectDelay: 5000,
+                    heartbeatIncoming: 4000,
+                    heartbeatOutgoing: 4000
                 });
-            };
 
-            // 오류 이벤트 핸들러
-            stompClient.current.onStompError = (frame) => {
-                console.error('RightSideChatModal.connectWebSocket 에러: STOMP 에러, ', frame);
-                setConnectionError(`STOMP 오류: ${frame.headers.message}`);
-            };
+                stompClient.current.onConnect = () => {
+                    const topic = getChatSubscriptionTopic(selectedProject.projectId);
+                    subscription.current = stompClient.current.subscribe(topic, (message) => {
+                        try {
+                            const msg = JSON.parse(message.body);
+                            setMessages(prev => [...prev, msg]);
+                        } catch (error) {
+                            console.error('RightSideChatModal.connectWebSocket 에러: 메세지 파싱 에러', error);
+                        }
+                    });
+                    setIsConnecting(false);
+                    resolve();
+                };
 
-            stompClient.current.onWebSocketError = (error) => {
-                console.error('RightSideChatModal.connectWebSocket 에러: 웹 소켓 에러, ', error);
-                setConnectionError('웹소켓 연결 실패');
-            };
+                stompClient.current.onStompError = (frame) => {
+                    console.error('RightSideChatModal.connectWebSocket 에러: STOMP 에러, ', frame);
+                    setConnectionError(`STOMP 오류: ${frame.headers.message}`);
+                    setIsConnecting(false);
+                    reject(new Error(frame.headers.message));
+                };
 
-            // 연결 시작
-            stompClient.current.activate();
+                stompClient.current.onWebSocketError = (error) => {
+                    console.error('RightSideChatModal.connectWebSocket 에러: 웹 소켓 에러, ', error);
+                    setConnectionError('웹소켓 연결 실패');
+                    setIsConnecting(false);
+                    reject(error);
+                };
 
-        } catch (error) {
-            console.error('RightSideChatModal.connectWebSocket 에러: 연결 초기화 에러', error);
-            setConnectionError(`초기화 에러: ${error.message}`);
-        }
+                stompClient.current.activate();
+
+            } catch (error) {
+                console.error('RightSideChatModal.connectWebSocket 에러: 연결 초기화 에러', error);
+                setConnectionError(`초기화 에러: ${error.message}`);
+                setIsConnecting(false);
+                reject(error);
+            }
+        });
     }, [selectedProject, user]);
 
     // 모달 열릴 때와 프로젝트/사용자 변경 시 연결
     useEffect(() => {
         if (open && selectedProject && user) {
-            connectWebSocket();
+            connectWebSocket().catch(error => {
+                console.error('채팅 연결 실패:', error);
+            });
 
-            // 모달 닫힐 때 정리
             return () => {
-                if (open) return;
-
                 if (subscription.current) {
                     try {
                         subscription.current.unsubscribe();
@@ -249,7 +251,7 @@ const RightSideChatModal = ({open, onClose}) => {
                 }
             };
         }
-    }, [open, connectWebSocket]);
+    }, [open, selectedProject, user, connectWebSocket]);
 
     // 메시지 전송 함수
     const sendMessage = useCallback(() => {
@@ -330,11 +332,9 @@ const RightSideChatModal = ({open, onClose}) => {
     // 재연결 핸들러
     const handleReconnect = () => {
         console.log('RightSideChatModal.handleReconnect');
-        setShowReconnectModal(true);
-        setTimeout(() => {
-            connectWebSocket();
-            setShowReconnectModal(false);
-        }, 1500);
+        connectWebSocket().catch(error => {
+            console.error('채팅 재연결 실패:', error);
+        });
     };
 
     // 초기 로딩 시 스크롤을 맨 아래로 이동
@@ -369,12 +369,13 @@ const RightSideChatModal = ({open, onClose}) => {
                     className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-full transition-colors mr-2"
                     onClick={handleReconnect}
                     title="채팅 서버 재연결"
+                    disabled={isConnecting}
                 >
-                    <FiGlobe size={18}/>
+                    <FiGlobe size={18} className={isConnecting ? 'animate-spin' : ''} />
                 </button>
             }
         >
-            {isLoading && !messages.length ? (
+            {isLoading ? (
                 <div className="flex justify-center items-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
                 </div>
@@ -386,10 +387,17 @@ const RightSideChatModal = ({open, onClose}) => {
                             projects={projects}
                             selectedProject={selectedProject}
                             onSelect={handleProjectSelect}
+                            disabled={isConnecting}
                         />
                     </div>
 
                     {/* 연결 상태 정보 */}
+                    {isConnecting && (
+                        <div className="mb-3 p-2 bg-blue-50 rounded text-xs text-blue-500 flex items-center">
+                            <div className="animate-spin rounded-full h-3 w-3 border border-blue-500 border-t-transparent mr-2"></div>
+                            채팅 서버에 연결 중...
+                        </div>
+                    )}
                     {connectionError && (
                         <div className="mb-3 p-2 bg-red-50 rounded text-xs text-red-500">
                             오류: {connectionError}
@@ -475,15 +483,6 @@ const RightSideChatModal = ({open, onClose}) => {
                 </div>
             )}
         </RightSideModal>
-
-        {/* 재연결 알림 모달 */}
-        <SmallInfoModal
-            isOpen={showReconnectModal}
-            onClose={() => setShowReconnectModal(false)}
-            title="재연결"
-            message="채팅 서버에 재연결합니다."
-            type="success"
-        />
         </>
     );
 };

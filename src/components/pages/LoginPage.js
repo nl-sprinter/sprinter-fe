@@ -66,7 +66,8 @@ const LoginPage = () => {
     };
 
     const handleGoogleLogin = async () => {
-        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+        alert("Google 로그인 기능은 도메인 문제로 현재 지원 중단 되었습니다.")
+        // window.location.href = 'http://localhost:8080/oauth2/authorization/google';
     };
 
     return (

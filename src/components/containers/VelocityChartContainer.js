@@ -84,7 +84,16 @@ const VelocityChartContainer = () => {
     return (
         <div className="w-full h-full flex items-center justify-center p-2">
             <div style={{ width: '100%', height: '250px' }}>
-                {chartData && <Bar data={chartData} options={options} />}
+                {chartData ? (
+                    <Bar data={chartData} options={options} />
+                ) : (
+                    <div className="flex items-center justify-center h-full">
+                        <p className="text-gray-500 text-center">
+                            스프린트 데이터가 없습니다.<br/>
+                            <span className="text-sm">스프린트가 시작되면 Velocity 차트가 표시됩니다.</span>
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     );

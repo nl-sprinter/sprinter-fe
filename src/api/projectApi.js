@@ -17,9 +17,20 @@ export const createProject = async (data) => {
     };
 
     const response = await axiosInstance.post('/projects/create', requestBody);
-    console.log(`[API] projectApi.getSprintList 호출, data=${JSON.stringify(response.data)}`);
+    console.log(`[API] projectApi.createProject 호출, data=${JSON.stringify(response.data)}`);
     return response.data;
 };
+
+export const createProjectWithoutAi = async (projectName, sprintPeriod) => {
+    const requestBody = {
+        projectName: projectName,
+        sprintPeriod: parseInt(sprintPeriod, 10),
+    };
+
+    const response = await axiosInstance.post('/projects/create/without-ai', requestBody);
+    console.log(`[API] projectApi.createProjectWithoutAi 호출, data=${JSON.stringify(response.data)}`);
+    return response.data;
+}
 
 
 

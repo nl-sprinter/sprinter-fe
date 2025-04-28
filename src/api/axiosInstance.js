@@ -14,11 +14,7 @@ export const setErrorHandler = (callback) => {
 
 // axios 기본 설정
 const axiosInstance = axios.create({
-    /**
-     * 개발용 baseURL: '/api/v1'
-     * 배포용 baseURL: 'http://localhost:8080/api/v1'
-     */
-    baseURL: '/api/v1', // axios 할 때 기본 URL을 여기서 설정 // TODO
+    baseURL: process.env.REACT_APP_API_BASE_URL || '/api/v1',
     headers: {
         'Content-Type': 'application/json',
     }

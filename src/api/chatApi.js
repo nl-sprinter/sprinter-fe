@@ -35,8 +35,7 @@ import axiosInstance from './axiosInstance';
 // WebSocket 엔드포인트 URL 반환
 export const getChatWebSocketEndpoint = () => {
     console.log('[API] chatApi.getChatWebSocketEndpoint 호출');
-    const endpoint = `/api/v1/chat/ws`; // TODO 로컬용: http://localhost:8080/api/v1/chat/ws
-    return endpoint;
+    return process.env.REACT_APP_WS_BASE_URL || '/api/v1/chat/ws';
 };
 
 // 프로젝트 채팅방의 모든 메시지 조회
