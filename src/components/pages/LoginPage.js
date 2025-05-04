@@ -67,7 +67,7 @@ const LoginPage = () => {
 
     const handleGoogleLogin = async () => {
         // alert("Google 로그인 기능은 도메인 문제로 현재 지원 중단 되었습니다.")
-        window.location.href = 'https://sprinter.kr/oauth2/authorization/google';
+        window.location.href = 'https://sprinter.kr/api/oauth2/authorization/google';
         // local: localhost:8080
     };
 
